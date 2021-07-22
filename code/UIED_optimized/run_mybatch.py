@@ -5,7 +5,7 @@ import glob
 import detect_text_east.ocr_east as ocr
 import detect_text_east.lib_east.eval as eval
 import detect_compo.ip_region_proposal as ip
-import merge
+import merge_optimized
 from cnn.CNN import CNN
 
 def resize_height_by_longest_edge(img_path, resize_length=800):
@@ -46,7 +46,7 @@ def run_single(input_path_img, output_dir, models):
         name = input_path_img.split('/')[-1][:-4]
         compo_path = pjoin(output_dir, 'ip', str(name) + '.json')
         ocr_path = pjoin(output_dir, 'ocr', str(name) + '.json')
-        merge.incorporate(input_path_img, compo_path, ocr_path, output_dir, params=key_params,
+        merge_optimized.incorporate(input_path_img, compo_path, ocr_path, output_dir, params=key_params,
                           resize_by_height=resized_height, show=False)
 
 
@@ -86,6 +86,6 @@ if __name__ == '__main__':
     is_merge = True
 
     usage_root_dir = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples'
-    output_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output'
+    output_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized'
 
     run_batch(usage_root_dir, output_root_dir)
