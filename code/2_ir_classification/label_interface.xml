@@ -1,22 +1,124 @@
 <View>
   <Image name="screen" value="$screen"/>
-  <Labels name="tag_screen" toName="screen">
-    <Label value="about" background="#FFC069"/>
-    <Label value="account" background="#AD8B00"/>
-    <Label value="account_guest" background="#D3F261"/>
-    <Label value="address_add" background="#389E0D"/>
-    <Label value="address_edit" background="#5CDBD3"/>
-    <Label value="cart" background="#096DD9"/>
-    <Label value="cart_add" background="#ADC6FF"/>
-  </Labels>
+  <Choices name="tag_screen" toName="screen">
+    <Choice value="about" background="#FFC069"/>
+    <Choice value="account" background="#AD8B00"/>
+    <Choice value="account_guest" background="#D3F261"/>
+    <Choice value="address_add" background="#389E0D"/>
+    <Choice value="address_edit" background="#5CDBD3"/>
+    <Choice value="shopping_cart" background="#096DD9"/>
+    <Choice value="cart_quantity" background="#ADC6FF"/>
+    <Choice value="cart_remove"/>
+    <Choice value="category"/>
+    <Choice value="city_spinner"/>
+    <Choice value="contact"/>
+    <Choice value="filter_option"/>
+    <Choice value="filter_sort"/>
+    <Choice value="get_started"/>
+    <Choice value="help"/>
+    <Choice value="home"/>
+    <Choice value="item_detail"/>
+    <Choice value="items"/>
+    <Choice value="menu"/>
+    <Choice value="profile_edit"/>
+    <Choice value="search"/>
+    <Choice value="setting"/>
+    <Choice value="sign_in"/>
+    <Choice value="sign_in_option"/>
+    <Choice value="sign_in_or_sign_up"/>
+    <Choice value="sign_in_pwd"/>
+    <Choice value="sign_in_username"/>
+    <Choice value="sign_up"/>
+    <Choice value="sign_up_birthday"/>
+    <Choice value="sign_up_gmail"/>
+    <Choice value="sign_up_option"/>
+    <Choice value="sign_up_pwd"/>
+    <Choice value="sign_up_username"/>
+    <Choice value="skip"/>
+    <Choice value="state_spinner"/>
+    <Choice value="terms"/>
+    <Choice value="bookmark"/>
+    <Choice value="text_size"/>
+  </Choices>
   <Image name="widget" value="$widget"/>
-  <Labels name="tag_widget" toName="widget">
-    <Label value="about" background="#9254DE"/>
-    <Label value="account" background="#F759AB"/>
-    <Label value="account_guest" background="#FFA39E"/>
-    <Label value="address_add" background="#D4380D"/>
-    <Label value="address_edit" background="#FFC069"/>
-    <Label value="cart" background="#AD8B00"/>
-    <Label value="cart_add" background="#D3F261"/>
-  </Labels>
+  <Choices name="tag_widget" toName="widget">
+    <Choice value="about" background="#9254DE"/>
+    <Choice value="account_address" background="#F759AB"/>
+    <Choice value="account_signin" background="#FFA39E"/>
+    <Choice value="add_cart" background="#D4380D"/>
+    <Choice value="address_add" background="#FFC069"/>
+    <Choice value="address_city" background="#AD8B00"/>
+    <Choice value="address_phone" background="#D3F261"/>
+    <Choice value="address_save"/>
+    <Choice value="address_state"/>
+    <Choice value="address_state_spinner"/>
+    <Choice value="address_street"/>
+    <Choice value="address_zip"/>
+    <Choice value="back"/>
+    <Choice value="bypass"/>
+    <Choice value="cart"/>
+    <Choice value="cart_quantity"/>
+    <Choice value="cart_quantity_0"/>
+    <Choice value="cart_remove"/>
+    <Choice value="cart_remove_confirm"/>
+    <Choice value="cart_select_all"/>
+    <Choice value="cat_1"/>
+    <Choice value="category"/>
+    <Choice value="contact"/>
+    <Choice value="contact_name"/>
+    <Choice value="filter"/>
+    <Choice value="filter_color"/>
+    <Choice value="filter_done"/>
+    <Choice value="filter_price"/>
+    <Choice value="filter_rating"/>
+    <Choice value="filter_sort"/>
+    <Choice value="get_started"/>
+    <Choice value="help"/>
+    <Choice value="home_signin"/>
+    <Choice value="home_signin_or_signup"/>
+    <Choice value="home_signup"/>
+    <Choice value="item_1"/>
+    <Choice value="legal"/>
+    <Choice value="menu"/>
+    <Choice value="menu_account"/>
+    <Choice value="menu_more"/>
+    <Choice value="menu_settings"/>
+    <Choice value="menu_signin"/>
+    <Choice value="minus"/>
+    <Choice value="perms_allow"/>
+    <Choice value="search"/>
+    <Choice value="search_bar"/>
+    <Choice value="sign_in"/>
+    <Choice value="sign_up"/>
+    <Choice value="signin_continue"/>
+    <Choice value="signin_email"/>
+    <Choice value="signin_email_or_phone"/>
+    <Choice value="signin_forget_pwd"/>
+    <Choice value="signin_password"/>
+    <Choice value="signin_tosignin"/>
+    <Choice value="signin_tosignup"/>
+    <Choice value="signin_username"/>
+    <Choice value="signin_username_or_email"/>
+    <Choice value="signup_business"/>
+    <Choice value="signup_confirm_email"/>
+    <Choice value="signup_confirm_password"/>
+    <Choice value="signup_continue"/>
+    <Choice value="signup_email"/>
+    <Choice value="signup_firstname"/>
+    <Choice value="signup_lastname"/>
+    <Choice value="signup_password"/>
+    <Choice value="signup_personal"/>
+    <Choice value="signup_tosignin"/>
+    <Choice value="signup_tosignup"/>
+    <Choice value="signup_username"/>
+    <Choice value="skip"/>
+    <Choice value="to_home"/>
+    <Choice value="to_search"/>
+    <Choice value="signin_by_email"/>
+    <Choice value="save_bookmark"/>
+    <Choice value="remove_bookmark"/>
+    <Choice value="menu_bookmark"/>
+    <Choice value="menu_textsize"/>
+    <Choice value="change_textsize"/>
+  </Choices>
 </View>
