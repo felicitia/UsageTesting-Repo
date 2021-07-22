@@ -3,5 +3,4 @@ code/.idea/*
 code/binaryClassifier/__pycache__/*
 code/binaryClassifier/sym*
 **/clicked_frames_crop/*
-**/ir_data_test/*
 *.pyc

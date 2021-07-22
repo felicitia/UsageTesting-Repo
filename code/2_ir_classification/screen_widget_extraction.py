@@ -15,7 +15,7 @@ import math
 usage_root_dir = os.path.abspath('../../video_data_examples')
 uied_result_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized/video_data_examples'
 input_dir = 'steps_clean'
-output_dir = 'ir_data_test'
+output_dir = 'ir_data_auto'
 v2s_height = 1920 # screen max height in v2s
 uied_height = 800 # image max height in UIED
 ### end of input parameters
@@ -37,7 +37,7 @@ def extract_screen(step_image_file, app_root_dir):
     shutil.copy(src_file, dst_file)
 
 def extract_widget(step_image_file, app_root_dir, detected_actions_json):
-    # if not 'bbox-0438' in os.path.basename(step_image_file) and not '0928' in os.path.basename(step_image_file):
+    # if not 'bbox-0285' in os.path.basename(step_image_file):
     #     return
     # make sure to name the file with app_root_folder name in the beginning
     filename = os.path.basename(step_image_file).replace('.jpg', '')
@@ -70,10 +70,12 @@ def rm_outer_compo(compo_found):
                 continue
             if space_func.bbox_relation_nms(c1, c2) == 1:  # if c2 is in c1, discard c1 since c2 is a finer compo
                 rm_marks[i] = 1
+                continue
+    inner_compos = []
     for i in range(len(rm_marks)):
-        if rm_marks[i] == 1:
-            del compo_found[i]
-    return compo_found
+        if rm_marks[i] == 0:
+            inner_compos.append(compo_found[i])
+    return inner_compos
 
 def find_cropped_widget(x, y, app_root_dir, filename):
     app_root_name = os.path.basename(os.path.normpath(app_root_dir))
@@ -87,6 +89,8 @@ def find_cropped_widget(x, y, app_root_dir, filename):
             if space_func.is_point_inside(x, y, compo['row_min'], compo['row_max'], compo['column_min'], compo['column_max']):
                 # print(compo['class'], compo['clip_path'])
                 compo_found.append(compo)
+    # for compo in compo_found:
+    #     print(compo['clip_path'])
     if len(compo_found) == 0:
         return None
     elif len(compo_found) == 1:
