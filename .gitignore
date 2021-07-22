@@ -4,3 +4,4 @@ code/binaryClassifier/__pycache__/*
 code/binaryClassifier/sym*
 **/clicked_frames_crop/*
 *.pyc
+**/sym*/*
