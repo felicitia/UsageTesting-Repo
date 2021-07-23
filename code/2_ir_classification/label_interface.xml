@@ -1,6 +1,7 @@
 <View>
-  <Image name="screen" value="$screen"/>
-  <Choices name="tag_screen" toName="screen">
+  <Image name="screen" value="$screen" width="40%"/>
+  <Filter name="screen_filter" toName="tag_screen" minlength="1" placeholder="ex. sign_in"/>
+  <Choices name="tag_screen" toName="screen" showInline="true">
     <Choice value="about" background="#FFC069"/>
     <Choice value="account" background="#AD8B00"/>
     <Choice value="account_guest" background="#D3F261"/>
@@ -40,8 +41,9 @@
     <Choice value="bookmark"/>
     <Choice value="text_size"/>
   </Choices>
-  <Image name="widget" value="$widget"/>
-  <Choices name="tag_widget" toName="widget">
+  <Image name="widget" value="$widget" width="40%"/>
+  <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
+  <Choices name="tag_widget" toName="widget" showInline="true">
     <Choice value="about" background="#9254DE"/>
     <Choice value="account_address" background="#F759AB"/>
     <Choice value="account_signin" background="#FFA39E"/>
