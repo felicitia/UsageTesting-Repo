@@ -126,5 +126,6 @@
     <Choice value="change_textsize"/>
     <Choice value="keep_signin"/>
     <Choice value="multi_form"/>
+    <Choice value="signin_amazon"/>
   </Choices>
 </View>
