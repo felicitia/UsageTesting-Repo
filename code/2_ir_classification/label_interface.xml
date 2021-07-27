@@ -40,6 +40,8 @@
     <Choice value="terms"/>
     <Choice value="bookmark"/>
     <Choice value="text_size"/>
+    <Choice value="signin_amazon"/>
+    
   </Choices>
   <Image name="widget" value="$widget" width="40%"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
