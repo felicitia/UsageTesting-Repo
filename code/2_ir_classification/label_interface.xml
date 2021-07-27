@@ -122,5 +122,7 @@
     <Choice value="menu_bookmark"/>
     <Choice value="menu_textsize"/>
     <Choice value="change_textsize"/>
+    <Choice value="keep_signin"/>
+    <Choice value="multi_form"/>
   </Choices>
 </View>
