@@ -79,3 +79,4 @@ menu_textsize,go to text size page,
 change_textsize,apply textsize changes,
 keep_signin,keep the user logged in (e.g. a checkbox),
 multi_form,form to fill with multiple fields,input
+signin_amazon,go to the page to sign in with Amazon account,
