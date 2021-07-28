@@ -1,3 +1,16 @@
+## Running for a usage
+1. `root_usage_dir` should point to V2S's results of a usage, e.g., "Combined/SignIn/"
+2. run `1_step_extraction/step_extraction.py` to generate `clicked_frames` folder
+3. go to `binaryClassifier` and follow README to generate final `typing_result.csv`
+4. run `1_step_extraction/step_cleaning.py` to generate `steps_clean` folder
+5. run `1_step_extraction/special_step_recognition.py` to append special actions in `steps_clean` folder
+6. run `2_ir_classification/screen_widget_extraction.py` (comment out extract_widget function) to generate `ir_data_auto` folder with screens only
+7. get UIED results (run UIED v2.3's `run_mybatch.py`)
+8. run `2_ir_classification/screen_widget_extraction.py` (comment out extract_screen function) to add widget crops to `ir_data_auto` folder
+
+## Setting up LS
+
+
 ## Running UIED v2.3
 1. `ImportError: No module named 'detect_text_east.lib_east.lanms.adaptor’` — check this [thread](https://github.com/argman/EAST/issues/174). Replace the Makefile in `/detect_text_east/lib_east/lanms` and go to that directory to run `make` command.
 
