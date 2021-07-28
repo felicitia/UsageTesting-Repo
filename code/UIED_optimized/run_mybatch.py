@@ -18,7 +18,11 @@ def resize_height_by_longest_edge(img_path, resize_length=800):
 
 def run_single(input_path_img, output_dir, models):
     # input_path_img = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/6pm-video-signin-1/ir_data/bbox-0189-screen.jpg'
-    # output_root = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output/'
+    single_output = os.path.join(output_dir, 'result.jpg')
+    if os.path.exists(single_output):
+        return
+
+    print('running', input_path_img)
 
     resized_height = resize_height_by_longest_edge(input_path_img)
 
@@ -53,8 +57,8 @@ def run_single(input_path_img, output_dir, models):
 def run_batch(usage_root_dir, output_root_dir):
     models = eval.load()
     usage_name = os.path.basename(os.path.normpath(usage_root_dir))
-    for ir_data_dir in glob.glob(usage_root_dir + '/*/ir_data/'):
-        app_root_name = os.path.basename(os.path.normpath(ir_data_dir.replace('ir_data/', '')))
+    for ir_data_dir in glob.glob(usage_root_dir + '/*/ir_data_auto/'):
+        app_root_name = os.path.basename(os.path.normpath(ir_data_dir.replace('ir_data_auto/', '')))
         for img in glob.glob(ir_data_dir + '*-screen.jpg'):
             output_dir = os.path.join(output_root_dir, usage_name, app_root_name, os.path.basename(img).split('.')[0])
             run_single(img, output_dir, models)
@@ -85,7 +89,7 @@ if __name__ == '__main__':
     is_ocr = True
     is_merge = True
 
-    usage_root_dir = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples'
+    usage_root_dir = '/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn'
     output_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized'
 
     run_batch(usage_root_dir, output_root_dir)
