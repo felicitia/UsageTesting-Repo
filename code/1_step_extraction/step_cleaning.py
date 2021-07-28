@@ -7,10 +7,10 @@ import shutil
 import pandas as pd
 
 ### input parameters you need to change ###
-usage_root_dir = os.path.abspath('../../video_data_examples')
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn')
 input_dir = 'clicked_frames'
 output_dir = 'steps_clean'
-typing_result_file = os.path.abspath('../../video_data_examples/typing_result.csv')
+typing_result_file = os.path.join(usage_root_dir, 'typing_result.csv')
 ### end of input parameters
 
 df_typing_result = pd.read_csv(typing_result_file)

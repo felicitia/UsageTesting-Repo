@@ -22,7 +22,7 @@ import csv
 
 '''Update the data_dir to input data location and the model location'''
 
-image_root_dir = os.path.abspath('sym_video_data_examples') # Update the data path. The images needs
+image_root_dir = os.path.abspath('sym_SignIn') # Update the data path. The images needs
 # to be in a subfolder within the location given here.
 output_filename = os.path.join(image_root_dir, 'typing_result.csv')
 

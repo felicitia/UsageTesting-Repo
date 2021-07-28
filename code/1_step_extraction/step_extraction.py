@@ -5,13 +5,13 @@ import shutil, os
 # and put such bbox-xxx files into clicked_frames folder
 
 frame_index = 0 #Index of the frame list
-dir_to_videos = "Spring_data/AddCart/" # directory to v2s data of a particular usage
+usage_root_dir = "/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn/" # directory to v2s data of a particular usage
 
-for folder in os.listdir(dir_to_videos):
-    if os.path.isdir(os.path.join(dir_to_videos, folder)):
-        dir_to_json = dir_to_videos+folder+"/detected_actions.json"
-        dir_to_frames = dir_to_videos+folder+"/detected_frames/"
-        dir_to_new_folder = dir_to_videos+folder+"/clicked_frames/"
+for folder in os.listdir(usage_root_dir):
+    if os.path.isdir(os.path.join(usage_root_dir, folder)):
+        dir_to_json = usage_root_dir + folder + "/detected_actions.json"
+        dir_to_frames = usage_root_dir + folder + "/detected_frames/"
+        dir_to_new_folder = usage_root_dir + folder + "/clicked_frames/"
 
         if not os.path.exists(dir_to_new_folder):
             os.makedirs(dir_to_new_folder)

@@ -5,8 +5,8 @@ import pandas as pd
 import json
 
 ### input parameters you need to change ###
-typing_result_file = os.path.abspath('../../video_data_examples/typing_result.csv') # output file to append 'touch_location' results
-usage_root_dir = os.path.abspath('../../video_data_examples')
+typing_result_file = os.path.abspath('sym_SignIn/typing_result.csv') # output file to append 'touch_location' results
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn')
 KEYBOARD_Y = 1110 # threashold for the keyboard region. Y coordinate where keyboard starts when Y >= KEYBOARD_Y
 frame_index = 0 # Index of the frame list. keep it consistent with the value in the step_extraction.py
 ### end input parameters ###
