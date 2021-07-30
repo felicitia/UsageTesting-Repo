@@ -6,8 +6,8 @@ this script creates symlinks in order to work with
 Label Studio's data import script 
 '''
 
-usage_root_dir = os.path.abspath('../../video_data_examples')
-include_folder = 'ir_data'
+usage_root_dir = os.path.abspath('../../video_data_examples') # change this
+include_folder = 'ir_data_auto'
 
 sym_root_dir = 'sym_' + os.path.basename(usage_root_dir)
 
