@@ -12,8 +12,8 @@ import numpy as np
 import math
 
 ### input parameters you need to change ###
-usage_root_dir = os.path.abspath('../../video_data_examples')
-uied_result_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized/video_data_examples'
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn')
+uied_result_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized/SignIn'
 input_dir = 'steps_clean'
 output_dir = 'ir_data_auto'
 v2s_height = 1920 # screen max height in v2s
@@ -53,7 +53,17 @@ def extract_widget(step_image_file, app_root_dir, detected_actions_json):
     x_uied, y_uied = normalize_coordinates(x_v2s, y_v2s, v2s_height, uied_height)
     compo = find_cropped_widget(x_uied, y_uied, app_root_dir, filename)
     if compo is None:
-        print('the cropped compo is None...')
+        compo_relaxed = find_cropped_widget_relaxed(x_uied, y_uied, app_root_dir, filename, 10) # relax the inside criteria once
+        if compo_relaxed is None:
+            print('relaxed compo is still None..., frame is', filename)
+            print('touch is', x_uied, y_uied)
+            wait = input('waiting to continue...')
+        else:
+            src_file = compo_relaxed['clip_path']
+            dst_file = os.path.join(app_root_dir, output_dir,
+                                    os.path.basename(os.path.normpath(app_root_dir)) + '-' + filename + '-widget.jpg')
+            # print(src_file, dst_file)
+            shutil.copy(src_file, dst_file)
     else:
         src_file = compo['clip_path']
         dst_file = os.path.join(app_root_dir, output_dir,
@@ -76,6 +86,37 @@ def rm_outer_compo(compo_found):
         if rm_marks[i] == 0:
             inner_compos.append(compo_found[i])
     return inner_compos
+
+def find_cropped_widget_relaxed(x, y, app_root_dir, filename, relax_threshold):
+    app_root_name = os.path.basename(os.path.normpath(app_root_dir))
+    screen_UIEDresult_dir = os.path.join(uied_result_root_dir, app_root_name, app_root_name + '-' + filename + '-screen')
+    compo_found = []
+    with open(os.path.join(screen_UIEDresult_dir, 'compo.json'), 'r') as f:
+        compo_json = json.load(f)
+        for compo in compo_json['compos']:
+            if compo['class'] == 'Background':
+                continue
+            if space_func.is_point_inside_relaxed(x, y, compo['row_min'], compo['row_max'], compo['column_min'], compo['column_max'], relax_threshold):
+                # print(compo['class'], compo['clip_path'])
+                compo_found.append(compo)
+    # for compo in compo_found:
+    #     print(compo['clip_path'])
+    if len(compo_found) == 0:
+        return None
+    elif len(compo_found) == 1:
+        return compo_found[0]
+    else: # when there are multiple compos found
+        compo_found = rm_outer_compo(compo_found)
+        distance_min = 2000 # initialized to a max value
+        closest_compo = None
+        for compo in compo_found:
+            mid_x = (compo['column_min'] + compo['column_max']) / 2
+            mid_y = (compo['row_min'] + compo['row_max']) / 2
+            distance = math.hypot(mid_x - x, mid_y - y)
+            if distance < distance_min:
+                distance_min = distance
+                closest_compo = compo
+        return closest_compo
 
 def find_cropped_widget(x, y, app_root_dir, filename):
     app_root_name = os.path.basename(os.path.normpath(app_root_dir))
@@ -133,7 +174,7 @@ def main():
             for step_image_file in os.scandir(step_dir):
                 # print(step_image_file.path) # full abs path
                 if step_image_file.path.endswith('.jpg'):
-                    extract_screen(step_image_file, app_root_dir)
+                    # extract_screen(step_image_file, app_root_dir)
                     extract_widget(step_image_file, app_root_dir, detected_actions_json)
 
 if __name__ == '__main__':

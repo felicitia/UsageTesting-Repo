@@ -1,8 +1,32 @@
 import numpy as np
 
-def is_point_inside(x, y, row_min, row_max, column_min, column_max):
-    if (column_min <= x <= column_max) and (row_min <= y <= row_max):
+def is_point_inside(x, y, row_min, row_max, column_min, column_max): # x, y is float. -1 and +1 to account for float vs int
+    if ((column_min - 1) <= x <= (column_max + 1)) and ((row_min -1) <= y <= (row_max + 1)):
         return True
+    return False
+
+def is_point_inside_relaxed(x, y, row_min, row_max, column_min, column_max, relax_threshold):
+    column_min_relaxed = column_min - relax_threshold
+    column_max_relaxed = column_max + relax_threshold
+    row_min_relaxed = row_min - relax_threshold
+    row_max_relaxed = row_max + relax_threshold
+    if (column_min_relaxed <= x <= column_max_relaxed) and (row_min_relaxed <= y <= row_max_relaxed):
+        print('relaxed true')
+        return True
+    elif (column_min - 1) <= x <= (column_max + 1): # x, y is float. -1 and +1 to account for float vs int
+        if y > row_max:
+            offset = abs(y - row_max)
+        else:
+            offset = abs(y - row_min)
+        if offset <= 40: # 100/1920*800
+            return True
+    elif (row_min - 1) <= y <= (row_max + 1):
+        if x > column_max:
+            offset = abs(x - column_max)
+        else:
+            offset = abs(x - column_min)
+        if offset <= 100:
+            return True
     return False
 
 def get_bbox_points(compo):

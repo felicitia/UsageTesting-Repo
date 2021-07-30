@@ -4,7 +4,7 @@ import json, os
 # and rename the bbox-xxx file
 
 ### input parameters you need to change ###
-usage_root_dir = os.path.abspath("../../video_data_examples") # directory to v2s data of a particular usage
+usage_root_dir = os.path.abspath("/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn") # directory to v2s data of a particular usage
 dir_to_rename = "steps_clean" # will rename the files in this folder to add special cases, such as swipe direction
 ### end of input parameters ###
 
