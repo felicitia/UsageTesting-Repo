@@ -42,7 +42,7 @@
     <Choice value="text_size"/>
     <Choice value="signin_amazon"/>
     <Choice value="pwd_assistant"/>
-    <Choice value="signin_google"/>
+    <Choice value="signin_google_popup"/>
     
   </Choices>
   <Image name="widget" value="$widget" width="40%"/>
