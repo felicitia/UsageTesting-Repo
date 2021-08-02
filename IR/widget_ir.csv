@@ -47,27 +47,21 @@ search,search item and go to the search results,
 search_bar,search bar that takes the input of searching keyword,input
 sign_in,sign in button to submit the inputs,
 sign_up,sign up button to submit the inputs,
-signin_continue,next button during the sign in process,
+continue,next button,
 signin_email,email filed when signing in,input
-signin_email_or_phone,input field for signing in with either email or phone number,input
 signin_forget_pwd,forget password,
 signin_password,password field when signing in,input
 signin_tosignin,jump from sign in dialog to sign in screen based on the chosen sign in method,
 signin_tosignup,jump from sign in screen/dialog to sign up screen based on the chosen sign up method,
 signin_username,username field when signing in,input
-signin_username_or_email,input filed for signing in with either username or email,input
 signup_business,sign up for a business account,
 signup_confirm_email,confirm email input field when signing up,input
 signup_confirm_password,confirm password input field when signing up,input
-signup_continue,continue in the sign up process,
-signup_email,email field when signing up,input
 signup_firstname,first name field when signing up,input
 signup_lastname,last name field when signing up,input
-signup_password,password field when signing up,input
 signup_personal,sign up for a personal account,
 signup_tosignin,jump from sign up to sign in,
 signup_tosignup,jump from sign up screen/dialog to sign up screen based on the chosen sign up method,
-signup_username,username field when signing up such as first name and last name together,input
 skip,skip button,
 to_home,jump to home page,
 to_search,go to search screen,
