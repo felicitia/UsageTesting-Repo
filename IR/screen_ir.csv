@@ -39,3 +39,4 @@ bookmark,the page to show all bookmarked/saved items,
 text_size,the page to adjust textsize,
 signin_amazon,the page to sign in with Amazon account,input
 pwd_assistant,passowrd assistant page,input
+signin_google,the popup screen to sign in with a Google account,
