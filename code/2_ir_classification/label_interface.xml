@@ -96,7 +96,7 @@
     <Choice value="search_bar"/>
     <Choice value="sign_in"/>
     <Choice value="sign_up"/>
-    <Choice value="signin_continue"/>
+    <Choice value="continue"/>
     <Choice value="signin_email"/>
     <Choice value="signup_confirm_email"/>
     <Choice value="signin_forget_pwd"/>
@@ -106,7 +106,6 @@
     <Choice value="signin_username"/>
     <Choice value="signup_business"/>
     <Choice value="signup_confirm_password"/>
-    <Choice value="signup_continue"/>
     <Choice value="signup_firstname"/>
     <Choice value="signup_lastname"/>
     <Choice value="signup_password"/>
