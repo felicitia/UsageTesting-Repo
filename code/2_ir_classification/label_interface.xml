@@ -98,6 +98,7 @@
     <Choice value="sign_up"/>
     <Choice value="signin_continue"/>
     <Choice value="signin_email"/>
+    <Choice value="signup_confirm_email"/>
     <Choice value="signin_forget_pwd"/>
     <Choice value="signin_password"/>
     <Choice value="signin_tosignin"/>
