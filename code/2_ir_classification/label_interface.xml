@@ -41,6 +41,7 @@
     <Choice value="bookmark"/>
     <Choice value="text_size"/>
     <Choice value="signin_amazon"/>
+    <Choice value="signin_google"/>
     
   </Choices>
   <Image name="widget" value="$widget" width="40%"/>
@@ -127,5 +128,7 @@
     <Choice value="keep_signin"/>
     <Choice value="multi_form"/>
     <Choice value="signin_amazon"/>
+    <Choice value="signin_google"/>
+    <Choice value="pick_google_account"/>
   </Choices>
 </View>
