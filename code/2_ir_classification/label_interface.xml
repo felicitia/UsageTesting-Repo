@@ -41,6 +41,7 @@
     <Choice value="bookmark"/>
     <Choice value="text_size"/>
     <Choice value="signin_amazon"/>
+    <Choice value="pwd_assistant"/>
     <Choice value="signin_google"/>
     
   </Choices>
