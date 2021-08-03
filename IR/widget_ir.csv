@@ -6,7 +6,7 @@ add_cart,add item to cart,
 address_add,jump to add new address,
 address_city,city input field or selection,input
 address_phone,phone number input field,input
-address_save,save address,
+save,save button such as save the address,
 address_state,state input field or choose the state,input
 address_state_spinner,open the spinner to select a state,
 address_street,street input field,input
