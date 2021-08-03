@@ -1,22 +1,31 @@
 import pandas as pd
 
-def check_screen(ir_screen, labeled_file):
-    df = pd.read_csv(labeled_file)
-    rows = df.loc[df['tag_screen'] == ir_screen]
-    if len(rows) == 0:
-        print('screen non exist')
-    else:
-        print('screen exist')
+def check_screen(ir_screen, labeled_files):
+    for file in labeled_files:
+        df = pd.read_csv(file)
+        rows = df.loc[df['tag_screen'] == ir_screen]
+        if len(rows) != 0:
+            return True
+    return False
 
-def check_widget(ir_widget, labeled_file):
-    df = pd.read_csv(labeled_file)
-    rows = df.loc[df['tag_widget'] == ir_widget]
-    if len(rows) == 0:
-        print('widget non exist')
-    else:
-        print('widget exist')
+def check_widget(ir_widget, labeled_files):
+    for file in labeled_files:
+        df = pd.read_csv(file)
+        rows = df.loc[df['tag_widget'] == ir_widget]
+        if len(rows) != 0:
+            return True
+    return False
 
 if __name__ == '__main__':
-    labeled_file = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/LS-annotations.csv'
-    check_widget('home', labeled_file)
-    check_screen('home', labeled_file)
+    labeled_files = ['/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/LS-annotations.csv',
+                     '/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/1-SignIn/LS-annotations.csv']
+    screen_to_check = 'home'
+    widget_to_check = 'home'
+    if check_widget(widget_to_check, labeled_files):
+        print('widget: YES')
+    else:
+        print('widget: NO')
+    if check_screen(screen_to_check, labeled_files):
+        print('screen: YES')
+    else:
+        print('screen: NO')
