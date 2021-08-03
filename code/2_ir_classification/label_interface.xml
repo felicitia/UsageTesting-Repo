@@ -44,7 +44,7 @@
     <Choice value="error"/>
     <Choice value="popup"/>
   </Choices>
-  <Image name="widget" value="$widget" width="40%"/>
+  <Image name="widget" value="$widget"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
   <Choices name="tag_widget" toName="widget" showInline="true">
     <Choice value="about" background="#9254DE"/>
