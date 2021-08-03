@@ -31,7 +31,6 @@
     <Choice value="sign_in_username"/>
     <Choice value="sign_up"/>
     <Choice value="sign_up_birthday"/>
-    <Choice value="sign_in_gmail"/>
     <Choice value="skip"/>
     <Choice value="state_spinner"/>
     <Choice value="terms"/>
@@ -40,6 +39,7 @@
     <Choice value="signin_amazon"/>
     <Choice value="pwd_assistant"/>
     <Choice value="signin_google"/>
+    <Choice value="signin_fb"/>
     <Choice value="signin_google_popup"/>
     <Choice value="error"/>
     <Choice value="popup"/>
@@ -63,7 +63,7 @@
     <Choice value="bypass"/>
     <Choice value="cart"/>
     <Choice value="cart_quantity"/>
-    <Choice value="cart_quantity_0"/>
+    <Choice value="quantity_0"/>
     <Choice value="remove"/>
     <Choice value="remove_confirm"/>
     <Choice value="select_all"/>
@@ -123,5 +123,7 @@
     <Choice value="signin_google"/>
     <Choice value="pick_google_account"/>
     <Choice value="captcha_input"/>
+    <Choice value="signin_fb"/>
+    <Choice value="buy"/>
   </Choices>
 </View>
