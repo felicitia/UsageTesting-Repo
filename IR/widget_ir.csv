@@ -73,5 +73,6 @@ keep_signin,keep the user logged in (e.g. a checkbox),
 multi_form,form to fill with multiple fields,input
 signin_amazon,go to the page to sign in with Amazon account,
 signin_google,go to the page to sign in with Google account,
+signin_fb,go to the page to sign in with Facebook account,
 pick_google_account,choose the google account to sign in inside the signin_google screen,
 captcha_input,input field for captcha in the pwd_assistant screen,
