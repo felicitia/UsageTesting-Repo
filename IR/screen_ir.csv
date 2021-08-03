@@ -39,4 +39,4 @@ pwd_assistant,passowrd assistant page,input
 signin_google,the screen for signing into google,
 signin_google_popup,the popup screen to sign in with a Google account,
 error,any popup page/screen where something goes wrong such as an 'incorrect password' notice,
-popup,any app popup screen such as a 'new features' popup or 'enable notifications' popup,
+popup,any app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
