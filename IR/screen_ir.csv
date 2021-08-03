@@ -28,7 +28,6 @@ sign_in_pwd,the page to enter the password such as when signing in and signing u
 sign_in_username,the page to enter the input for username/firstname/lastname/email/phone when signing in (when the sign in process is separated in different screens),
 sign_up,sign up page with input fields,input
 sign_up_birthday,the page to enter birthday during the sign up process,input
-sign_in_gmail,the page to choose the suggested gmail address or create your own gmail address,
 skip,the page where you can click skip,
 state_spinner,spinner to choose a state,
 terms,the page to show legal information such as terms of the app,
