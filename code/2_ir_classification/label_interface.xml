@@ -9,7 +9,7 @@
     <Choice value="address_edit" background="#5CDBD3"/>
     <Choice value="shopping_cart" background="#096DD9"/>
     <Choice value="cart_quantity" background="#ADC6FF"/>
-    <Choice value="cart_remove"/>
+    <Choice value="confirm_remove"/>
     <Choice value="category"/>
     <Choice value="city_spinner"/>
     <Choice value="conact"/>
@@ -31,10 +31,7 @@
     <Choice value="sign_in_username"/>
     <Choice value="sign_up"/>
     <Choice value="sign_up_birthday"/>
-    <Choice value="sign_up_gmail"/>
-    <Choice value="sign_up_option"/>
-    <Choice value="sign_up_pwd"/>
-    <Choice value="sign_up_username"/>
+    <Choice value="sign_in_gmail"/>
     <Choice value="skip"/>
     <Choice value="state_spinner"/>
     <Choice value="terms"/>
@@ -57,7 +54,7 @@
     <Choice value="address_add" background="#FFC069"/>
     <Choice value="address_city" background="#AD8B00"/>
     <Choice value="address_phone" background="#D3F261"/>
-    <Choice value="address_save"/>
+    <Choice value="save"/>
     <Choice value="address_state"/>
     <Choice value="address_state_spinner"/>
     <Choice value="address_street"/>
@@ -67,16 +64,16 @@
     <Choice value="cart"/>
     <Choice value="cart_quantity"/>
     <Choice value="cart_quantity_0"/>
-    <Choice value="cart_remove"/>
-    <Choice value="cart_remove_confirm"/>
-    <Choice value="cart_select_all"/>
+    <Choice value="remove"/>
+    <Choice value="remove_confirm"/>
+    <Choice value="select_all"/>
     <Choice value="cat_1"/>
     <Choice value="category"/>
     <Choice value="contact"/>
     <Choice value="contact_name"/>
     <Choice value="filter"/>
     <Choice value="filter_color"/>
-    <Choice value="filter_done"/>
+    <Choice value="apply"/>
     <Choice value="filter_price"/>
     <Choice value="filter_rating"/>
     <Choice value="filter_sort"/>
@@ -104,17 +101,13 @@
     <Choice value="signin_forget_pwd"/>
     <Choice value="signin_password"/>
     <Choice value="signin_tosignin"/>
-    <Choice value="signin_tosignup"/>
     <Choice value="signin_username"/>
     <Choice value="signup_business"/>
     <Choice value="signup_confirm_password"/>
-    <Choice value="signup_firstname"/>
-    <Choice value="signup_lastname"/>
-    <Choice value="signup_password"/>
+    <Choice value="firstname"/>
+    <Choice value="lastname"/>
     <Choice value="signup_personal"/>
     <Choice value="signup_tosignin"/>
-    <Choice value="signup_tosignup"/>
-    <Choice value="signup_username"/>
     <Choice value="skip"/>
     <Choice value="to_home"/>
     <Choice value="to_search"/>
