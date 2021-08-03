@@ -15,7 +15,7 @@ back,back button,
 bypass,go to the app without an account,
 cart,jump to the shopping cart,
 cart_quantity,enter the quantity of the item in the cart,input
-cart_quantity_0,choose 0 quantity of the item in the cart to remove the item,
+quantity_0,choose a number such as choose 0 quantity of the item in the cart to remove the item or choose the size,
 remove,remove button such as remove item from the cart,
 remove_confirm,confirm removing such as removing item from the cart,
 select_all,select all items such as from the shopping cart,
