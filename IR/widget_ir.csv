@@ -77,4 +77,4 @@ signin_fb,go to the page to sign in with Facebook account,
 pick_google_account,choose the google account to sign in inside the signin_google screen,
 captcha_input,input field for captcha in the pwd_assistant screen,
 buy,buy an item,
-show_checkbox,check box to show things such as password,input
+show_checkbox,checkbox to show things such as password,input
