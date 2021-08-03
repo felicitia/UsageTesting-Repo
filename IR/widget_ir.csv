@@ -81,3 +81,4 @@ show_checkbox,checkbox to show things such as password,input
 male,widget to show male gender,
 female,widget to show female gender,
 non_binary,widget to show nonbinary gender,
+filter_location,filter widget to select the location such as local,
