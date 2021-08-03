@@ -25,7 +25,7 @@ contact,jump to the contact page,
 contact_name,contact name input field,input
 filter,jump to filter options for the search result,
 filter_color,choose short by colors,
-filter_done,apply the chosen filter,
+apply,apply button such as apply the chosen filter,
 filter_price,choose sort by price,
 filter_rating,choose rating filter,
 filter_sort,choose sort filter,
@@ -48,20 +48,18 @@ search_bar,search bar that takes the input of searching keyword,input
 sign_in,sign in button to submit the inputs,
 sign_up,sign up button to submit the inputs,
 continue,next button,
-signin_email,email filed when signing in,input
+signin_email,email filed when signing in or signing up,input
 signin_forget_pwd,forget password,
-signin_password,password field when signing in,input
+signin_password,password field when signing in or signing up,input
 signin_tosignin,jump from sign in dialog to sign in screen based on the chosen sign in method,
-signin_tosignup,jump from sign in screen/dialog to sign up screen based on the chosen sign up method,
-signin_username,username field when signing in,input
+signin_username,username field when signing in or signing up,input
 signup_business,sign up for a business account,
 signup_confirm_email,confirm email input field when signing up,input
 signup_confirm_password,confirm password input field when signing up,input
-signup_firstname,first name field when signing up,input
-signup_lastname,last name field when signing up,input
+firstname,first name field such as when signing up,input
+lastname,last name field such as when signing up,input
 signup_personal,sign up for a personal account,
 signup_tosignin,jump from sign up to sign in,
-signup_tosignup,jump from sign up screen/dialog to sign up screen based on the chosen sign up method,
 skip,skip button,
 to_home,jump to home page,
 to_search,go to search screen,
