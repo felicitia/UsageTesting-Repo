@@ -6,7 +6,7 @@ address_add,the address page where the user can choose to add a new address,
 address_edit,the page to edit the different info of the address,input
 shopping_cart,shopping cart page where the user can see all items in the cart,
 cart_quantity,the dialog screen where the user can select the quantity of the item in the shopping cart,
-cart_remove,the dialog screen to confirm removing an item from the cart,
+confirm_remove,the dialog screen to confirm removing something such as an item from the cart,
 category,the page that shows all categories,
 city_spinner,the spinner to choose a city,
 contact,the page that contains the contact info of the app company,
