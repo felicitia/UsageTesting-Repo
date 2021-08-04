@@ -43,6 +43,7 @@
     <Choice value="signin_google_popup"/>
     <Choice value="error"/>
     <Choice value="popup"/>
+    <Choice value="gender"/>
   </Choices>
   <Image name="widget" value="$widget"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
@@ -125,5 +126,10 @@
     <Choice value="captcha_input"/>
     <Choice value="signin_fb"/>
     <Choice value="buy"/>
+    <Choice value="show_checkbox"/>
+    <Choice value="male"/>
+    <Choice value="female"/>
+    <Choice value="non_binary"/>
+    <Choice value="filter_location"/>
   </Choices>
 </View>
