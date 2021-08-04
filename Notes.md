@@ -5,7 +5,7 @@
 4. run `1_step_extraction/step_cleaning.py` to generate `steps_clean` folder (check if it contains extra steps like outside of the app)
 5. run `1_step_extraction/special_step_recognition.py` to append special actions in `steps_clean` folder
 6. run `2_ir_classification/screen_widget_extraction.py` (comment out extract_widget function) to generate `ir_data_auto` folder with screens only
-7. get UIED results (run UIED v2.3's `run_mybatch.py`)
+7. get UIED results (run UIED v2.3's `run_mybatch.py`) -- check terminal for running time as this process is time-consuming
 8. run `2_ir_classification/screen_widget_extraction.py` (comment out extract_screen function) to add widget crops to `ir_data_auto` folder (check if each screen has a matching widget.jpg. function in `util_func.py`)
 
 ## Setting up LS (run on the LS server)
