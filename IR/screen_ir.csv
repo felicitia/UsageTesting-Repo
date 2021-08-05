@@ -30,7 +30,7 @@ sign_up,sign up page with input fields,input
 sign_up_birthday,the page to enter birthday during the sign up process,input
 skip,the page where you can click skip,
 state_spinner,spinner to choose a state,
-terms,the page to show legal information such as terms of the app,
+terms,the page to show legal information such as terms of the app or permission related info,
 bookmark,the page to show all bookmarked/saved items,
 text_size,the page to adjust textsize,
 signin_amazon,the page to sign in with Amazon account,input
