@@ -131,5 +131,9 @@
     <Choice value="female"/>
     <Choice value="non_binary"/>
     <Choice value="filter_location"/>
+    <Choice value="promo_checkbox"/>
+    <Choice value="promo"/>
+    <Choice value="popular"/>
+    <Choice value="shipped"/>
   </Choices>
 </View>
