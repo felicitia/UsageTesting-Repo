@@ -22,7 +22,7 @@ select_all,select all items such as from the shopping cart,
 cat_1,choose first category,
 category,jump to categories,
 contact,jump to the contact page,
-contact_name,contact name input field,input
+contact_name,full name input field such as the contact name,input
 filter,jump to filter options for the search result,
 filter_color,choose short by colors,
 apply,apply button such as apply the chosen filter,
