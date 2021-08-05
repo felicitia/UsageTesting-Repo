@@ -15,6 +15,12 @@
 4. same directory, run `python generate_import_data.py` (need to change `image_root_dir` and `server_addr`) — this should generate a file called `import_....json`, e.g., `import_video_data_examples.json`
 5. go to your LS project and import data by uploading the json file generated above
 
+## Running V2S on Gypsum
+1. copy videos to scrtach, e.g., `rsync -av . gypsum-remote:/mnt/nfs/scratch1/yixuezhao/v2s_input/summer_data`
+2. go to `code/v2s_optimized` to generate JSON v2s batch config files (can be done on gypsum in `work1/brun/yixuezhao/video2scenario/myscripts`) and run `generate_v2s_config.py`
+3. check gypsum's status (`sinfo` command) and pick the idle cluster to use. sample .sh script can be found in `code/scripts`
+4. `conda activate python_v2s` and run .sh script on gypsum using `sbatch` command
+
 ## Running UIED v2.3
 1. `ImportError: No module named 'detect_text_east.lib_east.lanms.adaptor’` — check this [thread](https://github.com/argman/EAST/issues/174). Replace the Makefile in `/detect_text_east/lib_east/lanms` and go to that directory to run `make` command.
 
