@@ -3,7 +3,7 @@ about,jump to about page,
 account_address,jump to address management page,
 account_signin,jump from account screen to sign in dialog/screen,
 add_cart,add item to cart,
-address_add,jump to add new address,
+add,jump to add things such as add new address or new interest and it usually has a plus sign,
 address_city,city input field or selection,input
 address_phone,phone number input field,input
 save,save button such as save the address,
