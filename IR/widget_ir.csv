@@ -83,6 +83,6 @@ female,widget to show female gender,
 non_binary,widget to show nonbinary gender,
 filter_location,filter widget to select the location such as local,
 promo_checkbox,checkbox to opt in or out for things like promotions,input
-promo,promotions such as new user gift or coupons,
+promo,notifications such as promotions like new user gift or coupons or app new features,
 popular,go to popular page such as trending items,
 shipped,shipped order,
