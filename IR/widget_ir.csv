@@ -60,7 +60,7 @@ firstname,first name field such as when signing up,input
 lastname,last name field such as when signing up,input
 signup_personal,sign up for a personal account,
 signup_tosignin,jump from sign up to sign in,
-skip,skip button,
+skip,skip button or the close button,
 to_home,jump to home page,
 to_search,go to search screen,
 signin_by_email,choose to sign in by email,
