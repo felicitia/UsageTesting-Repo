@@ -19,7 +19,7 @@ quantity_0,choose a number such as choose 0 quantity of the item in the cart to 
 remove,remove button such as remove item from the cart,
 remove_confirm,confirm removing such as removing item from the cart,
 select_all,select all items such as from the shopping cart,
-cat_1,choose a category such as the first,
+cat_1,choose a category such as the first one or the first auto-completed suggestion during the search,
 category,jump to categories,
 contact,jump to the contact page,
 contact_name,full name input field such as the contact name,input
