@@ -16,11 +16,20 @@ def check_widget(ir_widget, labeled_files):
             return True
     return False
 
+def count_IRs(labeled_files):
+    df_array = []
+    for file in labeled_files:
+        df = pd.read_csv(file)
+        df_array.append(df)
+    merged_df = pd.concat(df_array)
+    print(merged_df.nunique())
+
+
 if __name__ == '__main__':
     labeled_files = ['/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/LS-annotations.csv',
                      '/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/1-SignIn/LS-annotations.csv']
-    screen_to_check = 'home'
-    widget_to_check = 'home'
+    screen_to_check = 'sign_up_gmail'
+    widget_to_check = 'cart_quantity_0'
     if check_widget(widget_to_check, labeled_files):
         print('widget: YES')
     else:
@@ -29,3 +38,4 @@ if __name__ == '__main__':
         print('screen: YES')
     else:
         print('screen: NO')
+    count_IRs(labeled_files)
