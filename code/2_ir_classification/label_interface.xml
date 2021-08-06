@@ -12,7 +12,7 @@
     <Choice value="confirm_remove"/>
     <Choice value="category"/>
     <Choice value="city_spinner"/>
-    <Choice value="contact"/>
+    <Choice value="conact"/>
     <Choice value="filter_option"/>
     <Choice value="filter_sort"/>
     <Choice value="get_started"/>
@@ -52,7 +52,7 @@
     <Choice value="account_address" background="#F759AB"/>
     <Choice value="account_signin" background="#FFA39E"/>
     <Choice value="add_cart" background="#D4380D"/>
-    <Choice value="address_add" background="#FFC069"/>
+    <Choice value="add" background="#FFC069"/>
     <Choice value="address_city" background="#AD8B00"/>
     <Choice value="address_phone" background="#D3F261"/>
     <Choice value="save"/>
@@ -135,5 +135,6 @@
     <Choice value="promo"/>
     <Choice value="popular"/>
     <Choice value="shipped"/>
+    <Choice value="interests" />
   </Choices>
 </View>
