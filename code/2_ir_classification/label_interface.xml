@@ -12,7 +12,7 @@
     <Choice value="confirm_remove"/>
     <Choice value="category"/>
     <Choice value="city_spinner"/>
-    <Choice value="conact"/>
+    <Choice value="contact"/>
     <Choice value="filter_option"/>
     <Choice value="filter_sort"/>
     <Choice value="get_started"/>
