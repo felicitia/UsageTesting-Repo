@@ -6,7 +6,7 @@ this script creates symlinks in order to work with
 pytorch's ImageFolder file structure 
 '''
 
-usage_root_dir = os.path.abspath('../../video_data_examples')
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/9-About')
 include_folder = 'clicked_frames_crop'
 
 sym_root_dir = 'sym_' + os.path.basename(usage_root_dir)

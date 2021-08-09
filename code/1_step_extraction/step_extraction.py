@@ -5,7 +5,7 @@ import shutil, os
 # and put such bbox-xxx files into clicked_frames folder
 
 frame_index = 0 #Index of the frame list
-usage_root_dir = "/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn/" # directory to v2s data of a particular usage
+usage_root_dir = "/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/10-Contact/" # directory to v2s data of a particular usage
 
 for folder in os.listdir(usage_root_dir):
     if os.path.isdir(os.path.join(usage_root_dir, folder)):

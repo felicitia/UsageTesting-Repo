@@ -12,7 +12,7 @@ import numpy as np
 import math
 
 ### input parameters you need to change ###
-usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn')
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/11-Help')
 uied_result_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Develop/UIED2.3-output-optimized/SignIn'
 input_dir = 'steps_clean'
 output_dir = 'ir_data_auto'
@@ -174,8 +174,8 @@ def main():
             for step_image_file in os.scandir(step_dir):
                 # print(step_image_file.path) # full abs path
                 if step_image_file.path.endswith('.jpg'):
-                    # extract_screen(step_image_file, app_root_dir)
-                    extract_widget(step_image_file, app_root_dir, detected_actions_json)
+                    extract_screen(step_image_file, app_root_dir)
+                    # extract_widget(step_image_file, app_root_dir, detected_actions_json)
 
 if __name__ == '__main__':
     main()

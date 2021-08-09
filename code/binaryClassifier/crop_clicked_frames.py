@@ -4,7 +4,7 @@ import os
 import glob
 
 
-usage_root_dir = os.path.abspath('../../video_data_examples')
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/11-Help')
 folder_to_crop = 'clicked_frames'
 
 # dataDir = os.path.join(scriptLocation,"data") # comment this when hardcoding input, output path
