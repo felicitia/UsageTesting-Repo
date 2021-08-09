@@ -3,10 +3,11 @@
 import os
 import pandas as pd
 import json
+import shutil
 
 ### input parameters you need to change ###
-typing_result_file = os.path.abspath('sym_SignIn/typing_result.csv') # output file to append 'touch_location' results
-usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/SignIn')
+typing_result_file = os.path.abspath('sym_7-Detail/typing_result.csv') # output file to append 'touch_location' results
+usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/7-Detail')
 KEYBOARD_Y = 1110 # threashold for the keyboard region. Y coordinate where keyboard starts when Y >= KEYBOARD_Y
 frame_index = 0 # Index of the frame list. keep it consistent with the value in the step_extraction.py
 ### end input parameters ###
@@ -38,5 +39,7 @@ def get_touch_Y(app_dir, frame_id):
 def main():
     df_typing_result['touch_location'] = df_typing_result.apply(lambda row: find_touch_location(row), axis = 1) # apply find_touch_location function to each row
     df_typing_result.to_csv(typing_result_file)
+    shutil.copy(typing_result_file, usage_root_dir+'/.')
+    print('all done! :)')
 if __name__ == '__main__':
     main()
