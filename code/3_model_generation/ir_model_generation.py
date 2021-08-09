@@ -85,6 +85,7 @@ def get_noswiping_previous_screenIR(app_root_dir, step_list, i):
             action = get_action_from_step(step_list[i])
         return get_screenIR_from_step_LS(app_root_dir, step_list[i])
 
+
 def add_transition_buffer(transition_buffer, ir_model, app_root_dir, step_list, i, screenIR):
     # print('transition buffer should have widget#action first, followed by swipes', transition_buffer)
     # add action to connect with previous screen
@@ -124,6 +125,12 @@ def build_ir_model(app_root_dir, step_dir):
     for i in range(len(step_list)):
         current_action = get_action_from_step(step_list[i])
         if i == 0: # initial step
+
+            # skip swipes in the beginning
+            while not (current_action == 'click' or current_action == 'long'):
+                i += 1
+                current_action = get_action_from_step(step_list[i])
+
             if current_action == 'click' or current_action == 'long': # only add initial state if the action is NOT swipe
                 screenIR = get_screenIR_from_step_LS(app_root_dir, step_list[i])
                 ir_model.machine.add_transition('initial', 'start', screenIR)
@@ -139,6 +146,8 @@ def build_ir_model(app_root_dir, step_dir):
                     # current step is the last step
                     final_transition = get_transition_name(app_root_dir, step_dir[i])
                     ir_model.machine.add_transition(final_transition, screenIR, 'end')
+            else:
+                print('initial state is a swipe, check', app_root_dir)
         elif i == len(glob.glob(step_dir + '/' + '*.jpg')) - 1: # last step
             if current_action == 'click' or current_action == 'long':
                 screenIR = get_screenIR_from_step_LS(app_root_dir, step_list[i])
