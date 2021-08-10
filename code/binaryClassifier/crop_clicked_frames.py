@@ -5,7 +5,7 @@ import glob
 
 
 usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/11-Help')
-folder_to_crop = 'clicked_frames'
+# folder_to_crop = 'clicked_frames'
 
 # dataDir = os.path.join(scriptLocation,"data") # comment this when hardcoding input, output path
 # outputDir = os.path.join(dataDir,'nonKeyCrop') #put the location of output folder here
@@ -44,8 +44,8 @@ def crop_per_dir(inputDir, outputDir):
         # Shows the image in image viewer
         # im1.show()
 
-def main():
-    for sub_dir in glob.glob(usage_root_dir + '/*/' + folder_to_crop):
+def generate_clicked_frame_crop(usage_root_dir):
+    for sub_dir in glob.glob(usage_root_dir + '/*/clicked_frames'):
         outputDir = sub_dir + '_crop'
         if not os.path.exists(outputDir):
             os.mkdir(outputDir)
@@ -53,5 +53,5 @@ def main():
         print(outputDir, 'DONE!')
 
 if __name__ == '__main__':
-    main()
+    generate_clicked_frame_crop(usage_root_dir)
     print('all done! :)')

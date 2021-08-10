@@ -7,6 +7,13 @@ class IR_Model(object):
         self.name = name
         self.machine = GraphMachine(model=self, states=IR_Model.states, initial='start', title=name, show_conditions=True, show_state_attributes=True)
 
+class Usage_Model(object):
+    states = ['start', 'end']
+    def __init__(self, name):
+        self.name = name
+        self.machine = GraphMachine(model=self, states=IR_Model.states, initial='start', title=name,
+                                    show_conditions=True, show_state_attributes=True)
+
 if __name__ == '__main__':
 #     transitions = [
 #         {'trigger': 'widget1', 'source': 'start', 'dest': 'state1', 'unless': 'aaa'},
