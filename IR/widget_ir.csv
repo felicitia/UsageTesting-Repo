@@ -47,7 +47,7 @@ search,search item and go to the search results,
 search_bar,search bar that takes the input of searching keyword,input
 sign_in,sign in button to submit the inputs,
 sign_up,sign up button to submit the inputs,
-continue,next button,
+continue,next button or ok button,
 signin_email,email filed when signing in or signing up,input
 signin_forget_pwd,forget password,
 signin_password,password field when signing in or signing up,input
