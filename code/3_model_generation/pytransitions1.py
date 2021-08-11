@@ -20,5 +20,8 @@ if __name__ == "__main__":
     batman = NarcolepticSuperhero("Batman")
     # batman.machine.add_state('awake!')
     batman.machine.add_transition('yay', 'asleep', 'awake!')
+    batman.machine.add_transition('yay2', 'awake!', 'asleep')
+    batman.machine.add_transition('self', 'asleep', 'asleep')
+    triggers = batman.machine.get_triggers('asleep')
     batman.get_graph().draw('my_state_diagram.png', prog='dot')
     # print(batman.machine.get_state('myname').tags)
