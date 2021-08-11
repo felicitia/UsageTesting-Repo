@@ -42,3 +42,4 @@ error,any popup page/screen where something goes wrong such as an 'incorrect pas
 popup,any app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
 gender,screen to choose genger/sex,
 interests,screen for the user's interests such as the My Topics page in news apps,
+alert,notification screen
