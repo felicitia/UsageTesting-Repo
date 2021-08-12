@@ -12,7 +12,8 @@
     <Choice value="confirm_remove"/>
     <Choice value="category"/>
     <Choice value="city_spinner"/>
-    <Choice value="conact"/>
+    <Choice value="contact"/>
+    <Choice value="edit"/>
     <Choice value="filter_option"/>
     <Choice value="filter_sort"/>
     <Choice value="get_started"/>
@@ -44,6 +45,8 @@
     <Choice value="error"/>
     <Choice value="popup"/>
     <Choice value="gender"/>
+    <Choice value="alert"/>
+    <Choice value="checkout"/>
   </Choices>
   <Image name="widget" value="$widget"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
@@ -72,7 +75,6 @@
     <Choice value="category"/>
     <Choice value="contact"/>
     <Choice value="contact_name"/>
-    <Choice value="edit"/>
     <Choice value="filter"/>
     <Choice value="filter_color"/>
     <Choice value="apply"/>
@@ -138,6 +140,8 @@
     <Choice value="shipped"/>
     <Choice value="interests"/>
     <Choice value="deny"/>
-    <Choice value="alert" />
+    <Choice value="alert"/>
+    <Choice value="item_option"/>
+    <Choice value="address"/>
   </Choices>
 </View>
