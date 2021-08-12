@@ -13,7 +13,6 @@
     <Choice value="category"/>
     <Choice value="city_spinner"/>
     <Choice value="contact"/>
-    <Choice value="edit"/>
     <Choice value="filter_option"/>
     <Choice value="filter_sort"/>
     <Choice value="get_started"/>
@@ -75,6 +74,7 @@
     <Choice value="category"/>
     <Choice value="contact"/>
     <Choice value="contact_name"/>
+    <Choice value="edit"/>
     <Choice value="filter"/>
     <Choice value="filter_color"/>
     <Choice value="apply"/>
