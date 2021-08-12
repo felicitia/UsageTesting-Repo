@@ -11,6 +11,7 @@ address_state,state input field or choose the state,input
 address_state_spinner,open the spinner to select a state,
 address_street,street input field,input
 address_zip,zipcode input field,input
+address,the address that can be selected to edit,
 back,back button,
 bypass,go to the app without an account,
 cart,jump to the shopping cart,
