@@ -72,6 +72,7 @@
     <Choice value="category"/>
     <Choice value="contact"/>
     <Choice value="contact_name"/>
+    <Choice value="edit"/>
     <Choice value="filter"/>
     <Choice value="filter_color"/>
     <Choice value="apply"/>
