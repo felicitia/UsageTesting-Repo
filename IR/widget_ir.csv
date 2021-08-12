@@ -24,6 +24,7 @@ cat_1,choose a category such as the first one or the first auto-completed sugges
 category,jump to categories,
 contact,jump to the contact page,
 contact_name,full name input field such as the contact name,input
+edit,edit button such as a pen to change an item,
 filter,jump to filter options for the search result,
 filter_color,choose short by colors,
 apply,apply button such as apply the chosen filter,
