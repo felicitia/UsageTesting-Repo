@@ -1,5 +1,5 @@
 ir,description,widget_type
-about,jump to about page,
+about,jump to about page or app version,
 account_address,jump to address management page,
 account_signin,jump from account screen to sign in dialog/screen,
 add_cart,add item to cart,
