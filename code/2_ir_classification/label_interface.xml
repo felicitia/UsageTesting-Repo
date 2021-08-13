@@ -61,6 +61,7 @@
     <Choice value="address_state"/>
     <Choice value="address_state_spinner"/>
     <Choice value="address_street"/>
+    <Choice value="address_country"/>
     <Choice value="address_zip"/>
     <Choice value="back"/>
     <Choice value="bypass"/>
