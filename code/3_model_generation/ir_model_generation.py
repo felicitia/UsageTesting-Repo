@@ -205,12 +205,13 @@ def generating_ir_models(usage_root_dir):
         app_root_dir = step_dir.replace(input_dir, '') # /Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/6pm-video-signin-3/
         print('building ir model for', app_root_dir)
         ir_model = build_ir_model(app_root_dir, step_dir, usage_root_dir)
+        ir_model.states = list(set(ir_model.states))
         ir_model_list.append(ir_model)
         ir_model.get_graph().draw(ir_model.name + '.png', prog='dot')
     pickle_file_path = os.path.join(usage_root_dir, 'ir_models.pickle')
     with open(pickle_file_path, 'wb') as file:
-        for ir_model in ir_model_list:
-            print(ir_model.states)
+        # for ir_model in ir_model_list:
+        #     print(ir_model.states)
         pickle.dump(ir_model_list, file)
 
 if __name__ == '__main__':

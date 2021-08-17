@@ -80,8 +80,11 @@ def merge_ir_models(usage_root_dir):
     while i < len(ir_model_list):
         add_ir_model(usage_model, ir_model_list[i])
         i += 1
+    usage_model.states = list(set(usage_model.states))
     usage_model.get_graph().draw('my_state_diagram.png', prog='dot')
-
+    pickle_file_path = os.path.join(usage_root_dir, 'usage_model.pickle')
+    with open(pickle_file_path, 'wb') as file:
+        pickle.dump(usage_model, file)
 
 if __name__ == '__main__':
     usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')

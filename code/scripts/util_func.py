@@ -19,12 +19,11 @@ def check_widget_exist(usage_root_dir):
             print('not exist', widget)
 
 if __name__ == '__main__':
-    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/10-Contact')
+    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/18-Textsize')
     check_widget_exist(usage_root_dir)
     # rename_file(usage_root_dir)
     # delete_subdire('steps_clean_crop')
     delete_subdire('clicked_frames')
     delete_subdire('clicked_frames_crop')
     delete_subdire('detected_frames')
-    # delete_subdire('ir_data_auto')
     print('all done! :)')
