@@ -6,16 +6,9 @@ from appium.webdriver.common.touch_action import TouchAction
 import pickle
 
 class Explorer:
-    def __init__(self):
+    def __init__(self, desiredCapabilities):
         # replace with you own desired capabilities for Appium
-        self.desiredCapabilities = {
-            "platformName": "Android",
-            "deviceName": "emulator-5554",
-            "newCommandTimeout": 10000,
-            "appPackage": "com.etsy.android",
-            "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
-        }
-
+        self.desiredCapabilities = desiredCapabilities
         # make sure too change to port your Appium server is listening on
         d = webdriver.Remote('http://localhost:4723/wd/hub', self.desiredCapabilities)
         assert d is not None
@@ -53,6 +46,45 @@ class Explorer:
         curr_state.add_screenshot_path(screenshot_path)
         self.screenshot_idx += 1
         return curr_state
+    def execute_swipe(self, direction):
+        # Get screen dimensions
+        screen_dimensions = self.driver.get_window_size()
+        if direction == 'up':
+            # Set co-ordinate X according to the element you want to scroll on.
+            location_x = screen_dimensions["width"] * 0.5
+            # Set co-ordinate start Y and end Y according to the scroll driection up or down
+            location_start_y = screen_dimensions["height"] * 0.6
+            location_end_y = screen_dimensions["height"] * 0.3
+            # Perform vertical scroll gesture using TouchAction API.
+            TouchAction(self.driver).press(x=location_x, y=location_start_y).wait(1000)\
+                .move_to(x=location_x, y=location_end_y).release().perform()
+        if direction == 'down':
+            # Set co-ordinate X according to the element you want to scroll on.
+            location_x = screen_dimensions["width"] * 0.5
+            # Set co-ordinate start Y and end Y according to the scroll driection up or down
+            location_start_y = screen_dimensions["height"] * 0.3
+            location_end_y = screen_dimensions["height"] * 0.6
+            # Perform vertical scroll gesture using TouchAction API.
+            TouchAction(self.driver).press(x=location_x, y=location_start_y).wait(1000) \
+                .move_to(x=location_x, y=location_end_y).release().perform()
+        if direction == 'left':
+            # Set co-ordinate start X and end X according
+            location_start_x = screen_dimensions["width"] * 0.8
+            location_end_x = screen_dimensions["width"] * 0.2
+            # Set co-ordinate Y according to the element you want to swipe on.
+            location_y = screen_dimensions["height"] * 0.5
+            # Perform swipe gesture using TouchAction API.
+            TouchAction(self.driver).press(x=location_start_x, y=location_y).wait(1000) \
+                .move_to(x=location_end_x, y=location_y).release().perform()
+        if direction == 'right':
+            # Set co-ordinate start X and end X according
+            location_start_x = screen_dimensions["width"] * 0.2
+            location_end_x = screen_dimensions["width"] * 0.8
+            # Set co-ordinate Y according to the element you want to swipe on.
+            location_y = screen_dimensions["height"] * 0.5
+            # Perform swipe gesture using TouchAction API.
+            TouchAction(self.driver).press(x=location_start_x, y=location_y).wait(1000) \
+                .move_to(x=location_end_x, y=location_y).release().perform()
 
     def execute_event(self, event): # return the name of next state (will end test generation is it's 'end')
         element = None
@@ -76,8 +108,7 @@ class Explorer:
         if event.action == 'long':
             time.sleep(2)
             alreadyClicked = True
-            actions.long_press(element)
-            actions.perform()
+            actions.long_press(element).release().perform()
 
         if event.action == "send_keys":
             time.sleep(2)
@@ -100,6 +131,17 @@ class Explorer:
 
 
 if __name__ == "__main__":
-    explorer = Explorer()
-    explorer.extract_state("example_extraction_output")
+    desiredCapabilities = {
+        "platformName": "Android",
+        "deviceName": "emulator-5554",
+        "newCommandTimeout": 10000,
+        "appPackage": "com.etsy.android",
+        "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
+    }
+    explorer = Explorer(desiredCapabilities)
+    while True:
+        direction = input('enter swipe direction')
+        time.sleep(5)
+        explorer.execute_swipe(direction)
+    # explorer.extract_state("example_extraction_output")
 

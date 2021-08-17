@@ -70,8 +70,8 @@ class DestEvent:
 
 
 class TestGenerator:
-    def __init__(self):
-        self.explorer = explorer.Explorer()
+    def __init__(self, desiredCapabilities):
+        self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
         self.MAX_TEST_NUM = 5
 
@@ -168,10 +168,13 @@ class TestGenerator:
         print('you typed', elementIR)
         return elementIR
 
-    def find_matching_action_in_app(self, current_state, trigger):
+    def find_matching_action_in_app(self, current_state, trigger, matching_screenIR):
         print('finding matching action for trigger', trigger)
         if trigger == 'self':
-            pass ### placeholder, consider input screens ###
+            self_transitions = self.usage_model.machine.get_transitions(trigger='self', source=matching_screenIR, dest=matching_screenIR)
+            condition_list = self.usage_model.get_condition_list(self_transitions)
+            # for condition in condition_list:
+
         else:
             widgetIR = trigger.split('#')[0]
             action = trigger.split('#')[1]
@@ -200,7 +203,7 @@ class TestGenerator:
                     isEnd = True
                 else:
                     isEnd = False
-                matching_element, action = self.find_matching_action_in_app(current_state, trigger)
+                matching_element, action = self.find_matching_action_in_app(current_state, trigger, matching_screenIR)
                 if matching_element is None:
                     print('no matching element found on the current screen...')
                 else:
@@ -210,14 +213,21 @@ class TestGenerator:
         # In the end your next event is a combination of a widget (next_event_widget) which is the type of the
         # node object defined in node.py. and and action that can be either "click" or "send_keys" or
         # "send_keys_enter" or "long". You can use the code line below to make a DestEvent (which is defined at the top of this file) - if your action type is send keys then the text input
-        # argument would be the input ow it would be emmpty string. This funtion should return DestEvent object
+        # argument would be the input ow it would be empty string. This funtion should return DestEvent object
         # next_event = DestEvent(action, next_event_widget.get_exec_id_type(),
         #                        next_event_widget.get_exec_id_val(), text_input)
         # return next_event
 
 if __name__ == "__main__":
+    desiredCapabilities = {
+        "platformName": "Android",
+        "deviceName": "emulator-5554",
+        "newCommandTimeout": 10000,
+        "appPackage": "com.etsy.android",
+        "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
+    }
     start = time.time()
-    test_gen = TestGenerator()
+    test_gen = TestGenerator(desiredCapabilities)
     test_gen.start('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output',
                    '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/usage_model.pickle',
                    'etsy')
