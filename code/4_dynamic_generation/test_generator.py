@@ -14,6 +14,7 @@ import pickle
 from entities import IR_Model
 import glob
 import random
+import pandas as pd
 
 
 class TestCase:
@@ -56,6 +57,7 @@ class DestEvent:
         self.exec_id_val = exec_id_val
         self.text_input = text_input
         self.isEnd = isEnd
+        # self.transition = transition
 
     def print_event(self):
         print("---- printing dest event ----")
@@ -111,30 +113,48 @@ class TestGenerator:
         file_path = os.path.join(self.generated_tests_dir, 'test_executable' + str(self.test_num) + '.pickle')
         with open(file_path, 'wb') as file:
             pickle.dump(current_generated_test, file)
+        # can't save ir model b/c next state is unknown
+        # file_path = os.path.join(self.generated_tests_dir, current_ir_model.name + '.png')
+        # current_ir_model.get_graph().draw(file_path, prog='dot')
+        # file_path = os.path.join(self.generated_tests_dir, current_ir_model.name + '.pickle')
+        # with open(file_path, 'wb') as file:
+        #     pickle.dump(current_ir_model, file)
 
     def generate_test(self):
         if self.test_num > self.MAX_TEST_NUM:
             return
         step_index = 0
-        isEnd = False
+        isEnd_flag = False
         current_generated_test = [] # list of DestEvent
-        while step_index < self.MAX_ACTION and not isEnd:
+        # current_ir_model = IR_Model('test_model' + str(self.test_num))
+        while step_index < self.MAX_ACTION and not isEnd_flag:
             time.sleep(2)
             current_state = self.explorer.extract_state(self.output_dir)
             current_state.print_state()
             next_event_list = self.find_next_event_list(current_state)
-            if len(next_event_list) == 0:
+            if next_event_list is None or len(next_event_list) == 0:
                 print('no next event found. ending dynamic generation...')
                 break
             elif len(next_event_list) == 1:
-                isEnd = next_event_list[0].isEnd
+                isEnd_flag = next_event_list[0].isEnd
                 current_generated_test.append(next_event_list[0])
+                # current_ir_model.machine.add_transition(next_event_list[0].transition)
                 self.explorer.execute_event(next_event_list[0])
             else:
+                for next_event in next_event_list:
+                    if type(next_event) is list: # trigger self actions first
+                        for self_action in next_event:
+                            current_generated_test.append(self_action)
+                            # current_ir_model.machine.add_transition(self_action.transition)
+                            self.explorer.execute_event(self_action)
+                        next_event_list.remove(next_event)
+
+                # randomly pick one path after executing the self actions
                 random_idx = random.randint(0, len(next_event_list)-1)
                 next_event = next_event_list[random_idx]
-                isEnd = next_event.isEnd
+                isEnd_flag = next_event.isEnd
                 current_generated_test.append(next_event)
+                # current_ir_model.machine.add_transition(next_event.transition)
                 self.explorer.execute_event(next_event)
             step_index += 1
 
@@ -161,62 +181,117 @@ class TestGenerator:
         else:
             return current_screenIR
 
-    def classify_widgetIR(self, element):
-        ### placeholder for widget classifier ###
-        ### element.path_to_screenshot gives you the croped image
-        elementIR = input('manually type widget IR based on crop here' + element.path_to_screenshot + '\n')
-        print('you typed', elementIR)
-        return elementIR
-
-    def find_matching_action_in_app(self, current_state, trigger, matching_screenIR):
-        print('finding matching action for trigger', trigger)
-        if trigger == 'self':
-            self_transitions = self.usage_model.machine.get_transitions(trigger='self', source=matching_screenIR, dest=matching_screenIR)
-            condition_list = self.usage_model.get_condition_list(self_transitions)
-            # for condition in condition_list:
-
-        else:
-            widgetIR = trigger.split('#')[0]
-            action = trigger.split('#')[1]
-            # The elements (widgets) are of type of node objects defined in node.py
-            for element in current_state.nodes:
-                if element.interactable:
-                    elementIR = self.classify_widgetIR(element)
-                    if elementIR == widgetIR:
-                        return element, action
-        ### placeholder to relax the criteria and find the closest widget ###
-        return None, None
+    # def classify_widgetIR(self, element):
+    #     ### placeholder for widget classifier ###
+    #     ### element.path_to_screenshot gives you the croped image
+    #     elementIR = input('manually type widget IR based on crop here' + element.path_to_screenshot + '\n')
+    #     print('you typed', elementIR)
+    #     return elementIR
 
     def is_final_trigger(self, trigger, source):
         if len(self.usage_model.machine.get_transitions(trigger=trigger, source=source, dest='end')) == 0:
             return False
         return True
 
+    def is_widgetIR_input_type(self, widgetIR):
+        widgetIR_file = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/IR/widget_ir.csv'
+        df = pd.read_csv(widgetIR_file)
+        row_found = df.loc[df['ir'] == widgetIR]
+        if len(row_found) == 0:
+            print('no widget IR found in the IR definition, check IR', widgetIR)
+        elif row_found.iloc[0]['widget_type'] == 'input':
+            return True
+        return False
+
+    def find_actions_from_self_transition(self, matching_screenIR, current_state):
+        print('finding action list for self trigger of', matching_screenIR)
+        self_actions = []
+        self_transitions = self.usage_model.machine.get_transitions(trigger='self',
+                                                                    source=matching_screenIR,
+                                                                    dest=matching_screenIR)
+        condition_list = self.usage_model.get_condition_list(self_transitions)
+        all_triggers = self.usage_model.machine.get_triggers(matching_screenIR)
+        needs_user_input = False
+        for condition in condition_list:
+            print('finding element for', condition)
+            if '#' in condition:
+                widgetIR = condition.split('#')[0]
+                action = condition.split('#')[1]
+                if self.is_widgetIR_input_type(widgetIR):
+                    needs_user_input = True
+                elif condition in all_triggers:
+                    pass # if current self action is covered by other triggers, it means this self action can jump to a diff state, so skip it and handle it when it appears in other triggers (that's not self trigger)
+                else:
+                    for element in current_state.nodes:
+                        if element.interactable:
+                            ### placeholder to find matching element based on widgetIR. change code below ###
+                            is_matched = input('check element ' + element.path_to_screenshot + '\n enter y if matched')
+                            if is_matched == 'y':
+                                self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
+                                                              exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False))
+            else:
+                action = 'swipe-' + condition
+                print('generated action', action)
+                self_actions.append(DestEvent(action=action, exec_id_val='', exec_id_type='', text_input='', isEnd=False))
+
+        # generate actions for EditText fields and fill the form
+        if needs_user_input:
+            print('generating user inputs...')
+            for element in current_state.nodes:
+                ### placeholder element.get_element_type() function needs to be implemented ###
+                if element.interactable and element.get_element_type() == 'EditText':
+                    user_input = input('please enter your input for element in ' + element.path_to_screenshot + '\nenter nothing if you want to skip this element')
+                    if not user_input == '':
+                        self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type, exec_id_val=element.get_exec_id_val,
+                                                      text_input=user_input, isEnd=False))
+
+        return self_actions
+
+    def find_matching_element_per_trigger(self, current_state, trigger):
+        print('finding matching action for trigger', trigger)
+        widgetIR = trigger.split('#')[0]
+        # The elements (widgets) are of type of node objects defined in node.py
+        for element in current_state.nodes:
+            if element.interactable:
+                ### placeholder to find matching element based on widgetIR. change code below ###
+                is_matched = input('check element ' + element.path_to_screenshot + '\n enter y if matched')
+                if is_matched == 'y':
+                    return element
+        return None
+
+    def find_possible_next_actions(self, current_state, matching_screenIR, triggers):
+        possible_actions = []
+        for trigger in triggers:
+            if trigger == 'self':
+                raise ValueError('self trigger should be removed already, check triggers of ', matching_screenIR)
+            isEnd = self.is_final_trigger(trigger=trigger, source=matching_screenIR)
+            matching_element = self.find_matching_element_per_trigger(current_state, trigger)
+            if matching_element is not None:
+                # transition = {'trigger': trigger, 'source': matching_screenIR, 'dest': 'aaa', 'conditions': ['con1', 'con2'],
+                #               'label': ['label1']}
+                possible_actions.append(DestEvent(action=trigger.split('#')[1], exec_id_type=matching_element.get_exec_id_type(),
+                                                  exec_id_val=matching_element.get_exec_id_val(), text_input='', isEnd=isEnd))
+        return possible_actions
+
     def find_next_event_list(self, current_state):
         next_event_list = []
         matching_screenIR = self.find_mathing_state_in_usage_model(current_state)
         if matching_screenIR is None:
             print('no matching state found in the usage model...')
+            return []
         else:
-            for trigger in self.usage_model.machine.get_triggers(matching_screenIR):
-                if self.is_final_trigger(trigger=trigger, source=matching_screenIR):
-                    isEnd = True
-                else:
-                    isEnd = False
-                matching_element, action = self.find_matching_action_in_app(current_state, trigger, matching_screenIR)
-                if matching_element is None:
-                    print('no matching element found on the current screen...')
-                else:
-                    next_event_list.append(DestEvent(action, matching_element.get_exec_id_type(), matching_element.get_exec_id_val(), '', isEnd))
+            all_possible_triggers = self.usage_model.machine.get_triggers(matching_screenIR)
+            if 'self' in all_possible_triggers:
+                # self_actions is a *list* of DestEvent
+                self_actions = self.find_actions_from_self_transition(matching_screenIR, current_state)
+                next_event_list.append(self_actions)
+                all_possible_triggers.remove('self')
+            next_event_list.append(self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers))
         return next_event_list
-
         # In the end your next event is a combination of a widget (next_event_widget) which is the type of the
         # node object defined in node.py. and and action that can be either "click" or "send_keys" or
-        # "send_keys_enter" or "long". You can use the code line below to make a DestEvent (which is defined at the top of this file) - if your action type is send keys then the text input
-        # argument would be the input ow it would be empty string. This funtion should return DestEvent object
-        # next_event = DestEvent(action, next_event_widget.get_exec_id_type(),
-        #                        next_event_widget.get_exec_id_val(), text_input)
-        # return next_event
+        # "send_keys_enter" or "long" or "swipe-up" etc. You can use the code line below to make a DestEvent (which is defined at the top of this file) - if your action type is send keys then the text input
+        # argument would be the input ow it would be empty string
 
 if __name__ == "__main__":
     desiredCapabilities = {

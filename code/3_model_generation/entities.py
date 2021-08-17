@@ -7,6 +7,41 @@ class IR_Model(object):
         self.states = ['start']
         self.machine = GraphMachine(model=self, initial='start', title=name, show_conditions=True, show_state_attributes=True)
 
+    def get_condition_list(self, self_transitions):
+        condition_list = []
+        existing_conditions = self_transitions[0].conditions
+        for condition in existing_conditions:
+            condition_list.append(condition.func)  # get the string of the condition, not the condition obj
+        return condition_list
+
+    def update_condition_list(self, self_transitions, new_condition_list):
+        condition_list = self.get_condition_list(self_transitions)
+        for new_condition in new_condition_list:
+            if new_condition not in condition_list:
+                condition_list.append(new_condition)
+        return condition_list
+
+    def add_new_transition(self, trigger, source, dest):
+        existing_transitions = self.machine.get_transitions(trigger=trigger, source=source, dest=dest)
+        if len(existing_transitions) == 0:
+            self.machine.add_transition(trigger=trigger, source=source, dest=dest)
+            self.states.append(source)
+            self.states.append(dest)
+
+    def add_self_transition(self, state, new_condition_list):
+        trigger_list = self.machine.get_triggers(state)
+        for trigger in trigger_list:
+            if trigger == 'self':  # self loop exists in the usage model
+                self_transitions = self.machine.get_transitions('self', state, state)
+                condition_list = self.update_condition_list(self_transitions, new_condition_list)
+                self.machine.remove_transition('self', state, state)
+                self.machine.add_transition(trigger='self', source=state, dest=state, conditions=condition_list)
+                self.states.append(state)
+                return
+        # when self loop doesn't exist or the state doesn't exist
+        self.machine.add_transition(trigger='self', source=state, dest=state, conditions=new_condition_list)
+        self.states.append(state)
+
 
 if __name__ == '__main__':
 #     transitions = [

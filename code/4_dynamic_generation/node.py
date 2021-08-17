@@ -16,6 +16,10 @@ class Node:
         self.sentence = []
         self.path_to_screenshot = screenshot
 
+    ### placeholder for ReDraw classifier ###
+    def get_element_type(self):
+        return 'EditText'
+
     def add_child(self, child_node):
         self.children.append(child_node)
 

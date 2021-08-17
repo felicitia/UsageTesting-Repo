@@ -18,7 +18,11 @@ class Explorer:
     def execute_test(self, test_file):
         test = pickle.load(open(test_file, 'rb'))
         for event in test:
-            self.execute_event(event)
+            if type(event) is list:
+                for self_event in event:
+                    self.execute_event(self_event)
+            else:
+                self.execute_event(event)
 
     def extract_state(self, output_dir):
         layout = LayoutTree.LayoutTree(self.driver, output_dir)
@@ -43,9 +47,13 @@ class Explorer:
             os.makedirs(os.path.join(output_dir, 'screenshots'))
         screenshot_path = os.path.join(output_dir, 'screenshots', str(self.screenshot_idx) + '.png')
         self.driver.save_screenshot(screenshot_path)
+        xml_path = os.path.join(output_dir, 'screenshots', str(self.screenshot_idx) + '.xml')
+        with open(xml_path, "w") as file:
+            file.write(self.driver.page_source)
         curr_state.add_screenshot_path(screenshot_path)
         self.screenshot_idx += 1
         return curr_state
+
     def execute_swipe(self, direction):
         # Get screen dimensions
         screen_dimensions = self.driver.get_window_size()
@@ -104,6 +112,11 @@ class Explorer:
         if event.exec_id_type == "resource-id":
             time.sleep(2)
             element = self.driver.find_element_by_id(event.exec_id_val)
+
+        if 'swipe' in event.action:
+            time.sleep(2)
+            swipe_direction = event.action.split('-')[1]
+            self.execute_swipe(swipe_direction)
 
         if event.action == 'long':
             time.sleep(2)
