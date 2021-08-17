@@ -6,3 +6,4 @@ code/binaryClassifier/sym*
 *.pyc
 **/sym*/*
 code/3_model_generation/*.png
+video_data_examples/*
