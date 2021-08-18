@@ -12,7 +12,7 @@ city_spinner,the spinner to choose a city,
 contact,the page that contains the contact info of the app company,
 filter_option,the page that shows all filter options,input
 filter_sort,the page to choose sort by,
-get_started,screen that shows get started,
+get_started,screen to start before the homepage such as showing get started,
 help,the help page of the app,
 home,home screen (usually has tabs etc),
 item_detail,the detail page of an item,
@@ -20,12 +20,11 @@ items,the page to show all items (usually a list/gallery view after search),
 menu,menu screen (usually a side bar),
 profile_edit,edit page of the user's profile,input
 search,search screen,input
-setting,app settings page,
+setting,app settings page usually a listview,
 sign_in,sign in screen with inputs fields of email/pwd etc,input
-sign_in_option,the page to choose sign in or sign up option,
-sign_in_or_sign_up,the screen to choose whether to sign in or sign up,
-sign_in_pwd,the page to enter the password such as when signing in and signing up (when the sign in or sign up process is separated in different screens),input
-sign_in_username,the page to enter the input for username/firstname/lastname/email/phone when signing in (when the sign in process is separated in different screens),
+signin_or_signup,the screen to choose whether to sign in or sign up or what method to use such as email/FB/Amazon/Google,
+password,the page to enter the password such as when signing in and signing up (when the sign in or sign up process is separated in different screens),input
+username,the page to enter the input for username/firstname/lastname/email/phone when signing in (when the sign in process is separated in different screens),
 sign_up,sign up page with input fields,input
 sign_up_birthday,the page to enter birthday during the sign up process,input
 skip,the page where you can click skip,
@@ -34,13 +33,13 @@ terms,the page to show legal information such as terms of the app or permission 
 bookmark,the page to show all bookmarked/saved items,
 text_size,the page to adjust textsize,
 checkout,checkout screen and payment related,
-signin_amazon,the page to sign in with Amazon account,input
 pwd_assistant,passowrd assistant page,input
+signin_amazon,the page to sign in with Amazon account,input
 signin_google,the screen for signing into google,
 signin_fb,the screen for signing into facebook,
 signin_google_popup,the popup screen to sign in with a Google account,
 error,any popup page/screen where something goes wrong such as an 'incorrect password' notice,
-popup,any app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
+popup,app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
 gender,screen to choose genger/sex,
 interests,screen for the user's interests such as the My Topics page in news apps,
 alert,notification screen,
