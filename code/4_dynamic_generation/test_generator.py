@@ -1,4 +1,8 @@
 import sys
+
+import PIL
+import psutil as psutil
+
 sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
 
 from sys import argv
@@ -15,7 +19,7 @@ from entities import IR_Model
 import glob
 import random
 import pandas as pd
-
+import webbrowser
 
 class TestCase:
     def __init__(self, test_folder_path):
@@ -118,7 +122,6 @@ class TestGenerator:
         with open(file_path, 'wb') as file:
             pickle.dump(current_generated_test, file)
         print('test generated and saved!')
-        # can't save ir model b/c next state is unknown
         # file_path = os.path.join(self.generated_tests_dir, current_ir_model.name + '.png')
         # current_ir_model.get_graph().draw(file_path, prog='dot')
         # file_path = os.path.join(self.generated_tests_dir, current_ir_model.name + '.pickle')
@@ -143,13 +146,16 @@ class TestGenerator:
                     break
                 elif len(next_event_list) == 1:
                     if type(next_event_list[0]) is list:
-                        print('the only event is a list of the following events')
+                        print('the only event is a list of the following events. should be self actions')
                         for event in next_event_list[0]:
                             print(event.exec_id_val, event.exec_id_val, event.action)
-                    isEnd_flag = (next_event_list[0]).isEnd
-                    current_generated_test.append(next_event_list[0])
-                    # current_ir_model.machine.add_transition(next_event_list[0].transition)
-                    self.explorer.execute_event(next_event_list[0])
+                            current_generated_test.append(event)
+                            self.explorer.execute_event(event)
+                    else:
+                        isEnd_flag = (next_event_list[0]).isEnd
+                        current_generated_test.append(next_event_list[0])
+                        # current_ir_model.machine.add_transition(next_event_list[0].transition)
+                        self.explorer.execute_event(next_event_list[0])
                 else:
                     for next_event in next_event_list:
                         if type(next_event) is list: # trigger self actions first
@@ -178,7 +184,9 @@ class TestGenerator:
 
     def find_mathing_state_in_usage_model(self, current_state):
         ### placeholder for screen classifier
-        current_screenIR = input('manually type current state IR based on screenshot here ' + current_state.screenshot_path + '\n')
+        image = PIL.Image.open(current_state.screenshot_path)
+        image.show()
+        current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:
             ### placeholder for screen classifier to get 2nd, 3rd ... possible matching screenIR when the top1 doesn't have a match ###
@@ -231,7 +239,9 @@ class TestGenerator:
                     for element in current_state.nodes:
                         if element.interactable:
                             ### placeholder to find matching element based on widgetIR. change code below ###
-                            is_matched = input('check element ' + element.path_to_screenshot + '\n enter y if matched')
+                            image = PIL.Image.open(element.path_to_screenshot)
+                            image.show()
+                            is_matched = input('check element that was just opened and enter y if matched')
                             if is_matched == 'y':
                                 self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
                                                               exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False))
@@ -245,8 +255,10 @@ class TestGenerator:
             print('generating user inputs...')
             for element in current_state.nodes:
                 ### placeholder element.get_element_type() function needs to be implemented ###
-                if element.interactable and element.get_element_type() == 'EditText':
-                    user_input = input('please enter your input for element in ' + element.path_to_screenshot + '\nenter nothing if you want to skip this element\n')
+                if element.interactable and 'EditText' in element.get_element_type():
+                    image = PIL.Image.open(element.path_to_screenshot)
+                    image.show()
+                    user_input = input('please enter your input for element that was just opened\n enter nothing if you want to skip this element\n')
                     if not user_input == '':
                         self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
                                                       exec_id_val=element.get_exec_id_val(),
@@ -261,7 +273,9 @@ class TestGenerator:
         for element in current_state.nodes:
             if element.interactable:
                 ### placeholder to find matching element based on widgetIR. change code below ###
-                is_matched = input('check element ' + element.path_to_screenshot + '\n enter y if matched')
+                image = PIL.Image.open(element.path_to_screenshot)
+                image.show()
+                is_matched = input('check element that was just opened. enter y if matched')
                 if is_matched == 'y':
                     return element
         return None
@@ -317,3 +331,7 @@ if __name__ == "__main__":
                    'etsy')
     end = time.time()
     print("Dynamic generation running time " + str(end - start) + " seconds")
+    for proc in psutil.process_iter():
+        # print(proc.name())
+        if proc.name() == 'Preview':
+            proc.kill()

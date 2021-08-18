@@ -16,9 +16,16 @@ class Node:
         self.sentence = []
         self.path_to_screenshot = screenshot
 
-    ### placeholder for ReDraw classifier ###
     def get_element_type(self):
-        return 'EditText'
+        # print('element attributes' , self.attributes)
+        # print('element tag', self.tag)
+        # print('element interactions', self.interactions)
+        if not self.tag is None and self.tag != '':
+            return self.tag
+        if self.attributes.has_key('class'):
+            return self.attributes['class']
+        else:
+            raise ValueError('element tag and class are both not available. consider using ReDraw')
 
     def add_child(self, child_node):
         self.children.append(child_node)
