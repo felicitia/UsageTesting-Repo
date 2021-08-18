@@ -4,42 +4,42 @@ account,account page when the user is signed in,
 account_guest,account page when the user is a guest,
 address_add,the address page where the user can choose to add a new address,
 address_edit,the page to edit the different info of the address,input
+alert,notification screen,
+bookmark,the page to show all bookmarked/saved items,
 cart,shopping cart page where the user can see all items in the cart,
-quantity,the dialog screen where the user can select the quantity of the item such as in the shopping cart,
-confirm_remove,the dialog screen to confirm removing something such as an item from the cart,
 category,the page that shows all categories,
+checkout,checkout screen and payment related,
 city_spinner,the spinner to choose a city,
+confirm_remove,the dialog screen to confirm removing something such as an item from the cart,
 contact,the page that contains the contact info of the app company,
+error,any popup page/screen where something goes wrong such as an 'incorrect password' notice,
 filter_option,the page that shows all filter options,input
 filter_sort,the page to choose sort by,
+gender,screen to choose genger/sex,
 get_started,screen to start before the homepage such as showing get started,
 help,the help page of the app,
 home,home screen (usually has tabs etc),
+interests,screen for the user's interests such as the My Topics page in news apps,
 item_detail,the detail page of an item,
 items,the page to show all items (usually a list/gallery view after search),
 menu,menu screen (usually a side bar),
+password,the page to enter the password such as when signing in and signing up (when the sign in or sign up process is separated in different screens),input
+popup,app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
 profile_edit,edit page of the user's profile,input
+pwd_assistant,passowrd assistant page,input
+quantity,the dialog screen where the user can select the quantity of the item such as in the shopping cart,
 search,search screen,input
 setting,app settings page usually a listview,
 sign_in,sign in screen with inputs fields of email/pwd etc,input
-signin_or_signup,the screen to choose whether to sign in or sign up or what method to use such as email/FB/Amazon/Google,
-password,the page to enter the password such as when signing in and signing up (when the sign in or sign up process is separated in different screens),input
-username,the page to enter the input for username/firstname/lastname/email/phone when signing in (when the sign in process is separated in different screens),
 sign_up,sign up page with input fields,input
 sign_up_birthday,the page to enter birthday during the sign up process,input
+signin_amazon,the page to sign in with Amazon account,input
+signin_fb,the screen for signing into facebook,
+signin_google,the screen for signing into google,
+signin_google_popup,the popup screen to sign in with a Google account,
+signin_or_signup,the screen to choose whether to sign in or sign up or what method to use such as email/FB/Amazon/Google,
 skip,the page where you can click skip,
 state_spinner,spinner to choose a state,
 terms,the page to show legal information such as terms of the app or permission related info,
-bookmark,the page to show all bookmarked/saved items,
 text_size,the page to adjust textsize,
-checkout,checkout screen and payment related,
-pwd_assistant,passowrd assistant page,input
-signin_amazon,the page to sign in with Amazon account,input
-signin_google,the screen for signing into google,
-signin_fb,the screen for signing into facebook,
-signin_google_popup,the popup screen to sign in with a Google account,
-error,any popup page/screen where something goes wrong such as an 'incorrect password' notice,
-popup,app popup screen such as a 'new features' popup or 'enable notifications' popup or 'permission request' popup,
-gender,screen to choose genger/sex,
-interests,screen for the user's interests such as the My Topics page in news apps,
-alert,notification screen,
+username,the page to enter the input for username/firstname/lastname/email/phone when signing in (when the sign in process is separated in different screens),
