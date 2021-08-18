@@ -2,7 +2,7 @@ import sys
 sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
 
 from sys import argv
-import os
+import os, shutil
 import re
 import explorer
 import time
@@ -75,10 +75,13 @@ class TestGenerator:
     def __init__(self, desiredCapabilities):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
-        self.MAX_TEST_NUM = 5
+        self.MAX_TEST_NUM = 3
 
     def start(self, output_dir, usage_model_path, appname):
         if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        else:
+            shutil.rmtree(output_dir)
             os.makedirs(output_dir)
         self.appname = appname
         self.output_dir = os.path.join(output_dir, appname)
@@ -105,14 +108,16 @@ class TestGenerator:
         return True
 
     def save_test(self, current_generated_test):
-        self.test_num += 1
+        print('saving test', self.test_num, '...')
         for test_file in glob.glob(os.path.join(self.generated_tests_dir, 'test_executable*')):
             existing_test = pickle.load(open(test_file, 'rb'))
             if self.is_test_equal(existing_test, current_generated_test):
+                print('test already generated')
                 return
         file_path = os.path.join(self.generated_tests_dir, 'test_executable' + str(self.test_num) + '.pickle')
         with open(file_path, 'wb') as file:
             pickle.dump(current_generated_test, file)
+        print('test generated and saved!')
         # can't save ir model b/c next state is unknown
         # file_path = os.path.join(self.generated_tests_dir, current_ir_model.name + '.png')
         # current_ir_model.get_graph().draw(file_path, prog='dot')
@@ -121,48 +126,50 @@ class TestGenerator:
         #     pickle.dump(current_ir_model, file)
 
     def generate_test(self):
-        if self.test_num > self.MAX_TEST_NUM:
-            return
-        step_index = 0
-        isEnd_flag = False
-        current_generated_test = [] # list of DestEvent
-        # current_ir_model = IR_Model('test_model' + str(self.test_num))
-        while step_index < self.MAX_ACTION and not isEnd_flag:
-            time.sleep(2)
-            current_state = self.explorer.extract_state(self.output_dir)
-            current_state.print_state()
-            next_event_list = self.find_next_event_list(current_state)
-            if next_event_list is None or len(next_event_list) == 0:
-                print('no next event found. ending dynamic generation...')
-                break
-            elif len(next_event_list) == 1:
-                isEnd_flag = next_event_list[0].isEnd
-                current_generated_test.append(next_event_list[0])
-                # current_ir_model.machine.add_transition(next_event_list[0].transition)
-                self.explorer.execute_event(next_event_list[0])
-            else:
-                for next_event in next_event_list:
-                    if type(next_event) is list: # trigger self actions first
-                        for self_action in next_event:
-                            current_generated_test.append(self_action)
-                            # current_ir_model.machine.add_transition(self_action.transition)
-                            self.explorer.execute_event(self_action)
-                        next_event_list.remove(next_event)
-
-                # randomly pick one path after executing the self actions
-                random_idx = random.randint(0, len(next_event_list)-1)
-                next_event = next_event_list[random_idx]
-                isEnd_flag = next_event.isEnd
-                current_generated_test.append(next_event)
-                # current_ir_model.machine.add_transition(next_event.transition)
-                self.explorer.execute_event(next_event)
-            step_index += 1
-
-        self.save_test(current_generated_test)
-        self.explorer.driver.close_app()
-        self.explorer.driver.launch_app()
-        self.generate_test()
-
+        while self.test_num < self.MAX_TEST_NUM:
+            step_index = 0
+            isEnd_flag = False
+            current_generated_test = [] # list of DestEvent/list(DestEvent) if self actions
+            # current_ir_model = IR_Model('test_model' + str(self.test_num))
+            self.explorer.test_num = self.test_num
+            self.explorer.screenshot_idx = 0
+            while step_index < self.MAX_ACTION and not isEnd_flag:
+                time.sleep(2)
+                current_state = self.explorer.extract_state(self.output_dir)
+                current_state.print_state()
+                next_event_list = self.find_next_event_list(current_state)
+                if next_event_list is None or len(next_event_list) == 0:
+                    print('no next event found. ending dynamic generation...')
+                    break
+                elif len(next_event_list) == 1:
+                    if type(next_event_list[0]) is list:
+                        print('the only event is a list of the following events')
+                        for event in next_event_list[0]:
+                            print(event.exec_id_val, event.exec_id_val, event.action)
+                    isEnd_flag = (next_event_list[0]).isEnd
+                    current_generated_test.append(next_event_list[0])
+                    # current_ir_model.machine.add_transition(next_event_list[0].transition)
+                    self.explorer.execute_event(next_event_list[0])
+                else:
+                    for next_event in next_event_list:
+                        if type(next_event) is list: # trigger self actions first
+                            for self_action in next_event:
+                                current_generated_test.append(self_action)
+                                # current_ir_model.machine.add_transition(self_action.transition)
+                                self.explorer.execute_event(self_action)
+                            next_event_list.remove(next_event)
+                    # randomly pick one path after executing the self actions
+                    random_idx = random.randint(0, len(next_event_list)-1)
+                    next_event = next_event_list[random_idx]
+                    isEnd_flag = next_event.isEnd
+                    current_generated_test.append(next_event)
+                    # current_ir_model.machine.add_transition(next_event.transition)
+                    self.explorer.execute_event(next_event)
+                step_index += 1
+            self.save_test(current_generated_test)
+            self.explorer.driver.close_app()
+            self.explorer.driver.launch_app()
+            self.test_num += 1
 
     def is_event_equal(self, event1, event2):
         if event1.exec_id_type == event2.exec_id_type and event1.exec_id_val == event2.exec_id_val:
@@ -172,7 +179,6 @@ class TestGenerator:
     def find_mathing_state_in_usage_model(self, current_state):
         ### placeholder for screen classifier
         current_screenIR = input('manually type current state IR based on screenshot here ' + current_state.screenshot_path + '\n')
-        print('you typed', current_screenIR)
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:
             ### placeholder for screen classifier to get 2nd, 3rd ... possible matching screenIR when the top1 doesn't have a match ###
@@ -240,9 +246,10 @@ class TestGenerator:
             for element in current_state.nodes:
                 ### placeholder element.get_element_type() function needs to be implemented ###
                 if element.interactable and element.get_element_type() == 'EditText':
-                    user_input = input('please enter your input for element in ' + element.path_to_screenshot + '\nenter nothing if you want to skip this element')
+                    user_input = input('please enter your input for element in ' + element.path_to_screenshot + '\nenter nothing if you want to skip this element\n')
                     if not user_input == '':
-                        self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type, exec_id_val=element.get_exec_id_val,
+                        self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
+                                                      exec_id_val=element.get_exec_id_val(),
                                                       text_input=user_input, isEnd=False))
 
         return self_actions
@@ -286,7 +293,9 @@ class TestGenerator:
                 self_actions = self.find_actions_from_self_transition(matching_screenIR, current_state)
                 next_event_list.append(self_actions)
                 all_possible_triggers.remove('self')
-            next_event_list.append(self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers))
+            possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers)
+            for possible_action in possible_actions:
+                next_event_list.append(possible_action)
         return next_event_list
         # In the end your next event is a combination of a widget (next_event_widget) which is the type of the
         # node object defined in node.py. and and action that can be either "click" or "send_keys" or
