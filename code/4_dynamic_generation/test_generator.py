@@ -254,7 +254,6 @@ class TestGenerator:
         if needs_user_input:
             print('generating user inputs...')
             for element in current_state.nodes:
-                ### placeholder element.get_element_type() function needs to be implemented ###
                 if element.interactable and 'EditText' in element.get_element_type():
                     image = PIL.Image.open(element.path_to_screenshot)
                     image.show()

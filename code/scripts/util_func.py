@@ -37,8 +37,8 @@ def rename_files():
         os.rename(file, full_new_file)
 
 def rename_screenIR():
-    oldIR = 'sign_in_username'
-    newIR = 'username'
+    oldIR = 'skip'
+    newIR = 'popup'
     for file in glob.glob('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/*/LS-annotations.csv'):
         print('processing', file)
         df = pd.read_csv(file)
@@ -46,6 +46,14 @@ def rename_screenIR():
         # print(df['tag_screen'])
         df.to_csv(file, index=False)
 
+def find_IRs():
+    IR = 'skip'
+    column = 'tag_screen'
+    for file in glob.glob('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/*/LS-annotations.csv'):
+        df = pd.read_csv(file)
+        rows = df.loc[df[column] == IR]
+        if len(rows) != 0:
+            print(file)
 def rename_widgetIR():
     oldIR = 'show_checkbox'
     newIR = 'show'
@@ -64,5 +72,4 @@ if __name__ == '__main__':
     # delete_subdire('clicked_frames')
     # delete_subdire('clicked_frames_crop')
     # delete_subdire('detected_frames')
-    rename_widgetIR()
     print('all done! :)')

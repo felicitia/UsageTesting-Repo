@@ -39,7 +39,7 @@ def third_auto_batch(usage_root_dir_list):
         widget_extraction_auto(usage_root_dir)
 
 if __name__ == '__main__':
-    option = input('enter 1 or 2 or 3 to run corresponding auto pipeline...')
+    option = input('enter 1 or 2 or 3 to run corresponding auto pipeline...\n')
     if option == '1':
         first_auto_batch(usage_root_dir_list)
         print('first automation all done! :) check steps clean folder now...')

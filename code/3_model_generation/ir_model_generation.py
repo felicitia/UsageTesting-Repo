@@ -1,7 +1,12 @@
 import os, glob
+
+import PIL
 import pandas as pd
 import pickle
+import psutil
+import json
 from entities import IR_Model
+import time
 
 ### input parameters to change ###
 CLICK_ACTION = 'click'
@@ -9,6 +14,7 @@ LONG_TAP_ACTION = 'long'
 # usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
 input_dir = 'steps_clean'
 screen_widget_dir = 'ir_data_auto'
+input_time = 0
 ### end input parameters ###
 
 def get_action_from_step(filename_abspath):
@@ -16,6 +22,7 @@ def get_action_from_step(filename_abspath):
         return LONG_TAP_ACTION
     elif 'swipe' in os.path.basename(filename_abspath):
         filename_array = str(os.path.basename(filename_abspath)).split('-')
+        # print(filename_array)
         return filename_array[3].replace('.jpg', '')
     else:
         return CLICK_ACTION
@@ -24,28 +31,40 @@ def get_screenIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_
     annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
     appname = os.path.basename(os.path.normpath(app_root_dir))
     screen = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-screen.jpg')
-    # print(screen)
+    if 'long' in screen:
+        screen = screen.replace('-long', '')
     df = pd.read_csv(annotation_file)
     row_found = df.loc[df['screen'].str.contains(screen)]
-    if len(row_found) == 1:
+    if len(row_found) == 0:
+        image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
+        image.show()
+        user_input = input('please enter screen IR manually for ' + screen + '\n')
+        return user_input
+    elif len(row_found) == 1:
         # print(row_found['tag_screen'].values[0])
         return row_found['tag_screen'].values[0]
     else:
-        print('row found is not 1, check', screen)
+        raise ValueError('row found is > 1 when getting screenIR, check', screen)
 
 
 def get_widgetIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir):
     annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
     appname = os.path.basename(os.path.normpath(app_root_dir))
     widget = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-widget.jpg')
-    # print(widget)
+    if 'long' in widget:
+        widget = widget.replace('-long', '')
     df = pd.read_csv(annotation_file)
     row_found = df.loc[df['widget'].str.contains(widget)]
-    if len(row_found) == 1:
+    if len(row_found) == 0:
+        image = PIL.Image.open(step_image_file_abspath)
+        image.show()
+        user_input = input('please enter widget IR manually for widget ' + widget + '\n')
+        return user_input
+    elif len(row_found) == 1:
         # print(row_found['tag_widget'].values[0])
         return row_found['tag_widget'].values[0]
     else:
-        print('row found is not 1, check', widget)
+        raise ValueError('row found is > 1 when getting widgetIR, check', widget)
 
 '''
 if the action is click or long, return 'widgetIR#action'
@@ -55,6 +74,11 @@ def get_transition_name(app_root_dir, step_image_file_abspath, usage_root_dir):
     action = get_action_from_step(step_image_file_abspath)
     if action == CLICK_ACTION or action == LONG_TAP_ACTION:
         widgetIR = get_widgetIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir)
+        if pd.isna(widgetIR):
+            image = PIL.Image.open(step_image_file_abspath)
+            image.show()
+            user_input = input('please enter widget IR manually for widget ' + os.path.basename(step_image_file_abspath) + '\n')
+            widgetIR = user_input
         return widgetIR + '#' + action
     else:
         return action
@@ -132,6 +156,7 @@ def build_ir_model(app_root_dir, step_dir, usage_root_dir):
     step_list = sorted(glob.glob(step_dir + '/' + '*.jpg'))
     transition_buffer = []
     i = 0
+    start_time = time.time()
     while i < len(step_list):
         current_action = get_action_from_step(step_list[i])
         if i == 0: # initial step
@@ -197,24 +222,50 @@ def build_ir_model(app_root_dir, step_dir, usage_root_dir):
             else: # current action is swipe, then add the swiping direction to the transition buffer (will handle at next non-swipe screen)
                 transition_buffer.append(get_transition_name(app_root_dir, step_list[i], usage_root_dir))
         i += 1
-    return ir_model
+    end_time = time.time()
+    return ir_model, (end_time - start_time)
 
 def generating_ir_models(usage_root_dir):
-    ir_model_list = []
+    # ir_model_list = []
+    runtime_per_model_list = []
     for step_dir in glob.glob(usage_root_dir + '/*/' + input_dir):
         app_root_dir = step_dir.replace(input_dir, '') # /Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/6pm-video-signin-3/
+        ir_model_path = os.path.join(app_root_dir, 'ir_model.pickle')
+        if os.path.exists(ir_model_path):
+            print('ir model already existed in', app_root_dir, 'skipping...')
+            continue
         print('building ir model for', app_root_dir)
-        ir_model = build_ir_model(app_root_dir, step_dir, usage_root_dir)
+        ir_model, runtime = build_ir_model(app_root_dir, step_dir, usage_root_dir)
+        runtime_per_model_list.append(runtime)
         ir_model.states = list(set(ir_model.states))
-        ir_model_list.append(ir_model)
-        ir_model.get_graph().draw(ir_model.name + '.png', prog='dot')
-    pickle_file_path = os.path.join(usage_root_dir, 'ir_models.pickle')
-    with open(pickle_file_path, 'wb') as file:
+        # ir_model_list.append(ir_model)
+        with open(ir_model_path, 'wb') as file:
+            pickle.dump(ir_model, file)
+        ir_model.get_graph().draw(os.path.join(app_root_dir, ir_model.name + '.png'), prog='dot')
+    return runtime_per_model_list
+    # ir_model_list_path = os.path.join(usage_root_dir, 'ir_model_list.pickle')
+    # with open(ir_model_list_path, 'wb') as file:
         # for ir_model in ir_model_list:
         #     print(ir_model.states)
-        pickle.dump(ir_model_list, file)
+        # pickle.dump(ir_model_list, file)
+
+
+def run_ir_model_generation(usage_root_dir):
+    runtime_list = generating_ir_models(usage_root_dir)
+    runtime = {}
+    runtime['ir_model_generation'] = runtime_list
+    runtime_file_path = os.path.join(usage_root_dir, 'runtime4.json')
+    with open(runtime_file_path, 'w') as outfile:
+        json.dump(runtime, outfile)
+    for proc in psutil.process_iter():
+        # print(proc.name())
+        if proc.name() == 'Preview':
+            proc.kill()
 
 if __name__ == '__main__':
     usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
+    start = time.time()
     generating_ir_models(usage_root_dir)
+    end = time.time()
+    print(os.path.basename(os.path.normpath(usage_root_dir)) + '\t' + str(end-start))
     print('all done! :)')
