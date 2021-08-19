@@ -41,7 +41,7 @@ firstname,first name field such as when signing up,input
 forget_pwd,forget password,
 fullname,full name input field such as the contact name,input
 help,jump to help page,
-interests,go to the user's interests such as my topics in the news app,
+interests,go to the user's interests such as my topics in the news app or my feeds,
 item_i,jump to the item's detailed page such as the first item's,
 item_option,product/item specific options such as the model of a phone,
 keep_signin,keep the user logged in (e.g. a checkbox),
