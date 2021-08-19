@@ -56,7 +56,7 @@ multi_form,form to fill with multiple fields,input
 non_binary,widget to show nonbinary gender,
 number,choose a number such as choose 0 quantity of the item in the cart to remove the item or choose the size,
 password,password field when signing in or signing up,input
-perms_allow,allow permissions,
+perms_allow,allow permissions or accept terms etc,
 personal_account,use a personal account such as when signing up,
 phone,phone number input field,input
 pick_google_account,choose the google account to sign in inside the signin_google screen,
