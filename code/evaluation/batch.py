@@ -10,4 +10,4 @@ def ir_model_batch():
         run_ir_model_generation(usage_dir)
 
 if __name__ == '__main__':
-    ir_model_batch()
+    print('all done! :)')

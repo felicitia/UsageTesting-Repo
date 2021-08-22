@@ -41,7 +41,11 @@ def get_screenIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_
         user_input = input('please enter screen IR manually for ' + screen + '\n')
         return user_input
     elif len(row_found) == 1:
-        # print(row_found['tag_screen'].values[0])
+        if pd.isna(row_found['tag_screen'].values[0]):
+            image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
+            image.show()
+            user_input = input('please enter screen IR manually for ' + screen + '\n')
+            return user_input
         return row_found['tag_screen'].values[0]
     else:
         raise ValueError('row found is > 1 when getting screenIR, check', screen)
@@ -61,7 +65,11 @@ def get_widgetIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_
         user_input = input('please enter widget IR manually for widget ' + widget + '\n')
         return user_input
     elif len(row_found) == 1:
-        # print(row_found['tag_widget'].values[0])
+        if pd.isna(row_found['tag_widget'].values[0]):
+            image = PIL.Image.open(step_image_file_abspath)
+            image.show()
+            user_input = input('please enter widget IR manually for widget ' + widget + '\n')
+            return user_input
         return row_found['tag_widget'].values[0]
     else:
         raise ValueError('row found is > 1 when getting widgetIR, check', widget)
@@ -254,7 +262,7 @@ def run_ir_model_generation(usage_root_dir):
     runtime_list = generating_ir_models(usage_root_dir)
     runtime = {}
     runtime['ir_model_generation'] = runtime_list
-    runtime_file_path = os.path.join(usage_root_dir, 'runtime4.json')
+    runtime_file_path = os.path.join(usage_root_dir, 'runtime.json')
     with open(runtime_file_path, 'w') as outfile:
         json.dump(runtime, outfile)
     for proc in psutil.process_iter():
@@ -263,9 +271,5 @@ def run_ir_model_generation(usage_root_dir):
             proc.kill()
 
 if __name__ == '__main__':
-    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
-    start = time.time()
-    generating_ir_models(usage_root_dir)
-    end = time.time()
-    print(os.path.basename(os.path.normpath(usage_root_dir)) + '\t' + str(end-start))
+    run_ir_model_generation('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts/18-Textsize')
     print('all done! :)')
