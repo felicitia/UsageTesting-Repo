@@ -88,7 +88,7 @@ def merge_filter_labels():
 
 def check_nan_state():
     # usatoday-about-2.png has nan state, check it!
-    all_states = set()
+    # count = 0
     for ir_model_file in glob.glob('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts/*/*/ir_model.pickle'):
         if not os.path.exists(ir_model_file):
             print('ir model non exist in', ir_model_file)
@@ -97,8 +97,10 @@ def check_nan_state():
             for state in ir_model.states:
                 if pd.isna(state):
                     print('nan state in', ir_model_file)
-                    # print()
-    print(all_states)
+                    # os.remove(ir_model_file)
+                    # count += 1
+    # print('removed', count)
+
 
 if __name__ == '__main__':
     # usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/18-Textsize')

@@ -81,7 +81,7 @@ def merge_ir_models(usage_root_dir):
         add_ir_model(usage_model, ir_model_list[i])
         i += 1
     usage_model.states = list(set(usage_model.states))
-    usage_model.get_graph().draw('my_state_diagram.png', prog='dot')
+    usage_model.get_graph().draw('merged.png', prog='dot')
     pickle_file_path = os.path.join(usage_root_dir, 'usage_model.pickle')
     with open(pickle_file_path, 'wb') as file:
         pickle.dump(usage_model, file)

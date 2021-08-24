@@ -5,5 +5,4 @@ code/binaryClassifier/sym*
 **/clicked_frames_crop/*
 *.pyc
 **/sym*/*
-code/3_model_generation/*.png
 video_data_examples/*

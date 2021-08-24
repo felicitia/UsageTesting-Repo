@@ -262,7 +262,7 @@ def run_ir_model_generation(usage_root_dir):
     runtime_list = generating_ir_models(usage_root_dir)
     runtime = {}
     runtime['ir_model_generation'] = runtime_list
-    runtime_file_path = os.path.join(usage_root_dir, 'runtime.json')
+    runtime_file_path = os.path.join(usage_root_dir, 'runtime8.json')
     with open(runtime_file_path, 'w') as outfile:
         json.dump(runtime, outfile)
     for proc in psutil.process_iter():

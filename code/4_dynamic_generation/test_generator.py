@@ -79,7 +79,7 @@ class TestGenerator:
     def __init__(self, desiredCapabilities):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
-        self.MAX_TEST_NUM = 3
+        self.MAX_TEST_NUM = 10
 
     def start(self, output_dir, usage_model_path, appname):
         if not os.path.isdir(output_dir):
@@ -140,6 +140,7 @@ class TestGenerator:
                 time.sleep(2)
                 current_state = self.explorer.extract_state(self.output_dir)
                 current_state.print_state()
+                # placeholder context: you only need to care about find_next_event_list function
                 next_event_list = self.find_next_event_list(current_state)
                 if next_event_list is None or len(next_event_list) == 0:
                     print('no next event found. ending dynamic generation...')
@@ -285,6 +286,7 @@ class TestGenerator:
             if trigger == 'self':
                 raise ValueError('self trigger should be removed already, check triggers of ', matching_screenIR)
             isEnd = self.is_final_trigger(trigger=trigger, source=matching_screenIR)
+            # placeholder context: change find_matching_element_per_trigger function
             matching_element = self.find_matching_element_per_trigger(current_state, trigger)
             if matching_element is not None:
                 # transition = {'trigger': trigger, 'source': matching_screenIR, 'dest': 'aaa', 'conditions': ['con1', 'con2'],
@@ -295,6 +297,7 @@ class TestGenerator:
 
     def find_next_event_list(self, current_state):
         next_event_list = []
+        # placeholder context: change find_matching_state_in_usage_model function
         matching_screenIR = self.find_mathing_state_in_usage_model(current_state)
         if matching_screenIR is None:
             print('no matching state found in the usage model...')
@@ -303,9 +306,11 @@ class TestGenerator:
             all_possible_triggers = self.usage_model.machine.get_triggers(matching_screenIR)
             if 'self' in all_possible_triggers:
                 # self_actions is a *list* of DestEvent
+                # placeholder context: change find_actions_from_self_transition function
                 self_actions = self.find_actions_from_self_transition(matching_screenIR, current_state)
                 next_event_list.append(self_actions)
                 all_possible_triggers.remove('self')
+            # placeholder context: change find_possible_next_actions function
             possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers)
             for possible_action in possible_actions:
                 next_event_list.append(possible_action)
@@ -316,6 +321,8 @@ class TestGenerator:
         # argument would be the input ow it would be empty string
 
 if __name__ == "__main__":
+    # appPackage and appActivity can be found here for shooping apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv
+    # here for news apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv
     desiredCapabilities = {
         "platformName": "Android",
         "deviceName": "emulator-5554",
@@ -325,11 +332,16 @@ if __name__ == "__main__":
     }
     start = time.time()
     test_gen = TestGenerator(desiredCapabilities)
+    # substitute abs path to our repo's path to point to video_data_examples folder
+    # dynamic_output folder contains our output and will be generated automatically, no need to create an empty folder
+    # usage_model.pickle's graph can be found here "merged.png": /code/3_model_generation
+    # merged.png is the result of merging other pngs in the same folder (it's not how we'll evaluate the appr but it's for illustration)
     test_gen.start('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output',
                    '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/usage_model.pickle',
                    'etsy')
     end = time.time()
     print("Dynamic generation running time " + str(end - start) + " seconds")
+    # kill all the images opened by Preview
     for proc in psutil.process_iter():
         # print(proc.name())
         if proc.name() == 'Preview':
