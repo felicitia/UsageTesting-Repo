@@ -73,10 +73,9 @@ class Explorer:
         else:
             raise ValueError('row found is > 1 when getting screenIR, check', event.state_screenshot_path)
 
-    def execute_test_and_generate_models(self, test_file):
+    def execute_test_and_generate_linear_model(self, test_file):
         test = pickle.load(open(test_file, 'rb'))
         linear_model = []
-        ir_model = IR_Model(os.path.basename(os.path.normpath(test_file)))
         dynamic_annotation_file = os.path.join(Path(test_file).parent.parent.parent.parent.absolute(), 'dynamic_annotations.csv')
         if not os.path.exists(dynamic_annotation_file):
             headers = ['filepath', 'IR']

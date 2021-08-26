@@ -23,7 +23,7 @@ if __name__ == '__main__':
     start = time.time()
     explorer = Explorer(desiredCapabilities)
     # explorer.execute_test('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
-    explorer.execute_test_and_generate_models('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
+    explorer.execute_test_and_generate_linear_model('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
     end = time.time()
     print("test running time " + str(end - start) + " seconds")
     # kill all the images opened by Preview
