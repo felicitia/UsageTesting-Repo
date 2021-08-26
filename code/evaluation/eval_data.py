@@ -63,6 +63,23 @@ def count_subject_apps():
         count += total_apps[key]
     print('total traces count', count)
 
+def find_overlapping_apps():
+    i = 0
+    overlapping_apps = set()
+    for sub_dir in sorted(glob.glob(os.path.join(final_data_dir, '*'))):
+        apps_per_usage = set()
+        for file in glob.glob(os.path.join(sub_dir, '*')):
+            if os.path.isdir(file):
+                appName = os.path.basename(os.path.normpath(file)).split('-')[0].lower()
+                apps_per_usage.add(appName)
+        if i == 0:
+            overlapping_apps = apps_per_usage
+        else:
+            overlapping_apps = overlapping_apps.intersection(apps_per_usage)
+        i += 1
+        print('apps in this usage', apps_per_usage, os.path.basename(os.path.normpath(sub_dir)))
+        print('overlapping apps', overlapping_apps)
+
 if __name__ == '__main__':
-    count_labels()
-    print('all done!')
+    find_overlapping_apps()
+    print('all done! :)')
