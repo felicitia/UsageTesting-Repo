@@ -271,5 +271,5 @@ def run_ir_model_generation(usage_root_dir):
             proc.kill()
 
 if __name__ == '__main__':
-    run_ir_model_generation('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts/18-Textsize')
+    run_ir_model_generation('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
     print('all done! :)')

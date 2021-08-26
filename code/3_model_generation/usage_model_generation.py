@@ -1,5 +1,5 @@
 import pickle
-import os
+import os, glob
 
 
 # usage_model.get_graph().draw('my_state_diagram.png', prog='dot')
@@ -70,9 +70,24 @@ def add_ir_model(usage_model, ir_model):
                     else:
                         print('transition is more than 1, check', ir_model.name, state, new_trigger)
 
-def merge_ir_models(usage_root_dir):
-    pickle_filepath = os.path.join(usage_root_dir, 'ir_models.pickle')
-    ir_model_list = pickle.load(open(pickle_filepath, 'rb'))
+def get_appname_from_ir_model_file(ir_model_file):
+    appname = ir_model_file.replace('ir_model.pickle', '')
+    appname = os.path.basename(os.path.normpath(appname))
+    appname = appname.split('-')[0].lower()
+    return appname
+
+def get_training_ir_model_list(usage_root_dir, AUTname):
+    ir_model_list = []
+    for ir_model_file in glob.glob(os.path.join(usage_root_dir, '*', 'ir_model.pickle')):
+        appname =get_appname_from_ir_model_file(ir_model_file)
+        if appname != AUTname:
+            ir_model = pickle.load(open(ir_model_file, 'rb'))
+            ir_model_list.append(ir_model)
+    return ir_model_list
+
+def merge_ir_models(usage_root_dir, AUTname):
+    # pickle_filepath = os.path.join(usage_root_dir, 'ir_models.pickle')
+    ir_model_list = get_training_ir_model_list(usage_root_dir, AUTname)
     usage_name = os.path.basename(os.path.normpath(usage_root_dir))
     usage_model = ir_model_list[0] # initialize usage model with the first ir model
     usage_model.name = usage_name
@@ -88,4 +103,4 @@ def merge_ir_models(usage_root_dir):
 
 if __name__ == '__main__':
     usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
-    merge_ir_models(usage_root_dir)
+    merge_ir_models(usage_root_dir, 'etsy')
