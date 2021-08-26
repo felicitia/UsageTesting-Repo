@@ -1,6 +1,9 @@
 from sys import argv
 import os
 import re
+
+import psutil
+
 import explorer
 import time
 import json
@@ -19,6 +22,12 @@ if __name__ == '__main__':
     }
     start = time.time()
     explorer = Explorer(desiredCapabilities)
-    explorer.execute_test('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable2.pickle')
+    # explorer.execute_test('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
+    explorer.execute_test_and_generate_models('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
     end = time.time()
     print("test running time " + str(end - start) + " seconds")
+    # kill all the images opened by Preview
+    for proc in psutil.process_iter():
+        # print(proc.name())
+        if proc.name() == 'Preview':
+            proc.kill()

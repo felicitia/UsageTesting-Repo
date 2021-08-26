@@ -1,9 +1,15 @@
+import PIL
 from appium import webdriver
 import layout_tree as LayoutTree
 import time
-import os
+import os, csv
 from appium.webdriver.common.touch_action import TouchAction
 import pickle
+import sys
+sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
+from entities import IR_Model
+from pathlib import Path
+import pandas as pd
 
 class Explorer:
     def __init__(self, desiredCapabilities):
@@ -24,6 +30,69 @@ class Explorer:
                     self.execute_event(self_event)
             else:
                 self.execute_event(event)
+
+    def add_new_annotation(self, new_annotation_dict, filepath, IR):
+        new_annotation_dict['filepath'].append(filepath)
+        new_annotation_dict['IR'].append(IR)
+
+    def execute_test_and_generate_models(self, test_file):
+        test = pickle.load(open(test_file, 'rb'))
+        linear_model = []
+        ir_model = IR_Model(os.path.basename(os.path.normpath(test_file)))
+        dynamic_annotation_file = os.path.join(Path(test_file).parent.parent.parent.parent.absolute(), 'dynamic_annotations.csv')
+        if not os.path.exists(dynamic_annotation_file):
+            headers = ['filepath', 'IR']
+            with open(dynamic_annotation_file, 'w') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                csvwriter.writerow(headers)
+        annotation_df = pd.read_csv(dynamic_annotation_file)
+        new_annotation_dict = {'filepath': [], 'IR': []}
+
+        for event in test:
+            if type(event) is list:
+                for self_event in event:
+                    image = PIL.Image.open(self_event.state_screenshot_path)
+                    image.show()
+                    current_screenIR = input('type current screen IR shown in the screenshot\n')
+                    self.add_new_annotation(new_annotation_dict=new_annotation_dict, filepath=self_event.state_screenshot_path,
+                                            IR=current_screenIR)
+                    action = self_event.action
+                    if 'swipe' in action:
+                        swipe_direction = event.action.split('-')[1]
+                        linear_model.append({'state': current_screenIR, 'transition': swipe_direction})
+                    else:
+                        image = PIL.Image.open(self_event.crop_screenshot_path)
+                        image.show()
+                        widgetIR = input('type widget IR that is about to trigger\n')
+                        self.add_new_annotation(new_annotation_dict=new_annotation_dict, filepath=self_event.crop_screenshot_path,
+                                                IR=widgetIR)
+                        transition_name = widgetIR + '#' + action
+                        linear_model.append({'state': current_screenIR, 'transition': transition_name})
+                    self.execute_event(self_event)
+            else:
+                image = PIL.Image.open(event.state_screenshot_path)
+                image.show()
+                current_screenIR = input('type current screen IR shown in the screenshot\n')
+                self.add_new_annotation(new_annotation_dict=new_annotation_dict,
+                                        filepath=event.state_screenshot_path,
+                                        IR=current_screenIR)
+                action = event.action
+                if 'swipe' in action:
+                    swipe_direction = event.action.split('-')[1]
+                    linear_model.append({'state': current_screenIR, 'transition': swipe_direction})
+                else:
+                    image = PIL.Image.open(event.crop_screenshot_path)
+                    image.show()
+                    widgetIR = input('type widget IR that is about to trigger\n')
+                    self.add_new_annotation(new_annotation_dict=new_annotation_dict,
+                                            filepath=event.crop_screenshot_path,
+                                            IR=widgetIR)
+                    transition_name = widgetIR + '#' + action
+                    linear_model.append({'state': current_screenIR, 'transition': transition_name})
+                self.execute_event(event)
+        annotation_df = pd.concat([annotation_df, pd.DataFrame(new_annotation_dict)], ignore_index=True)
+        annotation_df.to_csv(dynamic_annotation_file, index=False)
+        print(linear_model)
 
     def extract_state(self, output_dir):
         layout = LayoutTree.LayoutTree(self.driver, output_dir)
