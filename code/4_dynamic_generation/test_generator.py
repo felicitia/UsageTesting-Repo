@@ -55,13 +55,14 @@ class Event:
 
 
 class DestEvent:
-    def __init__(self, action, exec_id_type, exec_id_val, text_input, isEnd):
+    def __init__(self, action, exec_id_type, exec_id_val, text_input, isEnd, crop_screenshot_path, state_screenshot_path):
         self.action = action
         self.exec_id_type = exec_id_type
         self.exec_id_val = exec_id_val
         self.text_input = text_input
         self.isEnd = isEnd
-        # self.transition = transition
+        self.crop_screenshot_path = crop_screenshot_path
+        self.state_screenshot_path = state_screenshot_path
 
     def print_event(self):
         print("---- printing dest event ----")
@@ -79,7 +80,7 @@ class TestGenerator:
     def __init__(self, desiredCapabilities):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
-        self.MAX_TEST_NUM = 10
+        self.MAX_TEST_NUM = 3
 
     def start(self, output_dir, usage_model_path, appname):
         if not os.path.isdir(output_dir):
@@ -245,11 +246,13 @@ class TestGenerator:
                             is_matched = input('check element that was just opened and enter y if matched')
                             if is_matched == 'y':
                                 self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
-                                                              exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False))
+                                                              exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
+                                                              crop_screenshot_path=element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
             else:
                 action = 'swipe-' + condition
                 print('generated action', action)
-                self_actions.append(DestEvent(action=action, exec_id_val='', exec_id_type='', text_input='', isEnd=False))
+                self_actions.append(DestEvent(action=action, exec_id_val='', exec_id_type='', text_input='', isEnd=False, crop_screenshot_path=None,
+                                              state_screenshot_path=current_state.screenshot_path))
 
         # generate actions for EditText fields and fill the form
         if needs_user_input:
@@ -262,7 +265,8 @@ class TestGenerator:
                     if not user_input == '':
                         self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
                                                       exec_id_val=element.get_exec_id_val(),
-                                                      text_input=user_input, isEnd=False))
+                                                      text_input=user_input, isEnd=False, crop_screenshot_path=element.path_to_screenshot,
+                                                      state_screenshot_path=current_state.screenshot_path))
 
         return self_actions
 
@@ -292,7 +296,8 @@ class TestGenerator:
                 # transition = {'trigger': trigger, 'source': matching_screenIR, 'dest': 'aaa', 'conditions': ['con1', 'con2'],
                 #               'label': ['label1']}
                 possible_actions.append(DestEvent(action=trigger.split('#')[1], exec_id_type=matching_element.get_exec_id_type(),
-                                                  exec_id_val=matching_element.get_exec_id_val(), text_input='', isEnd=isEnd))
+                                                  exec_id_val=matching_element.get_exec_id_val(), text_input='', isEnd=isEnd,
+                                                  crop_screenshot_path=matching_element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
         return possible_actions
 
     def find_next_event_list(self, current_state):
