@@ -1,6 +1,6 @@
 import os, shutil, csv, json
 
-usage_root_dir = "C:/Users/leony/Downloads/Combined"
+usage_root_dir = "C:/Users/leony/Documents/UsageTesting/combined2"
 
 templist = []
 screen_list = []
@@ -47,12 +47,7 @@ for folder in folders:
 
     print("Finished "+folder)
 
+print("Screen ir count:", {i:screen_list.count(i) for i in screen_list})
+print("Widget ir count:", {i:widget_list.count(i) for i in widget_list})
 
 print("Done!")
-
-print({i:screen_list.count(i) for i in screen_list})
-print({i:widget_list.count(i) for i in widget_list})
-screen_list = set(screen_list)
-print("count of screens: "+str(len(screen_list)))
-widget_list = set(widget_list)
-print("count of widgets: "+str(len(widget_list)))
