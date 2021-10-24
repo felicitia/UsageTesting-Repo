@@ -26,7 +26,6 @@ for folder in folders:
                     # Size of the image in pixels (size of original image)
                     width, height = im.size
 
-                    # resize the input to 1080*1920 if not this size originally
                     if width != 1080 or height != 1920:
                         print(folder, end="/", file=sourceFile)
                         print(folder2, end="    ", file=sourceFile)
