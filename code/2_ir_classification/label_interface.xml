@@ -7,8 +7,8 @@
     <Choice value="account_guest" background="#D3F261"/>
     <Choice value="address_add" background="#389E0D"/>
     <Choice value="address_edit" background="#5CDBD3"/>
-    <Choice value="shopping_cart" background="#096DD9"/>
-    <Choice value="cart_quantity" background="#ADC6FF"/>
+    <Choice value="cart" background="#096DD9"/>
+    <Choice value="quantity" background="#ADC6FF"/>
     <Choice value="confirm_remove"/>
     <Choice value="category"/>
     <Choice value="city_spinner"/>
@@ -26,9 +26,8 @@
     <Choice value="setting"/>
     <Choice value="sign_in"/>
     <Choice value="sign_in_option"/>
-    <Choice value="sign_in_or_sign_up"/>
-    <Choice value="sign_in_pwd"/>
-    <Choice value="sign_in_username"/>
+    <Choice value="password"/>
+    <Choice value="username"/>
     <Choice value="sign_up"/>
     <Choice value="sign_up_birthday"/>
     <Choice value="skip"/>
@@ -48,8 +47,6 @@
     <Choice value="checkout"/>
     <Choice value="interests" />
     <Choice value="signin_or_signup" />
-    <Choice value="cart" />
-    <Choice value="username" />
   </Choices>
   <Image name="widget" value="$widget"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
