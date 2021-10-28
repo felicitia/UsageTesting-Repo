@@ -25,12 +25,10 @@
     <Choice value="search"/>
     <Choice value="setting"/>
     <Choice value="sign_in"/>
-    <Choice value="sign_in_option"/>
     <Choice value="password"/>
     <Choice value="username"/>
     <Choice value="sign_up"/>
     <Choice value="sign_up_birthday"/>
-    <Choice value="skip"/>
     <Choice value="state_spinner"/>
     <Choice value="terms"/>
     <Choice value="bookmark"/>
