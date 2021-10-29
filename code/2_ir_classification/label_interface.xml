@@ -50,30 +50,29 @@
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
   <Choices name="tag_widget" toName="widget" showInline="true">
     <Choice value="about" background="#9254DE"/>
-    <Choice value="account_address" background="#F759AB"/>
-    <Choice value="account_signin" background="#FFA39E"/>
+    <Choice value="to_address" background="#F759AB"/>
     <Choice value="add_cart" background="#D4380D"/>
     <Choice value="add" background="#FFC069"/>
-    <Choice value="address_city" background="#AD8B00"/>
-    <Choice value="address_phone" background="#D3F261"/>
+    <Choice value="edit" />
+    <Choice value="city" background="#AD8B00"/>
+    <Choice value="phone" background="#D3F261"/>
     <Choice value="save"/>
-    <Choice value="address_state"/>
-    <Choice value="address_state_spinner"/>
-    <Choice value="address_street"/>
-    <Choice value="address_country"/>
-    <Choice value="address_zip"/>
+    <Choice value="state"/>
+    <Choice value="state_spinner"/>
+    <Choice value="street"/>
+    <Choice value="country"/>
+    <Choice value="zipcode"/>
     <Choice value="back"/>
     <Choice value="bypass"/>
     <Choice value="cart"/>
-    <Choice value="cart_quantity"/>
-    <Choice value="quantity_0"/>
+    <Choice value="number" />
+    <Choice value="quantity"/>
     <Choice value="remove"/>
-    <Choice value="remove_confirm"/>
+    <Choice value="confirm"/>
     <Choice value="select_all"/>
-    <Choice value="cat_1"/>
+    <Choice value="category_i"/>
     <Choice value="category"/>
     <Choice value="contact"/>
-    <Choice value="contact_name"/>
     <Choice value="edit"/>
     <Choice value="filter"/>
     <Choice value="filter_color"/>
@@ -81,18 +80,15 @@
     <Choice value="filter_price"/>
     <Choice value="filter_rating"/>
     <Choice value="filter_sort"/>
-    <Choice value="get_started"/>
     <Choice value="help"/>
-    <Choice value="home_signin"/>
-    <Choice value="home_signin_or_signup"/>
-    <Choice value="home_signup"/>
-    <Choice value="item_1"/>
+    <Choice value="to_signin"/>
+    <Choice value="to_signup"/>
+    <Choice value="item_i"/>
     <Choice value="legal"/>
     <Choice value="menu"/>
-    <Choice value="menu_account"/>
+    <Choice value="account"/>
     <Choice value="menu_more"/>
     <Choice value="menu_settings"/>
-    <Choice value="menu_signin"/>
     <Choice value="minus"/>
     <Choice value="perms_allow"/>
     <Choice value="search"/>
@@ -100,35 +96,36 @@
     <Choice value="sign_in"/>
     <Choice value="sign_up"/>
     <Choice value="continue"/>
-    <Choice value="signin_email"/>
-    <Choice value="signup_confirm_email"/>
-    <Choice value="signin_forget_pwd"/>
-    <Choice value="signin_password"/>
+    <Choice value="email"/>
+    <Choice value="confirm_email"/>
+    <Choice value="forget_pwd"/>
+    <Choice value="password"/>
     <Choice value="to_signin_or_signup"/>
-    <Choice value="signin_username"/>
-    <Choice value="signup_business"/>
-    <Choice value="signup_confirm_password"/>
+    <Choice value="username"/>
+    <Choice value="business_account"/>
+    <Choice value="confirm_password"/>
     <Choice value="firstname"/>
     <Choice value="lastname"/>
-    <Choice value="signup_personal"/>
+    <Choice value="fullname" />
+    <Choice value="personal_account"/>
     <Choice value="skip"/>
     <Choice value="to_home"/>
     <Choice value="to_search"/>
-    <Choice value="signin_by_email"/>
+    <Choice value="by_email"/>
     <Choice value="save_bookmark"/>
     <Choice value="remove_bookmark"/>
-    <Choice value="menu_bookmark"/>
-    <Choice value="menu_textsize"/>
+    <Choice value="bookmark"/>
+    <Choice value="textsize"/>
     <Choice value="change_textsize"/>
     <Choice value="keep_signin"/>
     <Choice value="multi_form"/>
-    <Choice value="signin_amazon"/>
-    <Choice value="signin_google"/>
+    <Choice value="by_amazon"/>
+    <Choice value="by_google"/>
     <Choice value="pick_google_account"/>
     <Choice value="captcha_input"/>
-    <Choice value="signin_fb"/>
+    <Choice value="by_facebook"/>
     <Choice value="buy"/>
-    <Choice value="show_checkbox"/>
+    <Choice value="show"/>
     <Choice value="male"/>
     <Choice value="female"/>
     <Choice value="non_binary"/>

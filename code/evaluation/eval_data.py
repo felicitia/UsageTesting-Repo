@@ -1,6 +1,7 @@
 import os
 import glob
 import pandas as pd
+import xml.etree.ElementTree as ET
 
 final_data_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts')
 screenIR_file = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/IR/screen_ir.csv'
@@ -38,6 +39,8 @@ def count_labels():
     print('screen diff other way:', set(screenIR_def) - set(screenIRs))
     print('widget diff:', set(widgetIRs) - set(widgetIR_def))
     print('widget diff other way:', set(widgetIR_def) - set(widgetIRs))
+    return screenIRs, widgetIRs, screenIR_def, widgetIR_def
+
 
 def count_subject_apps():
     total_apps = {}
@@ -80,6 +83,28 @@ def find_overlapping_apps():
         print('apps in this usage', apps_per_usage, os.path.basename(os.path.normpath(sub_dir)))
         print('overlapping apps', overlapping_apps)
 
+def read_IRs_from_LS_interface():
+    interface_xml = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/2_ir_classification/label_interface.xml'
+    tree = ET.parse(interface_xml)
+    root = tree.getroot()
+    xml_widget_IRs = set()
+    xml_screen_IRs = set()
+    for node in root.findall('./'):
+        if node.attrib['name'] == 'tag_screen':
+            for choice in node.findall('./'):
+                xml_screen_IRs.add(choice.attrib['value'])
+        elif node.attrib['name'] == 'tag_widget':
+            for choice in node.findall('./'):
+                xml_widget_IRs.add(choice.attrib['value'])
+    return xml_screen_IRs, xml_widget_IRs
+
+
 if __name__ == '__main__':
-    find_overlapping_apps()
+    xml_screen_IRs, xml_widget_IRs = read_IRs_from_LS_interface()
+    labeled_screenIRs, labeled_widgetIRs, screenIR_def, widgetIR_def = count_labels()
+    print('aaa', set(xml_widget_IRs) - set(widgetIR_def))
+    print('bbb', set(widgetIR_def) - set(xml_widget_IRs))
+    print('def == xml?', set(xml_widget_IRs) == set(widgetIR_def))
+    print('ccc', set(xml_widget_IRs) - set(labeled_widgetIRs))
+    print('ddd', set(labeled_widgetIRs) - set(xml_widget_IRs))
     print('all done! :)')
