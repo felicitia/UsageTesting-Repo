@@ -104,14 +104,13 @@
     <Choice value="signup_confirm_email"/>
     <Choice value="signin_forget_pwd"/>
     <Choice value="signin_password"/>
-    <Choice value="signin_tosignin"/>
+    <Choice value="to_signin_or_signup"/>
     <Choice value="signin_username"/>
     <Choice value="signup_business"/>
     <Choice value="signup_confirm_password"/>
     <Choice value="firstname"/>
     <Choice value="lastname"/>
     <Choice value="signup_personal"/>
-    <Choice value="signup_tosignin"/>
     <Choice value="skip"/>
     <Choice value="to_home"/>
     <Choice value="to_search"/>
