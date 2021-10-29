@@ -53,7 +53,6 @@
     <Choice value="to_address" background="#F759AB"/>
     <Choice value="add_cart" background="#D4380D"/>
     <Choice value="add" background="#FFC069"/>
-    <Choice value="edit" />
     <Choice value="city" background="#AD8B00"/>
     <Choice value="phone" background="#D3F261"/>
     <Choice value="save"/>
