@@ -1,7 +1,7 @@
 <View>
   <Image name="screen" value="$screen" width="40%"/>
   <Filter name="screen_filter" toName="tag_screen" minlength="1" placeholder="ex. sign_in"/>
-  <Choices name="tag_screen" toName="screen" showInline="true">
+  <Choices name="tag_screen" toName="screen" showInline="true" choice="multiple">
     <Choice value="about" background="#FFC069"/>
     <Choice value="account" background="#AD8B00"/>
     <Choice value="account_guest" background="#D3F261"/>
@@ -43,12 +43,12 @@
     <Choice value="gender"/>
     <Choice value="alert"/>
     <Choice value="checkout"/>
-    <Choice value="interests" />
-    <Choice value="signin_or_signup" />
+    <Choice value="interests"/>
+    <Choice value="signin_or_signup"/>
   </Choices>
   <Image name="widget" value="$widget"/>
   <Filter name="widget_filter" toName="tag_widget" minlength="1" placeholder="ex. signin"/>
-  <Choices name="tag_widget" toName="widget" showInline="true">
+  <Choices name="tag_widget" toName="widget" showInline="true" choice="multiple">
     <Choice value="about" background="#9254DE"/>
     <Choice value="to_address" background="#F759AB"/>
     <Choice value="add_cart" background="#D4380D"/>
@@ -64,7 +64,7 @@
     <Choice value="back"/>
     <Choice value="bypass"/>
     <Choice value="cart"/>
-    <Choice value="number" />
+    <Choice value="number"/>
     <Choice value="quantity"/>
     <Choice value="remove"/>
     <Choice value="confirm"/>
@@ -105,7 +105,7 @@
     <Choice value="confirm_password"/>
     <Choice value="firstname"/>
     <Choice value="lastname"/>
-    <Choice value="fullname" />
+    <Choice value="fullname"/>
     <Choice value="personal_account"/>
     <Choice value="skip"/>
     <Choice value="to_home"/>
