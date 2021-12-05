@@ -37,6 +37,7 @@ filter_location,filter widget to select the location such as local,
 filter_price,choose filter by price,
 filter_rating,choose rating filter,
 filter_sort,choose sort filter,
+filter_option,choose filter by other options that are not listed,
 firstname,first name field such as when signing up,input
 forget_pwd,forget password,
 fullname,full name input field such as the contact name,input
