@@ -79,7 +79,7 @@
     <Choice value="filter_price"/>
     <Choice value="filter_rating"/>
     <Choice value="filter_sort"/>
-    <Choise value="filter_option"/>
+    <Choice value="filter_option"/>
     <Choice value="help"/>
     <Choice value="to_signin"/>
     <Choice value="to_signup"/>
