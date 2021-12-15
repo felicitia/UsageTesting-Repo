@@ -2,6 +2,7 @@ import os, glob
 import shutil
 import pandas as pd
 import pickle
+import json
 import sys
 sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
 
@@ -101,10 +102,51 @@ def check_nan_state():
                     # count += 1
     # print('removed', count)
 
+def count_screen_images():
+    root_usage = '/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts'
+    all_labels = pd.read_csv('/Users/yixue/Documents/Research/UsageTesting/v2s_data/final_labels/all.csv')
+
+    screen_list = []
+    for screen_file in glob.glob(os.path.join(root_usage, '*/*/ir_data_auto/*-screen.jpg')):
+        screen_list.append(os.path.basename(os.path.normpath(screen_file)))
+
+def count_REMAUI_output():
+    root_dir = '/Users/yixue/Documents/Research/UsageTesting/REMAUIOutput'
+    REMAUI_file_list = []
+    autoencoder_file_list = []
+    for file in glob.glob(root_dir + '/*/*/*-screen/activity_main.xml'):
+        tmp = os.path.split(os.path.split(file)[0])[1]
+        # print(tmp)
+        REMAUI_file_list.append(tmp)
+    autoencoder_file = open('/Users/yixue/Documents/Research/UsageTesting/KNNscreenClassifier/names.json')
+    names_json = json.load(autoencoder_file)
+    for name in names_json:
+        tmp = os.path.basename(os.path.normpath(name)).replace('.jpg', '')
+        # print(tmp)
+        autoencoder_file_list.append(tmp)
+
+    diff = set(REMAUI_file_list) - set(autoencoder_file_list)
+    print('diff =', diff)
+    print('diff len =', len(diff))
+
+
+def combine_LS_labels():
+    label_root = '/Users/yixue/Documents/Research/UsageTesting/v2s_data/final_labels'
+    merged_df = None
+    columns = None
+    for label_file in glob.glob(label_root +'/*.csv'):
+        df = pd.read_csv(label_file)
+        if merged_df is None:
+            merged_df = df
+            columns = df.columns
+        else:
+            merged_df = pd.concat([merged_df, df[columns]], axis=0)
+    # merged_df.to_csv(label_root + '/all.csv', index=False)
 
 if __name__ == '__main__':
     # usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/18-Textsize')
     # for file in glob.glob('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts/18-Textsize/*/ir_model.pickle'):
     #     os.remove(file)
-    check_nan_state()
+    # combine_LS_labels()
+    count_REMAUI_output()
     print('all done! :)')
