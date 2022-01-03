@@ -84,7 +84,7 @@ to_address,jump to address management page,
 to_home,jump to home page,
 to_search,go to search screen,
 to_signin,jump to sign in dialog/screen such as from account screen,
-to_signin_or_signup,jump to sign in or sign up options,
+to_signin_or_signup,jump to sign in or sign up,
 to_signup,jump to sign up dialog/screen such as from the home screen or from the signin screen,
 username,username field when signing in or signing up,input
 zipcode,zipcode input field,input
