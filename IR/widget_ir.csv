@@ -54,7 +54,6 @@ menu_more,more info,
 menu_settings,jump to app settings,
 minus,substract the amount,
 multi_form,form to fill with multiple fields,input
-non_binary,widget to show nonbinary gender,
 number,choose a number such as choose 0 quantity of the item in the cart to remove the item or choose the size,
 password,password field when signing in or signing up,input
 perms_allow,allow permissions or accept terms etc,
