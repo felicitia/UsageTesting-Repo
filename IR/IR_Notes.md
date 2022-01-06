@@ -10,6 +10,7 @@
 7. username --> sign_in / sign_up
 
 ### IR merging -- WIDGET ###
+✓
 
 1. bypass --> continue
 2. filter_color --> filter_option
