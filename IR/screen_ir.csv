@@ -1,7 +1,6 @@
 ir,description,screen_type
 about,about page of the app,
 account,account page of the app,
-
 address_add,the address page where the user can choose to add a new address,
 address_edit,the page to edit the different info of the address,input
 alert,notification screen,
@@ -12,7 +11,6 @@ checkout,checkout screen and payment related,
 city_spinner,the spinner to choose a city,
 confirm_remove,the dialog screen to confirm removing something such as an item from the cart,
 contact,the page that contains the contact info of the app company,
-
 filter,the page for any filter options,
 gender,screen to choose genger/sex,
 get_started,screen to start before the homepage such as showing get started,
