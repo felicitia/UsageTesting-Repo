@@ -1,10 +1,10 @@
-### IR merging -- SCREEN ###
+### IR merging -- SCREEN ### ✓
 
 1. account_guest --> account
 2. error --> popup
 3. filter_option --> filter
 4. filter_sort --> filter
-5. interests --> get_started
+5. interests --> get_started (?)
 6. password --> sign_in / sign_up
 7. username --> sign_in / sign_up
 
