@@ -6,11 +6,13 @@ import json
 import sys
 sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
 
-def delete_subdire(dirname):
+def delete_subdir(usage_root_dir, dirname):
     dir_path = os.path.join(usage_root_dir, '*', dirname)
     dir_list = glob.glob(dir_path)
     for dir in dir_list:
-        shutil.rmtree(dir)
+        print(dir)
+        # shutil.rmtree(dir) # delete directory
+        os.remove(dir) # delete a file
 
 def rename_file(dir):
     for src in glob.glob(dir + '/*'):
@@ -144,9 +146,5 @@ def combine_LS_labels():
     # merged_df.to_csv(label_root + '/all.csv', index=False)
 
 if __name__ == '__main__':
-    # usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/v2s_data/Combined/18-Textsize')
-    # for file in glob.glob('/Users/yixue/Documents/Research/UsageTesting/v2s_data/UsageTesting-Artifacts/18-Textsize/*/ir_model.pickle'):
-    #     os.remove(file)
-    # combine_LS_labels()
-    count_REMAUI_output()
+    delete_subdir('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/usage_data', '*/ir_model.pickle')
     print('all done! :)')

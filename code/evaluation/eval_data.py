@@ -15,7 +15,7 @@ def count_files():
                 totalDir += 1
         print(os.path.basename(os.path.normpath(sub_dir)) + '\t' + str(totalDir))
 
-def count_labels():
+def count_labels_per_usage():
     total_screen_label = 0
     total_widget_label = 0
     screenIRs = []
@@ -101,7 +101,7 @@ def read_IRs_from_LS_interface():
 
 if __name__ == '__main__':
     xml_screen_IRs, xml_widget_IRs = read_IRs_from_LS_interface()
-    labeled_screenIRs, labeled_widgetIRs, screenIR_def, widgetIR_def = count_labels()
+    labeled_screenIRs, labeled_widgetIRs, screenIR_def, widgetIR_def = count_labels_per_usage()
     print('aaa', set(xml_widget_IRs) - set(widgetIR_def))
     print('bbb', set(widgetIR_def) - set(xml_widget_IRs))
     print('def == xml?', set(xml_widget_IRs) == set(widgetIR_def))
