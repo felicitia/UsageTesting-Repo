@@ -1,5 +1,7 @@
 import pickle
 import os, glob
+import time
+import json
 
 
 # usage_model.get_graph().draw('my_state_diagram.png', prog='dot')
@@ -45,7 +47,7 @@ def add_self_transition(usage_model, state, new_condition_list):
 
 # merger ir_model into existing usage model
 def add_ir_model(usage_model, ir_model):
-    print('merging', ir_model.name)
+    # print('merging', ir_model.name)
     for state in set(ir_model.states): # add out transitions of each state
         if state == 'start':
             initial_transition_list = ir_model.machine.get_transitions(trigger='initial', source='start')
@@ -79,7 +81,7 @@ def get_appname_from_ir_model_file(ir_model_file):
 def get_training_ir_model_list(usage_root_dir, AUTname):
     ir_model_list = []
     for ir_model_file in glob.glob(os.path.join(usage_root_dir, '*', 'ir_model.pickle')):
-        appname =get_appname_from_ir_model_file(ir_model_file)
+        appname = get_appname_from_ir_model_file(ir_model_file)
         if appname != AUTname:
             ir_model = pickle.load(open(ir_model_file, 'rb'))
             ir_model_list.append(ir_model)
@@ -90,17 +92,52 @@ def merge_ir_models(usage_root_dir, AUTname):
     ir_model_list = get_training_ir_model_list(usage_root_dir, AUTname)
     usage_name = os.path.basename(os.path.normpath(usage_root_dir))
     usage_model = ir_model_list[0] # initialize usage model with the first ir model
-    usage_model.name = usage_name
+    # print('merged ir model', ir_model_list[0].name)
+    usage_model.name = usage_name + '-' + AUTname
     i = 1
     while i < len(ir_model_list):
         add_ir_model(usage_model, ir_model_list[i])
+        # print('merged ir model', ir_model_list[i].name)
         i += 1
     usage_model.states = list(set(usage_model.states))
-    usage_model.get_graph().draw('merged.png', prog='dot')
-    pickle_file_path = os.path.join(usage_root_dir, 'usage_model.pickle')
+    if not os.path.exists(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name)):
+        os.makedirs(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name))
+    usage_model.get_graph().draw(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name, usage_model.name + '.png'), prog='dot')
+    pickle_file_path = os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name, 'usage_model-' + AUTname + '.pickle')
     with open(pickle_file_path, 'wb') as file:
         pickle.dump(usage_model, file)
 
+def generating_usage_models(usage_root_dir):
+    runtime_per_model_list = []
+    app_set = set()
+    for file in os.listdir(usage_root_dir):
+        file_path = os.path.join(usage_root_dir, file)
+        if os.path.isdir(file_path):
+            app_name = file.split('-')[0].lower()
+            app_set.add(app_name)
+    for app_name in app_set:
+        print('generating usage model for', app_name, '...')
+        start_time = time.time()
+        merge_ir_models(usage_root_dir, app_name)
+        end_time = time.time()
+        runtime_per_model_list.append(end_time - start_time)
+    return runtime_per_model_list
+
+
+def run_usage_model_generation(usage_root_dir):
+    runtime_file_path = os.path.join(usage_root_dir, 'runtime_final.json')
+    runtime_per_model_list = generating_usage_models(usage_root_dir)
+
+    with open(runtime_file_path, "r") as inputfile:
+        runtime = json.load(inputfile)
+
+    runtime['usage_model_generation'] = runtime_per_model_list
+    with open(runtime_file_path, 'w') as outfile:
+        json.dump(runtime, outfile)
+
+
 if __name__ == '__main__':
-    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
-    merge_ir_models(usage_root_dir, 'etsy')
+    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/usage_data/1-SignIn')
+    # generating_usage_models(usage_root_dir)
+    run_usage_model_generation(usage_root_dir)
+    print('all done! :)')

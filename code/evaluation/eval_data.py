@@ -98,10 +98,28 @@ def read_IRs_from_LS_interface():
                 xml_widget_IRs.add(choice.attrib['value'])
     return xml_screen_IRs, xml_widget_IRs
 
+def get_labels_from_final_csv():
+    final_label = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/final_labels/final_labels_all.csv'
+
+    df = pd.read_csv(final_label)
+    screenIRs = df['tag_screen'].unique().tolist()
+    widgetIRs = df['tag_widget'].unique().tolist()
+    print('total screen IRs', len(set(screenIRs)), set(screenIRs))
+    print('total widget IRs', len(set(widgetIRs)), set(widgetIRs))
+
+    screen_df = pd.read_csv(screenIR_file)
+    widget_df = pd.read_csv(widgetIR_file)
+    screenIR_def = screen_df['ir'].unique().tolist()
+    widgetIR_def = widget_df['ir'].unique().tolist()
+    print('screen diff:', set(screenIRs) - set(screenIR_def))
+    print('screen diff other way:', set(screenIR_def) - set(screenIRs))
+    print('widget diff:', set(widgetIRs) - set(widgetIR_def))
+    print('widget diff other way:', set(widgetIR_def) - set(widgetIRs))
+    return screenIRs, widgetIRs, screenIR_def, widgetIR_def
 
 if __name__ == '__main__':
     xml_screen_IRs, xml_widget_IRs = read_IRs_from_LS_interface()
-    labeled_screenIRs, labeled_widgetIRs, screenIR_def, widgetIR_def = count_labels_per_usage()
+    labeled_screenIRs, labeled_widgetIRs, screenIR_def, widgetIR_def = get_labels_from_final_csv()
     print('aaa', set(xml_widget_IRs) - set(widgetIR_def))
     print('bbb', set(widgetIR_def) - set(xml_widget_IRs))
     print('def == xml?', set(xml_widget_IRs) == set(widgetIR_def))

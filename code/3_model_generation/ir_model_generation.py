@@ -27,28 +27,28 @@ def get_action_from_step(filename_abspath):
     else:
         return CLICK_ACTION
 
-def get_screenIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir):
-    annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
-    appname = os.path.basename(os.path.normpath(app_root_dir))
-    screen = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-screen.jpg')
-    if 'long' in screen:
-        screen = screen.replace('-long', '')
-    df = pd.read_csv(annotation_file)
-    row_found = df.loc[df['screen'].str.contains(screen)]
-    if len(row_found) == 0:
-        image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
-        image.show()
-        user_input = input('please enter screen IR manually for ' + screen + '\n')
-        return user_input
-    elif len(row_found) == 1:
-        if pd.isna(row_found['tag_screen'].values[0]):
-            image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
-            image.show()
-            user_input = input('please enter screen IR manually for ' + screen + '\n')
-            return user_input
-        return row_found['tag_screen'].values[0]
-    else:
-        raise ValueError('row found is > 1 when getting screenIR, check', screen)
+# def get_screenIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir):
+#     annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
+#     appname = os.path.basename(os.path.normpath(app_root_dir))
+#     screen = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-screen.jpg')
+#     if 'long' in screen:
+#         screen = screen.replace('-long', '')
+#     df = pd.read_csv(annotation_file)
+#     row_found = df.loc[df['screen'].str.contains(screen)]
+#     if len(row_found) == 0:
+#         image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
+#         image.show()
+#         user_input = input('please enter screen IR manually for ' + screen + '\n')
+#         return user_input
+#     elif len(row_found) == 1:
+#         if pd.isna(row_found['tag_screen'].values[0]):
+#             image = PIL.Image.open(os.path.join(app_root_dir, screen_widget_dir, screen))
+#             image.show()
+#             user_input = input('please enter screen IR manually for ' + screen + '\n')
+#             return user_input
+#         return row_found['tag_screen'].values[0]
+#     else:
+#         raise ValueError('row found is > 1 when getting screenIR, check', screen)
 
 def get_screenIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
     annotation_file = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/final_labels/final_labels_all.csv'
@@ -74,28 +74,28 @@ def get_screenIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
         raise ValueError('row found is > 1 when getting screenIR, check', screen)
 
 
-def get_widgetIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir):
-    annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
-    appname = os.path.basename(os.path.normpath(app_root_dir))
-    widget = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-widget.jpg')
-    if 'long' in widget:
-        widget = widget.replace('-long', '')
-    df = pd.read_csv(annotation_file)
-    row_found = df.loc[df['widget'].str.contains(widget)]
-    if len(row_found) == 0:
-        image = PIL.Image.open(step_image_file_abspath)
-        image.show()
-        user_input = input('please enter widget IR manually for widget ' + widget + '\n')
-        return user_input
-    elif len(row_found) == 1:
-        if pd.isna(row_found['tag_widget'].values[0]):
-            image = PIL.Image.open(step_image_file_abspath)
-            image.show()
-            user_input = input('please enter widget IR manually for widget ' + widget + '\n')
-            return user_input
-        return row_found['tag_widget'].values[0]
-    else:
-        raise ValueError('row found is > 1 when getting widgetIR, check', widget)
+# def get_widgetIR_from_step_LS(app_root_dir, step_image_file_abspath, usage_root_dir):
+#     annotation_file = os.path.join(usage_root_dir, 'LS-annotations.csv')
+#     appname = os.path.basename(os.path.normpath(app_root_dir))
+#     widget = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-widget.jpg')
+#     if 'long' in widget:
+#         widget = widget.replace('-long', '')
+#     df = pd.read_csv(annotation_file)
+#     row_found = df.loc[df['widget'].str.contains(widget)]
+#     if len(row_found) == 0:
+#         image = PIL.Image.open(step_image_file_abspath)
+#         image.show()
+#         user_input = input('please enter widget IR manually for widget ' + widget + '\n')
+#         return user_input
+#     elif len(row_found) == 1:
+#         if pd.isna(row_found['tag_widget'].values[0]):
+#             image = PIL.Image.open(step_image_file_abspath)
+#             image.show()
+#             user_input = input('please enter widget IR manually for widget ' + widget + '\n')
+#             return user_input
+#         return row_found['tag_widget'].values[0]
+#     else:
+#         raise ValueError('row found is > 1 when getting widgetIR, check', widget)
 
 
 def get_widgetIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
@@ -112,7 +112,7 @@ def get_widgetIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
         user_input = input('please enter widget IR manually for widget ' + widget + '\n')
         return user_input
     elif len(row_found) == 1:
-        if pd.isna(row_found['tag_widget'].values[0]):
+        if pd.isna(row_found['tag_widget'].values[0]) or row_found['tag_widget'].values[0] == 'N/A':
             image = PIL.Image.open(step_image_file_abspath)
             image.show()
             user_input = input('please enter widget IR manually for widget ' + widget + '\n')
@@ -125,7 +125,7 @@ def get_widgetIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
 if the action is click or long, return 'widgetIR#action'
 else (it's swipe), return only the action, e.g., 'up'
 '''
-def get_transition_name(app_root_dir, step_image_file_abspath, usage_root_dir):
+def get_transition_name(app_root_dir, step_image_file_abspath):
     action = get_action_from_step(step_image_file_abspath)
     if action == CLICK_ACTION or action == LONG_TAP_ACTION:
         widgetIR = get_widgetIR_from_step_LS_merged(app_root_dir, step_image_file_abspath)
@@ -243,7 +243,7 @@ def build_ir_model(app_root_dir, step_dir, usage_root_dir):
                 if len(transition_buffer) != 0:  # add transition buffer to transit to the current screen
                     ir_model = add_transition_buffer(transition_buffer, ir_model, app_root_dir, step_list, i, screenIR, usage_root_dir)
                     transition_buffer.clear()
-                final_transition = get_transition_name(app_root_dir, step_list[i], usage_root_dir)
+                final_transition = get_transition_name(app_root_dir, step_list[i])
                 ir_model.machine.add_transition(final_transition, screenIR, 'end')
                 ir_model.states.append(screenIR)
                 ir_model.states.append('end')
@@ -262,10 +262,10 @@ def build_ir_model(app_root_dir, step_dir, usage_root_dir):
                 if next_action == CLICK_ACTION or next_action == LONG_TAP_ACTION:
                     screenIR_next = get_screenIR_from_step_LS_merged(app_root_dir, step_list[i+1])
                     if screenIR == screenIR_next:  # transit to the same screen, such as typing username
-                        transition_name = get_transition_name(app_root_dir, step_list[i], usage_root_dir)
+                        transition_name = get_transition_name(app_root_dir, step_list[i])
                         ir_model = handle_self_loop(ir_model, screenIR, transition_name)
                     else:
-                        current_transition = get_transition_name(app_root_dir, step_list[i], usage_root_dir)
+                        current_transition = get_transition_name(app_root_dir, step_list[i])
                         ir_model.machine.add_transition(current_transition, screenIR, screenIR_next)
                         ir_model.states.append(screenIR)
                         ir_model.states.append(screenIR_next)
@@ -273,9 +273,9 @@ def build_ir_model(app_root_dir, step_dir, usage_root_dir):
                     if len(transition_buffer) != 0:
                         print('transition buffer is not 0, check', step_list[i])
                     else:
-                        transition_buffer.append(get_transition_name(app_root_dir, step_list[i], usage_root_dir))
+                        transition_buffer.append(get_transition_name(app_root_dir, step_list[i]))
             else: # current action is swipe, then add the swiping direction to the transition buffer (will handle at next non-swipe screen)
-                transition_buffer.append(get_transition_name(app_root_dir, step_list[i], usage_root_dir))
+                transition_buffer.append(get_transition_name(app_root_dir, step_list[i]))
         i += 1
     end_time = time.time()
     return ir_model, (end_time - start_time)
@@ -286,9 +286,9 @@ def generating_ir_models(usage_root_dir):
     for step_dir in glob.glob(usage_root_dir + '/*/' + input_dir):
         app_root_dir = step_dir.replace(input_dir, '') # /Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/6pm-video-signin-3/
         ir_model_path = os.path.join(app_root_dir, 'ir_model.pickle')
-        if os.path.exists(ir_model_path):
-            print('ir model already existed in', app_root_dir, 'skipping...')
-            continue
+        # if os.path.exists(ir_model_path):
+        #     print('ir model already existed in', app_root_dir, 'skipping...')
+        #     continue
         print('building ir model for', app_root_dir)
         ir_model, runtime = build_ir_model(app_root_dir, step_dir, usage_root_dir)
         runtime_per_model_list.append(runtime)
