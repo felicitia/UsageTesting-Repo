@@ -8,7 +8,7 @@ import explorer
 import time
 import json
 import selenium
-from test_generator import TestGenerator, DestEvent
+from test_generator_manual import TestGenerator, DestEvent
 from explorer import Explorer
 import pickle
 

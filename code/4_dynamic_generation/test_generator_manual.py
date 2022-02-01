@@ -12,7 +12,7 @@ import explorer
 import time
 import json
 import selenium
-import test_generator
+import test_generator_manual
 import os.path
 import pickle
 from entities import IR_Model
@@ -337,13 +337,12 @@ if __name__ == "__main__":
     }
     start = time.time()
     test_gen = TestGenerator(desiredCapabilities)
-    # substitute abs path to our repo's path to point to video_data_examples folder
+
+    AUT = 'etsy'
+    usage_model_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/usage_model-' + AUT + '.pickle'
     # dynamic_output folder contains our output and will be generated automatically, no need to create an empty folder
-    # usage_model.pickle's graph can be found here "merged.png": /code/3_model_generation
-    # merged.png is the result of merging other pngs in the same folder (it's not how we'll evaluate the appr but it's for illustration)
-    test_gen.start('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output',
-                   '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/usage_model.pickle',
-                   'etsy')
+    output_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output'
+    test_gen.start(output_path, usage_model_path, AUT)
     end = time.time()
     print("Dynamic generation running time " + str(end - start) + " seconds")
     # kill all the images opened by Preview
