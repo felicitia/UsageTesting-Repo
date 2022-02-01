@@ -13,7 +13,7 @@ confirm_remove,the dialog screen to confirm removing something such as an item f
 contact,the page that contains the contact info of the app company,
 filter,the page for any filter options,
 gender,screen to choose genger/sex,
-get_started,screen to start before the homepage such as showing get started or Pick Topics page or Pick Notifications page,
+get_started,screen to start before the homepage such as showing get started or Pick Topics/Interests/Notifications page,
 help,the help page of the app,
 home,home screen (usually has tabs etc),
 item_detail,the detail page of an item,
