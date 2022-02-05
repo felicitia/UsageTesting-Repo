@@ -113,7 +113,9 @@ class Explorer:
 
     def extract_state(self, output_dir):
         layout = LayoutTree.LayoutTree(self.driver, output_dir)
+        activity = self.driver.current_activity
         curr_state = layout.extract_state()
+        curr_state.set_activity(activity)
         for element in curr_state.nodes:
             if element.interactable:
                 if 'content-desc' in element.attributes.keys():
@@ -138,6 +140,7 @@ class Explorer:
         with open(xml_path, "w") as file:
             file.write(self.driver.page_source)
         curr_state.add_screenshot_path(screenshot_path)
+        curr_state.add_UIXML_path(xml_path)
         self.screenshot_idx += 1
         return curr_state
 

@@ -4,12 +4,16 @@ class State:
         self.nodes = []
         self.actions = {}
         self.name_actions = {}
-        self.activity = ""
+        self.activity = ''
         self.transitions = {}
         self.screenshot_path = ''
+        self.UIXML_path = ''
 
     def add_screenshot_path(self, path):
         self.screenshot_path = path
+
+    def add_UIXML_path(self, path):
+        self.UIXML_path = path
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -34,9 +38,14 @@ class State:
         self.transitions[action] = state
 
     def print_state(self):
-        print(self.name_actions)
+        print('Activity:', self.activity)
+        print('Actions:', self.name_actions)
         print("-------------------")
         for node in self.nodes:
             if node.interactable:
                 print(node.get_exec_identifiers())
         print("-------------------")
+
+    def get_screenIR(self):
+
+        return 'home'
