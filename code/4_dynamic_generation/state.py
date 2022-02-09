@@ -1,3 +1,11 @@
+import sys, os
+sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/autoencoder/')
+sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/autoencoder/aeSrc')
+
+from dynamicXML2JSON_convertor import convert_to_json_new_data
+from createSilhouette import createUIImage
+from getEmbeddings import getAEembeddings
+
 class State:
     def __init__(self, screenshot):
         self.screenshot = screenshot
@@ -47,5 +55,12 @@ class State:
         print("-------------------")
 
     def get_screenIR(self):
-
+        convert_to_json_new_data(self.UIXML_path)  # will output the json at the same directory as the xml input
+        createUIImage(self.UIXML_path.replace('xml', 'json'))
+        getAEembeddings(os.path.dirname(self.UIXML_path))
         return 'home'
+
+if __name__ == '__main__':
+    state = State('')
+    state.UIXML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-0.xml'
+    state.get_screenIR()
