@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
+sys.path.insert(0, '../3_model_generation')
 
 import glob, os
 from ir_model_generation import run_ir_model_generation
@@ -27,5 +27,5 @@ def usage_model_batch():
 
 if __name__ == '__main__':
     # linear_ir_model_batch()
-    usage_model_batch()
+    # usage_model_batch()
     print('all done! :)')

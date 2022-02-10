@@ -3,7 +3,7 @@ import sys
 import PIL
 import psutil as psutil
 
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
+sys.path.insert(0, '../3_model_generation')
 
 from sys import argv
 import os, shutil
@@ -189,7 +189,7 @@ class TestGenerator:
         # image = PIL.Image.open(current_state.screenshot_path)
         # image.show()
         # current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
-        current_screenIR = current_state.get_screenIR()
+        current_screenIR = current_state.get_screenIR(self.appname)
         input('aaaaa')
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:

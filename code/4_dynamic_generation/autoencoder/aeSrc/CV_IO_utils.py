@@ -8,8 +8,8 @@ from multiprocessing import Pool
 # Read image
 def read_img(filePath):
     # print("reading "+filePath)
-    imgFileName=filePath.split("\\")[-1]
-    return (skimage.io.imread(filePath, as_gray=False),imgFileName)
+    # imgFileName=filePath.split("\\")[-1]
+    return (skimage.io.imread(filePath, as_gray=False), filePath)
 
 # Read images with common extensions from a directory
 def read_imgs_dir(dirPath, extensions, parallel=True):

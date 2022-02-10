@@ -10,24 +10,26 @@ import json
 import torch
 
 # inputDir is the folder that contains layout jpg files
-def getAEembeddings(inputDir):
+def getAEembeddings(inputDir, layout_image_path):
     # Run mode: (autoencoder -> simpleAE, convAE) or (transfer learning -> vgg19)
     modelName = "convAE"  # try: "simpleAE", "convAE", "vgg19"
     trainModel = False
     parallel = False  # use multicore processing
-    outDir = os.path.join('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/autoencoder', modelName)
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
+    current_dir_path = os.path.dirname(os.path.realpath(__file__))
+    outDir = os.path.join(current_dir_path, modelName)
+    # if not os.path.exists(outDir):
+    #     os.makedirs(outDir)
 
     # Read images
-    extensions = [".jpg", ".jpeg"]
+    extensions = [os.path.basename(os.path.normpath(layout_image_path))]
 
     print("Reading images from '{}'...".format(inputDir))
     imgs_all_with_names = read_imgs_dir(inputDir, extensions, parallel=parallel)
     imgs_all = [tup[0] for tup in imgs_all_with_names]
     namesToPrint = [tup[1] for tup in imgs_all_with_names]
-    with open(os.path.join(outDir, 'AllNames.json'), 'w') as f:
-        json.dump(namesToPrint, f)
+    print('namesToPrint', namesToPrint)
+    # with open(os.path.join(outDir, 'AllNames.json'), 'w') as f:
+    #     json.dump(namesToPrint, f)
 
     shape_img = imgs_all[0].shape
 
@@ -73,10 +75,9 @@ def getAEembeddings(inputDir):
     else:
         raise Exception("Invalid modelName!")
 
-
     # Print some model info
-    print("input_shape_model = {}".format(input_shape_model))
-    print("output_shape_model = {}".format(output_shape_model))
+    # print("input_shape_model = {}".format(input_shape_model))
+    # print("output_shape_model = {}".format(output_shape_model))
 
     # Apply transformations to all images
     transformer = ImageTransformer(shape_img_resize)
@@ -85,8 +86,7 @@ def getAEembeddings(inputDir):
     imgs_all_transformed = apply_transformer(imgs_all, transformer, parallel=parallel)
 
     X_all = np.array(imgs_all_transformed).reshape((-1,) + input_shape_model)
-    print(" -> X_all.shape = {}".format(X_all.shape))
-
+    # print(" -> X_all.shape = {}".format(X_all.shape))
 
     # Train (if necessary)
     if modelName in ["simpleAE", "convAE"]:
@@ -98,14 +98,15 @@ def getAEembeddings(inputDir):
             model.load_models(loss="binary_crossentropy", optimizer="adam")
 
 
-
     print("Inferencing embeddings using pre-trained model...")
     E_all = model.predict(X_all)
     E_all_flatten = E_all.reshape((-1, np.prod(output_shape_model)))
 
-    torch.save(E_all_flatten, os.path.join(outDir, 'AllEmbeddings'))
-
-    print(" -> E_all.shape = {}".format(E_all.shape))
+    # print("returning embedding -> E_all.shape = {}".format(E_all.shape))
+    # torch.save(E_all_flatten, os.path.join(outDir, 'AllEmbeddings'))
+    # embedding = torch.load(os.path.join(outDir, 'AllEmbeddings'), map_location='cpu')
+    # print(E_all_flatten)
+    return E_all_flatten
 
 
 if __name__ == '__main__':

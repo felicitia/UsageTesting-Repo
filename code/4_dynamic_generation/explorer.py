@@ -6,7 +6,7 @@ import os, csv
 from appium.webdriver.common.touch_action import TouchAction
 import pickle
 import sys
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
+sys.path.insert(0, '../3_model_generation')
 from entities import IR_Model
 from pathlib import Path
 import pandas as pd

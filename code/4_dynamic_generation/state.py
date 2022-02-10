@@ -1,10 +1,12 @@
 import sys, os
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/autoencoder/')
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/autoencoder/aeSrc')
+sys.path.insert(0, 'autoencoder/')
+sys.path.insert(0, 'autoencoder/aeSrc')
+sys.path.insert(0, 'autoencoder_KNN/')
 
 from dynamicXML2JSON_convertor import convert_to_json_new_data
 from createSilhouette import createUIImage
 from getEmbeddings import getAEembeddings
+from screen_classifier_KNN_autoencoder import KNN_screen_classifier
 
 class State:
     def __init__(self, screenshot):
@@ -54,13 +56,22 @@ class State:
                 print(node.get_exec_identifiers())
         print("-------------------")
 
-    def get_screenIR(self):
+    def get_screenIR(self, AUT):
         convert_to_json_new_data(self.UIXML_path)  # will output the json at the same directory as the xml input
         createUIImage(self.UIXML_path.replace('xml', 'json'))
-        getAEembeddings(os.path.dirname(self.UIXML_path))
-        return 'home'
+        screen_embedding_autoencoder = getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+        current_dir_path = os.path.dirname(os.path.realpath(__file__))
+        embeddings_path = os.path.join(current_dir_path, "autoencoder_KNN", "autoencoder_embeddings")
+        k = 10
+        n = 10
+        labels_path = [os.path.join(current_dir_path, "autoencoder_KNN/final_labels_all.csv"),
+                       os.path.join(current_dir_path, "autoencoder_KNN/augmented_labels.csv")]
+        screen_classifier = KNN_screen_classifier(AUT, embeddings_path, labels_path, k, n)
+        screenIR, top_n_screenIR = screen_classifier.run_knn_query(screen_embedding_autoencoder)
+        print('screenIR results:', screenIR, top_n_screenIR)
+        return screenIR
 
 if __name__ == '__main__':
     state = State('')
-    state.UIXML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-0.xml'
-    state.get_screenIR()
+    state.UIXML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-1.xml'
+    state.get_screenIR('etsy')
