@@ -2,11 +2,13 @@ import sys, os
 sys.path.insert(0, 'autoencoder/')
 sys.path.insert(0, 'autoencoder/aeSrc')
 sys.path.insert(0, 'autoencoder_KNN/')
+sys.path.insert(0, 'autoencoder_MLP/')
 
 from dynamicXML2JSON_convertor import convert_to_json_new_data
 from createSilhouette import createUIImage
 from getEmbeddings import getAEembeddings
 from screen_classifier_KNN_autoencoder import KNN_screen_classifier
+from MLP_classify import MLP_ScreenClassifierForAUT
 
 class State:
     def __init__(self, screenshot):
@@ -59,19 +61,23 @@ class State:
     def get_screenIR(self, AUT):
         convert_to_json_new_data(self.UIXML_path)  # will output the json at the same directory as the xml input
         createUIImage(self.UIXML_path.replace('xml', 'json'))
-        screen_embedding_autoencoder = getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+        dynamicXML_embedding_autoencoder = getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         embeddings_path = os.path.join(current_dir_path, "autoencoder_KNN", "autoencoder_embeddings")
-        k = 10
-        n = 10
+        K = 5
+        N = 5
         labels_path = [os.path.join(current_dir_path, "autoencoder_KNN/final_labels_all.csv"),
                        os.path.join(current_dir_path, "autoencoder_KNN/augmented_labels.csv")]
-        screen_classifier = KNN_screen_classifier(AUT, embeddings_path, labels_path, k, n)
-        screenIR, top_n_screenIR = screen_classifier.run_knn_query(screen_embedding_autoencoder)
-        print('screenIR results:', screenIR, top_n_screenIR)
-        return screenIR
+        screen_classifier_KNN = KNN_screen_classifier(AUT, embeddings_path, labels_path, K, N)
+        screen_classifier_MLP = MLP_ScreenClassifierForAUT(autoencoder=True)
+
+        screenIR_KNN, top_n_screenIR_KNN = screen_classifier_KNN.run_knn_query(dynamicXML_embedding_autoencoder)
+        screenIR_MLP, top_n_screenIR_MLP = screen_classifier_MLP.classify(dynamicXML_embedding_autoencoder, AUT, N)
+        print('KNN screenIR results:', screenIR_KNN, top_n_screenIR_KNN)
+        print('MLP screenIR results:', screenIR_MLP, top_n_screenIR_MLP)
+        return screenIR_KNN
 
 if __name__ == '__main__':
     state = State('')
-    state.UIXML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-1.xml'
+    state.UIXML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-0.xml'
     state.get_screenIR('etsy')
