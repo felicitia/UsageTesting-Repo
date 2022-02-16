@@ -27,5 +27,6 @@ def usage_model_batch():
 
 if __name__ == '__main__':
     # linear_ir_model_batch()
-    # usage_model_batch()
+    usage_model_batch()
+    # ir_model_batch()
     print('all done! :)')

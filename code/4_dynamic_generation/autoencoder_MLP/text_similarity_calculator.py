@@ -30,14 +30,15 @@ class Sentence:
             self.tokens_without_stop.append("more")
 
 
-class SimilarityCalculator:
+class SimilarityCalculator_W2V:
     def __init__(self):
         nltk.download('stopwords')
         nltk.download('punkt')
         PATH_TO_WORD2VEC = os.path.join("/Users/yixue/Documents/Research/FrUITeR/Develop/CraftDroid/code-release", "GoogleNews-vectors-negative300.bin")
         self.word2vec = gensim.models.KeyedVectors.load_word2vec_format(PATH_TO_WORD2VEC, binary=True)
-        PATH_TO_FREQUENCIES_FILE = "frequencies.tsv"
-        PATH_TO_DOC_FREQUENCIES_FILE = "doc_frequencies.tsv"
+        current_dir_path = os.path.dirname(os.path.realpath(__file__))
+        PATH_TO_FREQUENCIES_FILE = os.path.join(current_dir_path, "frequencies.tsv")
+        PATH_TO_DOC_FREQUENCIES_FILE = os.path.join(current_dir_path, "doc_frequencies.tsv")
 
         self.frequencies = self.read_tsv(PATH_TO_FREQUENCIES_FILE)
         self.doc_frequencies = self.read_tsv(PATH_TO_DOC_FREQUENCIES_FILE)
@@ -97,6 +98,11 @@ class SimilarityCalculator:
             #print(sims)
             return sims[0]
 
+if __name__ == '__main__':
 
-#calc = SimilarityCalculator()
-#print(calc.calc_similarity('hello', 'happy hi hello'))
+    calc = SimilarityCalculator_W2V()
+    menu = 'account order cart customer home service browse profile information support history story login menu settings'
+    home = 'topic start list add continue trial show sign interested setup free follow'
+    test = 'ui homescreen HomescreenTabsActivity'
+    print('home result', calc.calc_similarity(home, test))
+    print('menu result', calc.calc_similarity(menu, test))

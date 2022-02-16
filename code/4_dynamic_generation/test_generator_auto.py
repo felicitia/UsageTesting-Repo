@@ -4,7 +4,11 @@ import PIL
 import psutil as psutil
 
 sys.path.insert(0, '../3_model_generation')
+sys.path.insert(0, 'autoencoder_MLP')
 
+from bert_similarity_calc import SimilarityCalculator_BERT
+from text_similarity_calculator import SimilarityCalculator_W2V
+from App_Config import *
 from sys import argv
 import os, shutil
 import re
@@ -81,6 +85,8 @@ class TestGenerator:
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
         self.MAX_TEST_NUM = 5
+        self.text_sim_w2v = SimilarityCalculator_W2V()
+        self.text_sim_bert = SimilarityCalculator_BERT()
 
     def start(self, output_dir, usage_model_path, appname):
         if not os.path.isdir(output_dir):
@@ -93,7 +99,7 @@ class TestGenerator:
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
         self.generated_tests_dir = os.path.join(self.output_dir, 'generated_tests')
-        self.MAX_ACTION = 20
+        self.MAX_ACTION = 15
         if not os.path.isdir(self.generated_tests_dir):
             os.makedirs(self.generated_tests_dir)
         self.load_usage_model(usage_model_path)
@@ -144,8 +150,29 @@ class TestGenerator:
                 # placeholder context: you only need to care about find_next_event_list function
                 next_event_list = self.find_next_event_list(current_state)
                 if next_event_list is None or len(next_event_list) == 0:
-                    print('no next event found. ending dynamic generation...')
-                    break
+
+                    element_candidates = []
+                    for element in current_state.nodes:
+                        if element.interactable:
+                            image = PIL.Image.open(element.path_to_screenshot)
+                            image.show()
+                            element_candidates.append(element)
+                    event_index = int(input('no next event found based on the usage model, please provide the index of the event to trigger (enter any out of range index to end current test)\n'))
+                    # kill all the images opened by Preview
+                    for proc in psutil.process_iter():
+                        # print(proc.name())
+                        if proc.name() == 'Preview':
+                            proc.kill()
+                    if event_index >= len(element_candidates):
+                        break
+                    else:
+                        element = element_candidates[event_index]
+                        guided_event = DestEvent(action='click', exec_id_type=element.get_exec_id_type(),
+                                                              exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
+                                                              crop_screenshot_path=element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path)
+                        current_generated_test.append(guided_event)
+                        self.explorer.execute_event(guided_event)
+
                 elif len(next_event_list) == 1:
                     if type(next_event_list[0]) is list:
                         print('the only event is a list of the following events. should be self actions')
@@ -189,13 +216,12 @@ class TestGenerator:
         # image = PIL.Image.open(current_state.screenshot_path)
         # image.show()
         # current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
-        current_screenIR = current_state.get_screenIR(self.appname)
-        input('aaaaa')
+        current_screenIR = current_state.get_screenIR(self.appname, self.usage_model, self.text_sim_w2v, self.text_sim_bert)
+        current_screenIR = input('the true IR you want to use')
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:
-            ### placeholder for screen classifier to get 2nd, 3rd ... possible matching screenIR when the top1 doesn't have a match ###
-            ### should NOT return None but should always find the closest state in the usage model
-            return None
+            print('current screenIR', current_screenIR)
+            raise ValueError('current screenIR does not have any triggers...')
         else:
             return current_screenIR
 
@@ -212,7 +238,8 @@ class TestGenerator:
         return True
 
     def is_widgetIR_input_type(self, widgetIR):
-        widgetIR_file = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/IR/widget_ir.csv'
+        current_dir_path = os.path.dirname(os.path.realpath(__file__))
+        widgetIR_file = os.path.join(current_dir_path, '..', '..', 'IR', 'widget_ir.csv')
         df = pd.read_csv(widgetIR_file)
         row_found = df.loc[df['ir'] == widgetIR]
         if len(row_found) == 0:
@@ -240,14 +267,16 @@ class TestGenerator:
                 elif condition in all_triggers:
                     pass # if current self action is covered by other triggers, it means this self action can jump to a diff state, so skip it and handle it when it appears in other triggers (that's not self trigger)
                 else:
-                    for element in current_state.nodes:
-                        if element.interactable:
-                            ### placeholder to find matching element based on widgetIR. change code below ###
-                            image = PIL.Image.open(element.path_to_screenshot)
-                            image.show()
-                            is_matched = input('check element that was just opened and enter y if matched')
-                            if is_matched == 'y':
-                                self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
+                    # for element in current_state.nodes:
+                    #     if element.interactable:
+                    #         ### placeholder to find matching element based on widgetIR. change code below ###
+                    #         image = PIL.Image.open(element.path_to_screenshot)
+                    #         image.show()
+                    #         is_matched = input('check element that was just opened and enter y if matched')
+                    #         if is_matched == 'y':
+                    element = current_state.find_widget_to_trigger(widgetIR)
+                    if element is not None:
+                        self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
                                                               exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
                                                               crop_screenshot_path=element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
             else:
@@ -276,15 +305,16 @@ class TestGenerator:
         print('finding matching action for trigger', trigger)
         widgetIR = trigger.split('#')[0]
         # The elements (widgets) are of type of node objects defined in node.py
-        for element in current_state.nodes:
-            if element.interactable:
-                ### placeholder to find matching element based on widgetIR. change code below ###
-                image = PIL.Image.open(element.path_to_screenshot)
-                image.show()
-                is_matched = input('check element that was just opened. enter y if matched')
-                if is_matched == 'y':
-                    return element
-        return None
+        # for element in current_state.nodes:
+        #     if element.interactable:
+        #         ### placeholder to find matching element based on widgetIR. change code below ###
+        #         image = PIL.Image.open(element.path_to_screenshot)
+        #         image.show()
+        #         is_matched = input('check element that was just opened. enter y if matched')
+        #         if is_matched == 'y':
+        #             return element
+        element = current_state.find_widget_to_trigger(widgetIR)
+        return element
 
     def find_possible_next_actions(self, current_state, matching_screenIR, triggers):
         possible_actions = []
@@ -330,23 +360,34 @@ class TestGenerator:
 if __name__ == "__main__":
     # appPackage and appActivity can be found here for shooping apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv
     # here for news apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv
-    desiredCapabilities = {
-        "platformName": "Android",
-        "deviceName": "emulator-5554", # adb devices
-        "newCommandTimeout": 10000,
-        "appPackage": "com.etsy.android",
-        "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
-    }
-    start = time.time()
-    test_gen = TestGenerator(desiredCapabilities)
+    # desiredCapabilities = {
+    #     "platformName": "Android",
+    #     "deviceName": "emulator-5554", # adb devices
+    #     "newCommandTimeout": 10000,
+    #     "appPackage": "com.etsy.android",
+    #     "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
+    # }
 
-    AUT = 'etsy'
-    usage_model_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/usage_model-' + AUT + '.pickle'
+
+    # AUT = Etsy()
+    # usage_name = '1-SignIn'
+    AUT = Abc()
+    usage_name = '18-TextSize'
+    start = time.time()
+    test_gen = TestGenerator(AUT.desiredCapabilities)
+
+
+    final_data_root = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts'
+
+    usage_model_path = os.path.join(final_data_root, 'output', 'models', usage_name, 'usage_model-' + AUT.appname + '.pickle')
     # dynamic_output folder contains our output and will be generated automatically, no need to create an empty folder
-    output_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output'
-    test_gen.start(output_path, usage_model_path, AUT)
+    output_path = os.path.join(final_data_root, 'output', 'models', usage_name, 'dynamic_output')
+
+    test_gen.start(output_path, usage_model_path, AUT.appname)
+
     end = time.time()
     print("Dynamic generation running time " + str(end - start) + " seconds")
+
     # kill all the images opened by Preview
     for proc in psutil.process_iter():
         # print(proc.name())

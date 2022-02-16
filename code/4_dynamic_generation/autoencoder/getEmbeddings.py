@@ -65,7 +65,7 @@ def getAEembeddings(inputDir, layout_image_path):
         print("Loading VGG19 pre-trained model...")
         model = tf.keras.applications.VGG19(weights='imagenet', include_top=False,
                                             input_shape=shape_img)
-        model.summary()
+        # model.summary()
 
         shape_img_resize = tuple([int(x) for x in model.input.shape[1:]])
         input_shape_model = tuple([int(x) for x in model.input.shape[1:]])

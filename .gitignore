@@ -6,3 +6,4 @@ code/binaryClassifier/sym*
 *.pyc
 **/sym*/*
 video_data_examples/*
+**/tmp_screen_test/*

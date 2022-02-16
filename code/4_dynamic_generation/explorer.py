@@ -144,6 +144,7 @@ class Explorer:
         self.screenshot_idx += 1
         return curr_state
 
+
     def execute_swipe(self, direction):
         # Get screen dimensions
         screen_dimensions = self.driver.get_window_size()

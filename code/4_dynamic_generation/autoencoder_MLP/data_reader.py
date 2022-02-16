@@ -91,7 +91,8 @@ def prepare_autoencoder_data_for_AUT(embedding_file, augmented_embedding_file, f
     names.extend(names_augmented)
     np_names = np.array(names)
 
-    wrong_dimensions_file = open('weird_dimensions.txt', 'r')
+    current_dir_path = os.path.dirname(os.path.realpath(__file__))
+    wrong_dimensions_file = open(os.path.join(current_dir_path, 'weird_dimensions.txt'), 'r')
     wrong_dimensions_whole_txt = wrong_dimensions_file.read()
     wrong_file_names = []
     if remove_wrong_dimensions:
@@ -127,6 +128,77 @@ def prepare_autoencoder_data_for_AUT(embedding_file, augmented_embedding_file, f
                     pass # no need for test set, as the autoencoder embedding will be fed on the fly (1 autoencoder embedding from dynamic XML)
                 else:
                     point_label_df_train = point_label_df_train.append({'embedding': all_embeddings[i], 'label_path': [label, get_image_path(file_name)]}, ignore_index=True)
+            counter2 = counter2 + 1
+        except:
+            pass
+    return point_label_df_train
+
+
+
+def prepare_autoencoder_data_for_states(embedding_file, augmented_embedding_file, final_label_file, augmented_label_file, AUT, states, remove_wrong_dimensions=False):
+    counter = 0
+    counter2 = 0
+    df1 = pd.read_csv(final_label_file, usecols=['screen', 'tag_screen'])
+    df2 = pd.read_csv(augmented_label_file, usecols=['screen', 'tag_screen'])
+    label_df = pd.concat([df1, df2], axis=0, ignore_index=True)
+    for index in label_df.index:
+        if 'http' in label_df.loc[index, 'screen']:
+            label_df.loc[index, 'screen'] = label_df.loc[index, 'screen'].split('/')[-1]
+    # df1.screen = (df1.screen.str.rsplit("/", n=1, expand=True)[1])
+    # df1.screen = (df1.screen.str.rsplit("-", n=1, expand=True)[0])
+
+    label_dict = dict(zip(label_df.screen, label_df.tag_screen))
+    point_label_df_train = pd.DataFrame(columns=['embedding', 'label'])
+    # point_label_df_test = pd.DataFrame(columns=['embedding', 'label'])
+
+    embeddings_old = torch.load(embedding_file, map_location='cpu')
+    embeddings_augmented = torch.load(augmented_embedding_file, map_location='cpu')
+    all_embeddings = np.concatenate((embeddings_old, embeddings_augmented), axis=0)
+
+    # np_names = np.array(json.load(open(r"autoencoder_embeddings\names.json")))
+    names = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNamesOld.json"))
+    names_augmented = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNames_augmented.json"))
+    names.extend(names_augmented)
+    np_names = np.array(names)
+    current_dir_path = os.path.dirname(os.path.realpath(__file__))
+    wrong_dimensions_file = open(os.path.join(current_dir_path, 'weird_dimensions.txt'), 'r')
+    wrong_dimensions_whole_txt = wrong_dimensions_file.read()
+    wrong_file_names = []
+    if remove_wrong_dimensions:
+        for wrong_file_name in wrong_dimensions_whole_txt.split(' '):
+            if len(wrong_file_name) > 0 and wrong_file_name[-1] == ":":
+                wrong_file_names.append(wrong_file_name[:-1])
+
+    for i in range(len(all_embeddings)):
+        try:
+            # remove files with incorrect dimensions
+            file_name = np_names[i].split("/")[-1]
+            if remove_wrong_dimensions and file_name in wrong_file_names:
+                continue
+            if 'screen' in file_name:
+                # file_name = file_name.split(".")[0][:-7]  # remove -screen in the file name
+                pass
+            elif 'activity_main' in file_name:
+                file_name = file_name.replace('-activity_main.jpg', '')
+            else:
+                print('embedding name:', file_name)
+                raise ValueError('embedding name does not contain screen or activity_main...')
+
+            app_name = file_name.split('-')[0].lower()
+
+            counter = counter + 1
+            if file_name in label_dict.keys():
+                counter2 = counter2 + 1
+                label = label_dict[file_name]
+                if type(label) == float:
+                    raise TypeError('label is float')
+                if app_name == AUT:
+                    # point_label_df_test = point_label_df_test.append({'embedding': all_embeddings[i], 'label_path': [label, get_image_path(file_name)]}, ignore_index=True)
+                    pass # no need for test set, as the autoencoder embedding will be fed on the fly (1 autoencoder embedding from dynamic XML)
+                else:
+                    # only train with the states in the usage model
+                    if label in states:
+                        point_label_df_train = point_label_df_train.append({'embedding': all_embeddings[i], 'label_path': [label, get_image_path(file_name)]}, ignore_index=True)
             counter2 = counter2 + 1
         except:
             pass

@@ -228,6 +228,7 @@ class LayoutTree:
 
     def extract_state(self, saveElementBoundsRect=None, saveCrops=True, onlyVisible=False):
         counter = 0
+        print("{}/graph.dot".format(self.pathName), "w")
         f = open("{}/graph.dot".format(self.pathName), "w")
         f.write("digraph Layout {\n\n\tnode [shape=record fontname=Arial];\n\n")
         curr_state = state.State(self.screenshot)
