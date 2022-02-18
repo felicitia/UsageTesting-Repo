@@ -2,15 +2,19 @@ import sys
 
 import PIL
 import psutil as psutil
+import os, shutil
 
-sys.path.insert(0, '../3_model_generation')
-sys.path.insert(0, 'autoencoder_MLP')
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..', '3_model_generation'))
+sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_MLP'))
+sys.path.insert(0, os.path.join(current_dir_path, '..'))
 
+from global_config import *
 from bert_similarity_calc import SimilarityCalculator_BERT
 from text_similarity_calculator import SimilarityCalculator_W2V
 from App_Config import *
 from sys import argv
-import os, shutil
+
 import re
 import explorer
 import time
@@ -376,8 +380,7 @@ if __name__ == "__main__":
     start = time.time()
     test_gen = TestGenerator(AUT.desiredCapabilities)
 
-
-    final_data_root = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts'
+    final_data_root = FINAL_ARTIFACT_ROOT_DIR
 
     usage_model_path = os.path.join(final_data_root, 'output', 'models', usage_name, 'usage_model-' + AUT.appname + '.pickle')
     # dynamic_output folder contains our output and will be generated automatically, no need to create an empty folder

@@ -1,9 +1,13 @@
-import sys
-
+import sys, os
 import PIL
 import psutil as psutil
 
-sys.path.insert(0, '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/3_model_generation')
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..', '3_model_generation'))
+sys.path.insert(0, os.path.join(current_dir_path, '..'))
+
+from global_config import *
+from App_Config import *
 
 from sys import argv
 import os, shutil
@@ -210,7 +214,7 @@ class TestGenerator:
         return True
 
     def is_widgetIR_input_type(self, widgetIR):
-        widgetIR_file = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/IR/widget_ir.csv'
+        widgetIR_file = os.path.join(USAGE_REPO_ROOT_DIR, 'IR', 'widget_ir.csv')
         df = pd.read_csv(widgetIR_file)
         row_found = df.loc[df['ir'] == widgetIR]
         if len(row_found) == 0:
@@ -328,20 +332,29 @@ class TestGenerator:
 if __name__ == "__main__":
     # appPackage and appActivity can be found here for shooping apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv
     # here for news apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv
-    desiredCapabilities = {
-        "platformName": "Android",
-        "deviceName": "emulator-5554", # adb devices
-        "newCommandTimeout": 10000,
-        "appPackage": "com.etsy.android",
-        "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
-    }
-    start = time.time()
-    test_gen = TestGenerator(desiredCapabilities)
+    # desiredCapabilities = {
+    #     "platformName": "Android",
+    #     "deviceName": "emulator-5554", # adb devices
+    #     "newCommandTimeout": 10000,
+    #     "appPackage": "com.etsy.android",
+    #     "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
+    # }
 
-    AUT = 'etsy'
-    usage_model_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/usage_model-' + AUT + '.pickle'
+    # AUT = Etsy()
+    # usage_name = '1-SignIn'
+    AUT = Abc()
+    usage_name = '18-TextSize'
+
+    start = time.time()
+    test_gen = TestGenerator(AUT.desiredCapabilities)
+
+    final_data_root = FINAL_ARTIFACT_ROOT_DIR
+
+    usage_model_path = os.path.join(final_data_root, 'output', 'models', usage_name,
+                                    'usage_model-' + AUT.appname + '.pickle')
     # dynamic_output folder contains our output and will be generated automatically, no need to create an empty folder
-    output_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output'
+    output_path = os.path.join(final_data_root, 'output', 'models', usage_name, 'dynamic_output')
+
     test_gen.start(output_path, usage_model_path, AUT)
     end = time.time()
     print("Dynamic generation running time " + str(end - start) + " seconds")

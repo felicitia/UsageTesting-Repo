@@ -6,7 +6,10 @@ import os, csv
 from appium.webdriver.common.touch_action import TouchAction
 import pickle
 import sys
-sys.path.insert(0, '../3_model_generation')
+
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..', '3_model_generation'))
+
 from entities import IR_Model
 from pathlib import Path
 import pandas as pd

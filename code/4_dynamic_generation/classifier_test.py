@@ -5,10 +5,14 @@ from bert_similarity_calc import SimilarityCalculator_BERT
 from text_similarity_calculator import SimilarityCalculator_W2V
 from App_Config import *
 
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..'))
+
+from global_config import *
 
 def test_screen_classifier(AUT, usage_name, desiredCapabilities):
-    usage_model_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/' + \
-                       usage_name + '/usage_model-' + AUT + '.pickle'
+    usage_model_path = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'output', 'models', usage_name, 'usage_model-' + AUT + '.pickle')
+
     app_explorer = explorer.Explorer(desiredCapabilities)
     text_sim_w2v = SimilarityCalculator_W2V()
     text_sim_bert = SimilarityCalculator_BERT()
@@ -29,7 +33,11 @@ def test_screen_classifier(AUT, usage_name, desiredCapabilities):
 if __name__ == '__main__':
     # appPackage and appActivity can be found here for shooping apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv
     # here for news apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv
-    etsy = Etsy()
-    abc = Abc()
-    usage_name = '1-SignIn' #'18-TextSize' #'1-SignIn'
-    test_screen_classifier(etsy.appname, usage_name, etsy.desiredCapabilities)
+    # AUT = Etsy()
+    # AUT = Abc()
+    AUT = SixPM()
+    # AUT = Home()
+    # usage_name = '1-SignIn'
+    # usage_name = '18-TextSize'
+    usage_name = '3-Category'
+    test_screen_classifier(AUT.appname, usage_name, AUT.desiredCapabilities)

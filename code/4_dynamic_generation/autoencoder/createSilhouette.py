@@ -89,16 +89,19 @@ def createUIImage(jsonPath):
     # creating new Image object
     img = Image.new("RGB", (resolution[0], resolution[1]))
     # create rectangle images
-    for shape in ntShapes:
-        #Non text object will be drawn in blue
-        nontextobj=ImageDraw.Draw(img)
-        nontextobj.rectangle(shape, fill ="#339FFF", outline ="blue", width=10)
-        # print('non text', shape)
+
+    # draw text first to follow offline phase when using REMAUI
     for shape in tShapes:
         textObj=ImageDraw.Draw(img)
         #Text object will be drawn in yellow
         textObj.rectangle(shape, fill ="#ffff33", outline ="yellow",width=10)
         # print('text', shape)
+    for shape in ntShapes:
+        #Non text object will be drawn in blue
+        nontextobj=ImageDraw.Draw(img)
+        nontextobj.rectangle(shape, fill ="#339FFF", outline ="blue", width=10)
+        # print('non text', shape)
+
     img=img.resize(resized_resolution)
     #save image
     outputPath = jsonPath.replace('.json', '-layout.jpg')

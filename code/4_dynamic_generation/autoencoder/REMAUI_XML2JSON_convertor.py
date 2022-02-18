@@ -14,9 +14,9 @@ def get_object(data_dict):
         else:
             obj["visibility"]= "visible"
         children = []
-        ifBounds = False
         if type(value) == collections.OrderedDict:
-            startX=startY=width=height=endX=endY=0
+            startX=startY=width=height=0
+
             for k, v in value.items():
                 if type(v) != list and type(v) != collections.OrderedDict:
                     if k == "@android:layout_marginLeft":
@@ -33,21 +33,6 @@ def get_object(data_dict):
                             height = int(v[:-2])
                     elif k == "@android:text":
                         obj["text"] = v
-                    elif k == '@text' and v != '':
-                        obj['text'] = v
-                    elif k == '@width':
-                        width = int(v)
-                    elif k == '@height':
-                        height = int(v)
-                    elif k == '@bounds':
-                        ifBounds = True
-                        first_cor = v.split('][')[0]
-                        second_cor = v.split('][')[1]
-                        startX = int(first_cor.split(',')[0].replace('[', ''))
-                        startY = int(first_cor.split(',')[1])
-                        endX = int(second_cor.split(',')[0])
-                        endY = int(second_cor.split(',')[1].replace(']', ''))
-
 
                 elif type(v) == collections.OrderedDict:
                     # print("here1")
@@ -57,30 +42,24 @@ def get_object(data_dict):
                         children.append(get_object({k: c}))
             if len(children) > 0:
                 obj["children"] = children
-
-            if ifBounds == True:
-                obj['bounds']  = [startX, startY, endX, endY]
-            else:
-                obj["bounds"] = [startX, startY, startX+width, startY+height]
+            obj["bounds"] = [startX, startY, startX+width, startY+height]
         return obj
 
 
-def convert_to_json_dynamic(input_XML_path):
+def convert_to_json_REMAUI(input_XML_path):
     try:
         with open(input_XML_path) as xml_file:
             data_dict = dict(xmltodict.parse(xml_file.read()))
         xml_file.close()
         package_name = (input_XML_path.split("/")[1]).split("-")[0]
         json_dict = {"activity_name": package_name, "request_id": 3, "is_keyboard_deployed": False}
-        # print(json_dict)
         activity = {"added_fragments": ["1"], "active_fragments": ["1"]}
         root = get_object(data_dict)
-        root["bounds"] = [0,0,1440,2560]
+        root["bounds"] =  [0,0,1440,2560]
         activity["root"] = root
         json_dict["activity"] = activity
         output_path = input_XML_path.split(".xml")[0]
-        with open(os.path.join(output_path + ".json"), "w") as json_file:
-            print('output json file to ', output_path)
+        with open(os.path.join(output_path+".json"), "w") as json_file:
             json_file.write(json.dumps(json_dict))
         json_file.close()
     except Exception as e:
@@ -89,7 +68,7 @@ def convert_to_json_dynamic(input_XML_path):
 
 
 if __name__ == '__main__':
-    input_XML_path = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models/1-SignIn/dynamic_output/etsy/screenshots/0-0.xml'
+    input_XML_path = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/tmp_screen_test/REMAUI/0-0/activity_main.xml'
     # input_XML_path = '/Users/yixue/Documents/Research/UsageTesting/KNNscreenClassifier/REMAUIOutputNew/about/6pm-about-1/activity_main.xml'
-    convert_to_json_dynamic(input_XML_path) # will output the json at the same directory as the xml input
+    convert_to_json_REMAUI(input_XML_path) # will output the json at the same directory as the xml input
     print('all done! :)')

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import scipy
 import math
-import os
+import os, sys
 import matplotlib.pyplot as plt
 #import seaborn as sns
 #import requests
@@ -15,6 +15,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
 import math
 import functools as ft
+
+
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..', '..'))
+
+from global_config import *
 
 
 class Sentence:
@@ -34,7 +40,6 @@ class SimilarityCalculator_W2V:
     def __init__(self):
         nltk.download('stopwords')
         nltk.download('punkt')
-        PATH_TO_WORD2VEC = os.path.join("/Users/yixue/Documents/Research/FrUITeR/Develop/CraftDroid/code-release", "GoogleNews-vectors-negative300.bin")
         self.word2vec = gensim.models.KeyedVectors.load_word2vec_format(PATH_TO_WORD2VEC, binary=True)
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         PATH_TO_FREQUENCIES_FILE = os.path.join(current_dir_path, "frequencies.tsv")

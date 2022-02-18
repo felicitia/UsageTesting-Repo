@@ -1,35 +1,25 @@
 import pandas as pd
 import numpy as np
-import os
+import os, sys
 import torch
 import re
 import json
+
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, '..', '..'))
+
+from global_config import *
+
 
 # file path of image
 # filename example: 'zappos-filter-1-bbox-1140-screen.jpg' for old data
 # filename example: 'zappos-state_spinner-3' for augmented data
 def get_image_path(filename):
-    usage_folder_map = {}
-    usage_folder_map['signin'] = '1-SignIn'
-    usage_folder_map['signup'] = '2-SignUp'
-    usage_folder_map['category'] = '3-Category'
-    usage_folder_map['search'] = '4-Search'
-    usage_folder_map['terms'] = '5-Terms'
-    usage_folder_map['account'] = '6-Account'
-    usage_folder_map['detail'] = '7-Detail'
-    usage_folder_map['menu'] = '8-Menu'
-    usage_folder_map['about'] = '9-About'
-    usage_folder_map['contact'] = '10-Contact'
-    usage_folder_map['help'] = '11-Help'
-    usage_folder_map['addcart'] = '12-AddCart'
-    usage_folder_map['removecart'] = '13-RemoveCart'
-    usage_folder_map['address'] = '14-Address'
-    usage_folder_map['filter'] = '15-Filter'
-    usage_folder_map['addbookmark'] = '16-AddBookmark'
-    usage_folder_map['removebookmark'] = '17-RemoveBookmark'
-    usage_folder_map['textsize'] = '18-Textsize'
-    usage_root_dir = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/usage_data'
-    augmented_data_dir = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/Screen_AugmentedTrainingData'
+
+    usage_root_dir = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data')
+        # '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/usage_data'
+    augmented_data_dir = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'Screen_AugmentedTrainingData')
+        # '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/Screen_AugmentedTrainingData'
 
     if 'screen' in filename:
         info = filename.split('-')
@@ -51,15 +41,15 @@ def get_image_path(filename):
                                        'ir_data_auto',
                                        filename)
         if not os.path.exists(image_file_path):
-            print('filename:', filename)
-            print('image path:', image_file_path)
+            # print('filename:', filename)
+            # print('image path:', image_file_path)
             raise ValueError('image path not exist')
         return image_file_path
     else:
         image_file_path = os.path.join(augmented_data_dir, filename + '.png')
         if not os.path.exists(image_file_path):
-            print('filename:', filename)
-            print('image path:', image_file_path)
+            # print('filename:', filename)
+            # print('image path:', image_file_path)
             raise ValueError('image path not exist')
         return image_file_path
 
@@ -86,8 +76,13 @@ def prepare_autoencoder_data_for_AUT(embedding_file, augmented_embedding_file, f
     all_embeddings = np.concatenate((embeddings_old, embeddings_augmented), axis=0)
 
     # np_names = np.array(json.load(open(r"autoencoder_embeddings\names.json")))
-    names = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNamesOld.json"))
-    names_augmented = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNames_augmented.json"))
+
+    all_names_old_path = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'embeddings', 'autoencoder', 'AllNamesOld.json')
+    # "/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNamesOld.json"
+    all_names_augmented_path = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'embeddings', 'autoencoder', 'AllNames_augmented.json')
+    # "/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNames_augmented.json"
+    names = json.load(open(all_names_old_path))
+    names_augmented = json.load(open(all_names_augmented_path))
     names.extend(names_augmented)
     np_names = np.array(names)
 
@@ -155,9 +150,14 @@ def prepare_autoencoder_data_for_states(embedding_file, augmented_embedding_file
     embeddings_augmented = torch.load(augmented_embedding_file, map_location='cpu')
     all_embeddings = np.concatenate((embeddings_old, embeddings_augmented), axis=0)
 
-    # np_names = np.array(json.load(open(r"autoencoder_embeddings\names.json")))
-    names = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNamesOld.json"))
-    names_augmented = json.load(open(r"/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNames_augmented.json"))
+    all_names_old_path = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'embeddings', 'autoencoder', 'AllNamesOld.json')
+    # "/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNamesOld.json"
+    all_names_augmented_path = os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'embeddings', 'autoencoder',
+                                            'AllNames_augmented.json')
+    # "/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/embeddings/autoencoder/AllNames_augmented.json"
+
+    names = json.load(open(all_names_old_path))
+    names_augmented = json.load(open(all_names_augmented_path))
     names.extend(names_augmented)
     np_names = np.array(names)
     current_dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -196,8 +196,8 @@ def prepare_autoencoder_data_for_states(embedding_file, augmented_embedding_file
                     # point_label_df_test = point_label_df_test.append({'embedding': all_embeddings[i], 'label_path': [label, get_image_path(file_name)]}, ignore_index=True)
                     pass # no need for test set, as the autoencoder embedding will be fed on the fly (1 autoencoder embedding from dynamic XML)
                 else:
-                    # only train with the states in the usage model
-                    if label in states:
+                    # only train with the states in the usage model and not in the excluding list
+                    if (label in states) and (label not in ['sign_up_birthday', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']):
                         point_label_df_train = point_label_df_train.append({'embedding': all_embeddings[i], 'label_path': [label, get_image_path(file_name)]}, ignore_index=True)
             counter2 = counter2 + 1
         except:

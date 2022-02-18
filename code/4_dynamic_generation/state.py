@@ -1,12 +1,15 @@
 import sys, os
-sys.path.insert(0, 'autoencoder/')
-sys.path.insert(0, 'autoencoder/aeSrc')
-sys.path.insert(0, 'autoencoder_KNN/')
-sys.path.insert(0, 'autoencoder_MLP/')
+
+current_dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder'))
+sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder', 'aeSrc'))
+sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_KNN'))
+sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_MLP'))
 
 import PIL, psutil
 import pandas as pd
-from dynamicXML2JSON_convertor import convert_to_json_new_data
+from dynamicXML2JSON_convertor import convert_to_json_dynamic
+from REMAUI_XML2JSON_convertor import convert_to_json_REMAUI
 from createSilhouette import createUIImage
 from getEmbeddings import getAEembeddings
 from screen_classifier_KNN_autoencoder import KNN_screen_classifier
@@ -60,10 +63,23 @@ class State:
                 print(node.get_exec_identifiers())
         print("-------------------")
 
-    def get_screenIR(self, AUT, usage_model, text_sim_w2v, text_sim_bert):
-        convert_to_json_new_data(self.UIXML_path)  # will output the json at the same directory as the xml input
+    def get_dynamic_embedding(self):
+        convert_to_json_dynamic(self.UIXML_path)  # will output the json at the same directory as the xml input
         createUIImage(self.UIXML_path.replace('xml', 'json'))
-        dynamicXML_embedding_autoencoder = getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+        return getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+
+
+    def get_REMAUI_embedding(self):
+        XML_basename = os.path.basename(os.path.normpath(self.UIXML_path)).replace('.xml', '')
+        REMAUI_XML_path = os.path.join(os.path.dirname(self.UIXML_path), '..', 'REMAUI', XML_basename, 'activity_main.xml')
+        convert_to_json_REMAUI(REMAUI_XML_path)  # will output the json at the same directory as the xml input
+        createUIImage(REMAUI_XML_path.replace('xml', 'json'))
+        return getAEembeddings(os.path.dirname(REMAUI_XML_path), REMAUI_XML_path.replace('.xml', '-layout.jpg'))
+
+    def get_screenIR(self, AUT, usage_model, text_sim_w2v, text_sim_bert):
+        dynamicXML_embedding_autoencoder = self.get_dynamic_embedding()
+        REMAUI_embedding_autoencoder = self.get_REMAUI_embedding()
+
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         embeddings_path = os.path.join(current_dir_path, "autoencoder_KNN", "autoencoder_embeddings")
         K = 5
@@ -72,35 +88,63 @@ class State:
                        os.path.join(current_dir_path, "autoencoder_KNN/augmented_labels.csv")]
         screen_classifier_KNN = KNN_screen_classifier(AUT, embeddings_path, labels_path, K, N)
         screen_classifier_MLP = MLP_ScreenClassifierForAUT(autoencoder=True)
+
+
         # Find Screen title (top-left corner)
         screenIR_KNN, top_n_screenIR_KNN = screen_classifier_KNN.run_knn_query(dynamicXML_embedding_autoencoder)
         screenIR_MLP, top_n_screenIR_MLP = screen_classifier_MLP.classify(dynamicXML_embedding_autoencoder, AUT, N)
+        REMAUI_KNN, REMAUI_top_n_KNN = screen_classifier_KNN.run_knn_query(REMAUI_embedding_autoencoder)
+        REMAU_MLP, REMAUI_top_n_MLP = screen_classifier_MLP.classify(REMAUI_embedding_autoencoder, AUT, N)
+
+
         screenIR_MLP_all, top_n_screenIR_MLP_all = screen_classifier_MLP.classify_allapp_as_training(dynamicXML_embedding_autoencoder, N)
-        screenIR_MLP_states, top_n_screenIR_MLP_states = screen_classifier_MLP.train_and_classify_for_states(AUT,
-                                                                                                       dynamicXML_embedding_autoencoder,
+        REMAUI_all, REMAUI_top_n_all = screen_classifier_MLP.classify_allapp_as_training(REMAUI_embedding_autoencoder, N)
+
+
+
+        screenIR_MLP_states, top_n_screenIR_MLP_states = screen_classifier_MLP.train_and_classify_for_states(AUT,dynamicXML_embedding_autoencoder,
                                                                                                        N, usage_model.states)
+        REMAUI_states, REMAUI_top_n_states = screen_classifier_MLP.train_and_classify_for_states(AUT,REMAUI_embedding_autoencoder,
+                                                                                                       N, usage_model.states)
+
+
         screenIR_MLP_states_all, top_n_screenIR_MLP_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
                                                                                                        dynamicXML_embedding_autoencoder,
-                                                                                                       N,
-                                                                                                       usage_model.states)
-        print('KNN screenIR results:', screenIR_KNN, top_n_screenIR_KNN)
-        print('MLP screenIR results:', screenIR_MLP, top_n_screenIR_MLP)
-        print('MLP all training results:', screenIR_MLP_all, top_n_screenIR_MLP_all)
-        print('MLP states partial training results:', screenIR_MLP_states, top_n_screenIR_MLP_states)
-        print('MLP all states partial training results:', screenIR_MLP_states_all, top_n_screenIR_MLP_states_all)
+                                                                                                       N, usage_model.states)
+        REMAUI_states_all, REMAUI_top_n_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
+                                                                                                       REMAUI_embedding_autoencoder,
+                                                                                                       N, usage_model.states)
+
+        print('KNN:', screenIR_KNN, top_n_screenIR_KNN)
+        print('REMAUI KNN:', REMAUI_KNN, REMAUI_top_n_KNN)
+        print()
+        print('MLP:', screenIR_MLP, top_n_screenIR_MLP)
+        print('REMAUI MLP:', REMAU_MLP, REMAUI_top_n_MLP)
+        print()
+        print('MLP all training:', screenIR_MLP_all, top_n_screenIR_MLP_all)
+        print('REMAUI all training:', REMAUI_all, REMAUI_top_n_all)
+        print()
+        print('MLP states partial training:', screenIR_MLP_states, top_n_screenIR_MLP_states)
+        print('REMAUI states partial:', REMAUI_states, REMAUI_top_n_states)
+        print()
+        print('MLP states all apps:', screenIR_MLP_states_all, top_n_screenIR_MLP_states_all)
+        print('REMAUI states all apps:', REMAUI_states_all, REMAUI_top_n_states_all)
+        print()
         print('usage model states:', usage_model.states)
-        ## filter out results that's NOT from usage model's states first
-        for ir in top_n_screenIR_MLP:
-            if ir not in usage_model.states:
-                top_n_screenIR_MLP.remove(ir)
-        for ir in top_n_screenIR_KNN:
-            if ir not in usage_model.states:
-                top_n_screenIR_KNN.remove(ir)
-        all_ir_candidates = set(top_n_screenIR_KNN).union(set(top_n_screenIR_MLP))
-        print('filtered top N of both KNN and MLP', all_ir_candidates)
+        print()
+        all_ir_candidates = set(top_n_screenIR_KNN).union(set(top_n_screenIR_MLP_states), set(top_n_screenIR_MLP_states_all))
+        all_ir_candidates = list(all_ir_candidates)
+        ## filter out results that's NOT from usage model's states and should be excluded
+        for ir in all_ir_candidates:
+            if (ir not in usage_model.states) or (ir in ['sign_up_birthday', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']):
+                all_ir_candidates.remove(ir)
+
+        print('filtered top N:', all_ir_candidates)
+        print()
         print('Activity:', self.activity)
         activity_wordlist = self.activity.replace('.', ' ').lower().strip()
         print('Activity wordlist:', activity_wordlist)
+        print()
         text_info_strs = set()
         text_info_strs.add(activity_wordlist)
         for element in self.nodes:
@@ -114,9 +158,11 @@ class State:
                 if key == 'id':
                     text_info_strs.add(element.data[key])
         text_info_strs = " ".join(text_info_strs)
+        print('text info:', text_info_strs)
         print('-----textual similarities-----')
         for ir_candidate in all_ir_candidates:
             wordlist = self.get_wordlist(ir_candidate)
+            print('wordlist:', wordlist)
             # wordlist = ir_candidate
             bert_sim = text_sim_bert.calc_similarity(text_info_strs, wordlist)
             w2v_sim = text_sim_w2v.calc_similarity(text_info_strs, wordlist)
@@ -171,6 +217,8 @@ class State:
         if i >= len(element_candidates):
             return None
         return element_candidates[i]
+
+
 
 if __name__ == '__main__':
     state = State('')
