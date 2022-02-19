@@ -85,12 +85,17 @@ class DestEvent:
 
 
 class TestGenerator:
-    def __init__(self, desiredCapabilities):
+    def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
         self.MAX_TEST_NUM = 5
-        self.text_sim_w2v = SimilarityCalculator_W2V()
-        self.text_sim_bert = SimilarityCalculator_BERT()
+        self.REMAUI_flag = REMAUI_flag
+        if text_sim_flag:
+            self.text_sim_w2v = SimilarityCalculator_W2V()
+            self.text_sim_bert = SimilarityCalculator_BERT()
+        else:
+            self.text_sim_w2v = None
+            self.text_sim_bert = None
 
     def start(self, output_dir, usage_model_path, appname):
         if not os.path.isdir(output_dir):
@@ -220,7 +225,7 @@ class TestGenerator:
         # image = PIL.Image.open(current_state.screenshot_path)
         # image.show()
         # current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
-        current_screenIR = current_state.get_screenIR(self.appname, self.usage_model, self.text_sim_w2v, self.text_sim_bert)
+        current_screenIR = current_state.get_screenIR(self.appname, self.usage_model, self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag)
         current_screenIR = input('the true IR you want to use')
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:

@@ -76,9 +76,11 @@ class State:
         createUIImage(REMAUI_XML_path.replace('xml', 'json'))
         return getAEembeddings(os.path.dirname(REMAUI_XML_path), REMAUI_XML_path.replace('.xml', '-layout.jpg'))
 
-    def get_screenIR(self, AUT, usage_model, text_sim_w2v, text_sim_bert):
+    def get_screenIR(self, AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag):
         dynamicXML_embedding_autoencoder = self.get_dynamic_embedding()
-        REMAUI_embedding_autoencoder = self.get_REMAUI_embedding()
+        REMAUI_embedding_autoencoder = None
+        if REMAUI_flag:
+            REMAUI_embedding_autoencoder = self.get_REMAUI_embedding()
 
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         embeddings_path = os.path.join(current_dir_path, "autoencoder_KNN", "autoencoder_embeddings")
@@ -93,46 +95,67 @@ class State:
         # Find Screen title (top-left corner)
         screenIR_KNN, top_n_screenIR_KNN = screen_classifier_KNN.run_knn_query(dynamicXML_embedding_autoencoder)
         screenIR_MLP, top_n_screenIR_MLP = screen_classifier_MLP.classify(dynamicXML_embedding_autoencoder, AUT, N)
-        REMAUI_KNN, REMAUI_top_n_KNN = screen_classifier_KNN.run_knn_query(REMAUI_embedding_autoencoder)
-        REMAU_MLP, REMAUI_top_n_MLP = screen_classifier_MLP.classify(REMAUI_embedding_autoencoder, AUT, N)
+
+        KNN_states, top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(dynamicXML_embedding_autoencoder, usage_model.states)
+
 
 
         screenIR_MLP_all, top_n_screenIR_MLP_all = screen_classifier_MLP.classify_allapp_as_training(dynamicXML_embedding_autoencoder, N)
-        REMAUI_all, REMAUI_top_n_all = screen_classifier_MLP.classify_allapp_as_training(REMAUI_embedding_autoencoder, N)
+
 
 
 
         screenIR_MLP_states, top_n_screenIR_MLP_states = screen_classifier_MLP.train_and_classify_for_states(AUT,dynamicXML_embedding_autoencoder,
                                                                                                        N, usage_model.states)
-        REMAUI_states, REMAUI_top_n_states = screen_classifier_MLP.train_and_classify_for_states(AUT,REMAUI_embedding_autoencoder,
-                                                                                                       N, usage_model.states)
 
 
-        screenIR_MLP_states_all, top_n_screenIR_MLP_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
-                                                                                                       dynamicXML_embedding_autoencoder,
-                                                                                                       N, usage_model.states)
-        REMAUI_states_all, REMAUI_top_n_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
-                                                                                                       REMAUI_embedding_autoencoder,
-                                                                                                       N, usage_model.states)
+        # screenIR_MLP_states_all, top_n_screenIR_MLP_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
+        #                                                                                                dynamicXML_embedding_autoencoder,
+        #                                                                                                N, usage_model.states)
 
+        if REMAUI_embedding_autoencoder is not None:
+            REMAUI_KNN_states, REMAUI_top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(REMAUI_embedding_autoencoder,
+                                                                                  usage_model.states)
+            REMAUI_KNN, REMAUI_top_n_KNN = screen_classifier_KNN.run_knn_query(REMAUI_embedding_autoencoder)
+            REMAU_MLP, REMAUI_top_n_MLP = screen_classifier_MLP.classify(REMAUI_embedding_autoencoder, AUT, N)
+
+            REMAUI_all, REMAUI_top_n_all = screen_classifier_MLP.classify_allapp_as_training(
+                REMAUI_embedding_autoencoder, N)
+            REMAUI_states, REMAUI_top_n_states = screen_classifier_MLP.train_and_classify_for_states(AUT,
+                                                                                                     REMAUI_embedding_autoencoder,
+                                                                                                     N,
+                                                                                                     usage_model.states)
+            REMAUI_states_all, REMAUI_top_n_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
+                                                                                                             REMAUI_embedding_autoencoder,
+                                                                                                             N,
+                                                                                                             usage_model.states)
         print('KNN:', screenIR_KNN, top_n_screenIR_KNN)
-        print('REMAUI KNN:', REMAUI_KNN, REMAUI_top_n_KNN)
+        if REMAUI_flag:
+            print('REMAUI KNN:', REMAUI_KNN, REMAUI_top_n_KNN)
         print()
         print('MLP:', screenIR_MLP, top_n_screenIR_MLP)
-        print('REMAUI MLP:', REMAU_MLP, REMAUI_top_n_MLP)
+        if REMAUI_flag:
+            print('REMAUI MLP:', REMAU_MLP, REMAUI_top_n_MLP)
         print()
         print('MLP all training:', screenIR_MLP_all, top_n_screenIR_MLP_all)
-        print('REMAUI all training:', REMAUI_all, REMAUI_top_n_all)
+        if REMAUI_flag:
+            print('REMAUI all training:', REMAUI_all, REMAUI_top_n_all)
         print()
         print('MLP states partial training:', screenIR_MLP_states, top_n_screenIR_MLP_states)
-        print('REMAUI states partial:', REMAUI_states, REMAUI_top_n_states)
+        if REMAUI_flag:
+            print('REMAUI states partial:', REMAUI_states, REMAUI_top_n_states)
         print()
-        print('MLP states all apps:', screenIR_MLP_states_all, top_n_screenIR_MLP_states_all)
-        print('REMAUI states all apps:', REMAUI_states_all, REMAUI_top_n_states_all)
+        print('KNN states:', KNN_states, top_n_KNN_states)
+        if REMAUI_flag:
+            print('REMAUI KNN states:', REMAUI_KNN_states, REMAUI_top_n_KNN_states)
+        print()
+        # print('MLP states all apps:', screenIR_MLP_states_all, top_n_screenIR_MLP_states_all)
+        if REMAUI_flag:
+            print('REMAUI states all apps:', REMAUI_states_all, REMAUI_top_n_states_all)
         print()
         print('usage model states:', usage_model.states)
         print()
-        all_ir_candidates = set(top_n_screenIR_KNN).union(set(top_n_screenIR_MLP_states), set(top_n_screenIR_MLP_states_all))
+        all_ir_candidates = set(top_n_screenIR_KNN).union(set(top_n_screenIR_MLP_states))
         all_ir_candidates = list(all_ir_candidates)
         ## filter out results that's NOT from usage model's states and should be excluded
         for ir in all_ir_candidates:
@@ -159,14 +182,16 @@ class State:
                     text_info_strs.add(element.data[key])
         text_info_strs = " ".join(text_info_strs)
         print('text info:', text_info_strs)
-        print('-----textual similarities-----')
-        for ir_candidate in all_ir_candidates:
-            wordlist = self.get_wordlist(ir_candidate)
-            print('wordlist:', wordlist)
-            # wordlist = ir_candidate
-            bert_sim = text_sim_bert.calc_similarity(text_info_strs, wordlist)
-            w2v_sim = text_sim_w2v.calc_similarity(text_info_strs, wordlist)
-            print(ir_candidate, 'BERT:' + str(bert_sim), 'W2V:' + str(w2v_sim))
+
+        if text_sim_w2v is not None and text_sim_bert is not None:
+            print('-----textual similarities-----')
+            for ir_candidate in all_ir_candidates:
+                wordlist = self.get_wordlist(ir_candidate)
+                print('wordlist:', wordlist)
+                # wordlist = ir_candidate
+                bert_sim = text_sim_bert.calc_similarity(text_info_strs, wordlist)
+                w2v_sim = text_sim_w2v.calc_similarity(text_info_strs, wordlist)
+                print(ir_candidate, 'BERT:' + str(bert_sim), 'W2V:' + str(w2v_sim))
 
         return None
 

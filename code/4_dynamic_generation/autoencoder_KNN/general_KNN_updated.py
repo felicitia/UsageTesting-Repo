@@ -29,6 +29,32 @@ class GeneralKNNClassifier:
         prediction = max(set(top_labels), key=top_labels.count)
         return prediction, top_n
 
+    # only return the prediction that belongs to the states in the usage model
+    def run_dynamic_knn_query_states(self, query_embedding, states):
+        sims = cosine_similarity(self.embeddings, query_embedding.reshape(1, -1))
+        sims_sorted = sims.argsort(axis=0)
+        sims_sorted_list = list(sims_sorted.flatten())
+
+        top_labels = {}
+        k_counter = 0
+        for entry in reversed(sims_sorted_list):
+            name = self.embedding_id_dict[entry].split("_")[0]
+            label = self.read_query_label(name)
+            if (label is not None) and (label in states):
+                k_counter += 1
+                if label in top_labels:
+                    top_labels[label] += 1
+                else:
+                    top_labels[label] = 1
+            if k_counter == self.k:
+                break
+
+        top_labels = sorted(top_labels.items(), key=lambda x: x[1])
+        # top_labels  = self.read_labels(names)
+        # top_n = (sorted(set(top_labels), key=top_labels.count))[-self.n_accuracy:]
+        # prediction = max(set(top_labels), key=top_labels.count)
+        return top_labels[-1][0], [key for key, value in top_labels]
+
     def run_knn_query(self, query_embedding, query_name):
         sims = cosine_similarity(self.embeddings, query_embedding.reshape(1,-1))
         top_k = sims.argsort(axis=0)[-self.k:]
@@ -67,10 +93,12 @@ class GeneralKNNClassifier:
         return labels
 
     def read_query_label(self, query_name):
+        query_label = None
         try:
             query_label = self.labels_dict[query_name]
         except:
-            raise Exception("Query screen does not exist.")
+            # raise Exception("Query screen does not exist.")
+            pass
 
         return query_label
 

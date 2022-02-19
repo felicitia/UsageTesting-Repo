@@ -129,6 +129,10 @@ class KNN_screen_classifier:
         prediction, top_n = self.classifier.run_dynamic_knn_query(query_embedding)
         return prediction, top_n
 
+    def run_knn_query_states(self, query_embedding, states):
+        prediction, top_n = self.classifier.run_dynamic_knn_query_states(query_embedding, states)
+        return prediction, top_n
+
 if __name__ == "__main__":
     # get directory of this file
     current_dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -137,15 +141,17 @@ if __name__ == "__main__":
     k = 5
     n = 5
     labels_path = ["final_labels_all.csv", "augmented_labels.csv"]
-    precisions_sum = 0
-    top_n_percision_sum = 0
-    for app in app_names:
-        screen_classifier = KNN_screen_classifier(app, embeddings_path, labels_path, k, n)
-        precision, top_n_precision = screen_classifier.run_all_queries_and_get_percision()
-        print(app + ": " + str(precision))
-        print(app + " top-5 :" + str(top_n_precision))
-        print("---------------")
-        precisions_sum += precision
-        top_n_percision_sum += top_n_precision
-    print("average precisions:" + str(precisions_sum/len(app_names)))
-    print("average top-n precisions:" + str(top_n_percision_sum/len(app_names)))
+    screen_classifier = KNN_screen_classifier('etsy', embeddings_path, labels_path, k, n)
+    KNN_screen_classifier.run_knn_query()
+    # precisions_sum = 0
+    # top_n_percision_sum = 0
+    # for app in app_names:
+    #     screen_classifier = KNN_screen_classifier(app, embeddings_path, labels_path, k, n)
+    #     precision, top_n_precision = screen_classifier.run_all_queries_and_get_percision()
+    #     print(app + ": " + str(precision))
+    #     print(app + " top-5 :" + str(top_n_precision))
+    #     print("---------------")
+    #     precisions_sum += precision
+    #     top_n_percision_sum += top_n_precision
+    # print("average precisions:" + str(precisions_sum/len(app_names)))
+    # print("average top-n precisions:" + str(top_n_percision_sum/len(app_names)))
