@@ -8,6 +8,8 @@
 7. Change file paths in [global_config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/global_config.py)
 8. run main method in [test_generator_auto.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/test_generator_auto.py)
 
+Note: If you need to enable REMAUI, then you have to first get [REMAUI Java program](https://github.com/SageSELab/REMAUI) working. Regarding installing openCV, follow this (if using Mac because you need to build openCV on your own): After you get opencv-x, make a build directory in it. Then you build opencv using cmake. If you are in the build folder you just made “cmake ..” will do. Then run “make -j8"
+
 ## Running for a usage
 1. `root_usage_dir` should point to V2S's results of a usage, e.g., "Combined/SignIn/"
 2. run `1_step_extraction/step_extraction.py` to generate `clicked_frames` folder
