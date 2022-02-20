@@ -1,12 +1,14 @@
 ## Setting Up Repo for Test Generation
 1. download repo
-2. install Conda environment for the project using this [environment file](https://github.com/felicitia/UsageTesting-Repo/blob/master/environment.yml)
-3. install Appium Desktop
+2. install Conda environment for the project using this [environment file](https://github.com/felicitia/UsageTesting-Repo/blob/master/environment.yml). you can use `conda env create -f environment.yml` to create the environment and activate the environment by `conda activate usage`
+3. install [Appium](http://appium.io/) Desktop
 4. add app's configuration in [App_Config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/App_Config.py) -- you can find relevant info in [news_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv) and [shopping_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv)
 5. start Android Emulator (same as the one used for data collection) -- make sure the AUT (App Under Test) is installed on the Emulator, e.g., abcnews
 6. start Appium Server
 7. Change file paths in [global_config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/global_config.py)
 8. run main method in [test_generator_auto.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/test_generator_auto.py)
+
+Note: If you need to enable REMAUI, then you have to first get [REMAUI Java program](https://github.com/SageSELab/REMAUI) working. Regarding installing openCV, follow this (if using Mac because you need to build openCV on your own): After you get opencv-x, make a build directory in it. Then you build opencv using cmake. If you are in the build folder you just made “cmake ..” will do. Then run “make -j8"
 
 ## Running for a usage
 1. `root_usage_dir` should point to V2S's results of a usage, e.g., "Combined/SignIn/"
