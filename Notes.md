@@ -1,5 +1,5 @@
 ## Setting Up Repo for Test Generation
-1. download repo
+1. clone repo
 2. install Conda environment for the project using this [environment file](https://github.com/felicitia/UsageTesting-Repo/blob/master/environment.yml). you can use `conda env create -f environment.yml` to create the environment and activate the environment by `conda activate usage`
 3. install [Appium](http://appium.io/) Desktop
 4. add app's configuration in [App_Config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/App_Config.py) -- you can find relevant info in [news_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv) and [shopping_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv)
