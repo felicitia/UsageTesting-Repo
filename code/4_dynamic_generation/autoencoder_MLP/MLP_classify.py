@@ -179,7 +179,21 @@ if __name__ == "__main__":
 
     screen_classifier_autoencoder = MLP_ScreenClassifierForAUT(autoencoder=True)
     print("Training with autoencoder:")
-    screen_classifier_autoencoder.learn('buzzfeed')
+
+    screen_classifier_autoencoder.learn('ebay')
+    screen_classifier_autoencoder.learn('geek')
+    screen_classifier_autoencoder.learn('groupon')
+    screen_classifier_autoencoder.learn('wish')
+    screen_classifier_autoencoder.learn('zappos')
+
+    # screen_classifier_autoencoder.learn('cbs')
+    # screen_classifier_autoencoder.learn('dailyhunt')
+    # screen_classifier_autoencoder.learn('fox')
+    # screen_classifier_autoencoder.learn('newsbreak')
+    # screen_classifier_autoencoder.learn('reuters')
+    # screen_classifier_autoencoder.learn('guardian')
+    # screen_classifier_autoencoder.learn('usatoday')
+
     # print('Predicting with autoencoder')
     # embedding_to_predict = torch.load('test_dynamic_embedding', map_location='cpu') # read from autoencoder embedding obtained from dynamic phase
     # top_1, top_n = screen_classifier_autoencoder.classify(embedding_to_predict, 'etsy', 5)
