@@ -1,4 +1,5 @@
 import sys, os
+import pickle
 
 current_dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder'))
@@ -66,7 +67,11 @@ class State:
     def get_dynamic_embedding(self):
         convert_to_json_dynamic(self.UIXML_path)  # will output the json at the same directory as the xml input
         createUIImage(self.UIXML_path.replace('xml', 'json'))
-        return getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+        dynamic_embedding = getAEembeddings(os.path.dirname(self.UIXML_path), self.UIXML_path.replace('.xml', '-layout.jpg'))
+        embedding_path = self.UIXML_path.replace('.xml', '-dynamicEmbedding.pickle')
+        with open(embedding_path, 'wb') as file:
+            pickle.dump(dynamic_embedding, file)
+        return dynamic_embedding
 
 
     def get_REMAUI_embedding(self):
@@ -81,15 +86,21 @@ class State:
         os.system(REMAUI_cmd)
         XML_basename = os.path.basename(os.path.normpath(self.UIXML_path)).replace('.xml', '')
         REMAUI_XML_path = os.path.join(os.path.dirname(self.UIXML_path), '..', 'REMAUI', XML_basename, 'activity_main.xml')
-        convert_to_json_REMAUI(REMAUI_XML_path)  # will output the json at the same directory as the xml input
-        createUIImage(REMAUI_XML_path.replace('xml', 'json'))
-        return getAEembeddings(os.path.dirname(REMAUI_XML_path), REMAUI_XML_path.replace('.xml', '-layout.jpg'))
+        REMAUI_error = convert_to_json_REMAUI(REMAUI_XML_path)  # will output the json at the same directory as the xml input
+        while REMAUI_error is not None:
+            print('REMAUI error:', REMAUI_error)
+            input('please fix the XML and continue')
+            REMAUI_error = convert_to_json_REMAUI(REMAUI_XML_path)
 
-    def get_screenIR(self, AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag):
-        dynamicXML_embedding_autoencoder = self.get_dynamic_embedding()
-        REMAUI_embedding_autoencoder = None
-        if REMAUI_flag:
-            REMAUI_embedding_autoencoder = self.get_REMAUI_embedding()
+        createUIImage(REMAUI_XML_path.replace('xml', 'json'))
+        REMAUI_embedding =  getAEembeddings(os.path.dirname(REMAUI_XML_path), REMAUI_XML_path.replace('.xml', '-layout.jpg'))
+        embedding_path = REMAUI_XML_path.replace('.xml', '-REMAUIEmbedding.pickle')
+        with open(embedding_path, 'wb') as file:
+            pickle.dump(REMAUI_embedding, file)
+        return REMAUI_embedding
+
+    def explore_screen_classifiers(self, dynamicXML_embedding_autoencoder, REMAUI_embedding_autoencoder,
+                                   AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag, true_IR=None):
 
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         embeddings_path = os.path.join(current_dir_path, "autoencoder_KNN", "autoencoder_embeddings")
@@ -100,31 +111,29 @@ class State:
         screen_classifier_KNN = KNN_screen_classifier(AUT, embeddings_path, labels_path, K, N)
         screen_classifier_MLP = MLP_ScreenClassifierForAUT(autoencoder=True)
 
-
         # Find Screen title (top-left corner)
         screenIR_KNN, top_n_screenIR_KNN = screen_classifier_KNN.run_knn_query(dynamicXML_embedding_autoencoder)
         screenIR_MLP, top_n_screenIR_MLP = screen_classifier_MLP.classify(dynamicXML_embedding_autoencoder, AUT, N)
 
-        KNN_states, top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(dynamicXML_embedding_autoencoder, usage_model.states)
+        KNN_states, top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(dynamicXML_embedding_autoencoder,
+                                                                                  usage_model.states)
 
+        screenIR_MLP_all, top_n_screenIR_MLP_all = screen_classifier_MLP.classify_allapp_as_training(
+            dynamicXML_embedding_autoencoder, N)
 
-
-        screenIR_MLP_all, top_n_screenIR_MLP_all = screen_classifier_MLP.classify_allapp_as_training(dynamicXML_embedding_autoencoder, N)
-
-
-
-
-        screenIR_MLP_states, top_n_screenIR_MLP_states = screen_classifier_MLP.train_and_classify_for_states(AUT,dynamicXML_embedding_autoencoder,
-                                                                                                       N, usage_model.states)
-
+        screenIR_MLP_states, top_n_screenIR_MLP_states = screen_classifier_MLP.train_and_classify_for_states(AUT,
+                                                                                                             dynamicXML_embedding_autoencoder,
+                                                                                                             N,
+                                                                                                             usage_model.states)
 
         # screenIR_MLP_states_all, top_n_screenIR_MLP_states_all = screen_classifier_MLP.train_and_classify_for_states('allapps',
         #                                                                                                dynamicXML_embedding_autoencoder,
         #                                                                                                N, usage_model.states)
 
         if REMAUI_embedding_autoencoder is not None:
-            REMAUI_KNN_states, REMAUI_top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(REMAUI_embedding_autoencoder,
-                                                                                  usage_model.states)
+            REMAUI_KNN_states, REMAUI_top_n_KNN_states = screen_classifier_KNN.run_knn_query_states(
+                REMAUI_embedding_autoencoder,
+                usage_model.states)
             REMAUI_KNN, REMAUI_top_n_KNN = screen_classifier_KNN.run_knn_query(REMAUI_embedding_autoencoder)
             REMAU_MLP, REMAUI_top_n_MLP = screen_classifier_MLP.classify(REMAUI_embedding_autoencoder, AUT, N)
 
@@ -168,7 +177,8 @@ class State:
         all_ir_candidates = list(all_ir_candidates)
         ## filter out results that's NOT from usage model's states and should be excluded
         for ir in all_ir_candidates:
-            if (ir not in usage_model.states) or (ir in ['sign_up_birthday', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']):
+            if (ir not in usage_model.states) or (
+                    ir in ['sign_up_birthday', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']):
                 all_ir_candidates.remove(ir)
 
         print('filtered top N:', all_ir_candidates)
@@ -201,6 +211,32 @@ class State:
                 bert_sim = text_sim_bert.calc_similarity(text_info_strs, wordlist)
                 w2v_sim = text_sim_w2v.calc_similarity(text_info_strs, wordlist)
                 print(ir_candidate, 'BERT:' + str(bert_sim), 'W2V:' + str(w2v_sim))
+
+
+
+    def get_screenIR(self, eval_results, AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag, true_IR=None):
+
+        # save autoencoder embeddings to files
+        dynamicXML_embedding_autoencoder = self.get_dynamic_embedding()
+        REMAUI_embedding_autoencoder = None
+        if REMAUI_flag:
+            REMAUI_embedding_autoencoder = self.get_REMAUI_embedding()
+
+
+        if true_IR is not None: # using true IR to generate tests (disable screen classifiers)
+            XML_basename = os.path.basename(os.path.normpath(self.UIXML_path)).replace('.xml', '')
+            if XML_basename in eval_results.keys():
+                eval_results[XML_basename]['true_IR'] = true_IR
+                eval_results[XML_basename]['usage_states'] = usage_model.states
+            else:
+                eval_results[XML_basename] = {}
+                eval_results[XML_basename]['true_IR'] = true_IR
+                eval_results[XML_basename]['usage_states'] = usage_model.states
+            return true_IR
+
+        else:
+            self.explore_screen_classifiers(dynamicXML_embedding_autoencoder, REMAUI_embedding_autoencoder,
+                                   AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag, true_IR)
 
         return None
 
