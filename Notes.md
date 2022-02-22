@@ -14,6 +14,7 @@
 3. configure all the build paths (the REMAUI repo should already contain all the necessary jars except for openCV)
 4. follow this [tutorial](https://docs.opencv.org/2.4/doc/tutorials/introduction/java_eclipse/java_eclipse.html) to enable openCV (see notes below first if using Mac)
 5. run the main method in `edu.wm.cs.semeru.redraw.REMAUI` through Eclipse's "run configurations" and give one argument which is the path of a screen image (see below). (Make sure to change file path in `run_REMAUI_single_image` function, including `projectRootDirectory`, and `screenshots` String which should be the folder name that contains the image). REMAUI output should be in the parent folder of the image path. 
+6. After running sccessfully, copy the command and replace `REMAUI_cmd` in [state.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/state.py)
 
 If you're using Mac, you need to build openCV yourself in order to have that "build" folder. follow steps below:
 1. after downloading openCV's source, make a `build` directory in it. 
