@@ -42,3 +42,146 @@ class Home:
             "appPackage": "com.contextlogic.home",
             "appActivity": "com.contextlogic.wish.activity.browse.BrowseActivity"
         }
+
+class FiveMiles:
+    def __init__(self):
+        self.appname = '5miles'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.thirdrock.fivemiles",
+            "appActivity": "com.insthub.fivemiles.Activity.GuidePagerActivity"
+        }
+
+class AliExpress:
+    def __init__(self):
+        self.appname = 'aliexpress'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.alibaba.aliexpresshd",
+            "appActivity": "com.alibaba.aliexpresshd.home.ui.MainActivity"
+        }
+
+class Ebay:
+    def __init__(self):
+        self.appname = 'ebay'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.ebay.mobile",
+            "appActivity": "com.ebay.mobile.activities.MainActivity"
+        }
+
+class Geek:
+    def __init__(self):
+        self.appname = 'geek'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.contextlogic.geek",
+            "appActivity": "com.contextlogic.wish.activity.browse.BrowseActivity"
+        }
+        
+class GoogleShopping:
+    def __init__(self):
+        self.appname = 'googleshopping'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.google.android.apps.shopping.express",
+            "appActivity": "com.google.android.apps.shopping.express.main.PreMainActivity"
+        }
+
+class Groupon:
+    def __init__(self):
+        self.appname = 'groupon'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.groupon",
+            "appActivity": ".onboarding.main.activities.Onboarding"
+        }
+
+class Wish:
+    def __init__(self):
+        self.appname = 'wish'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.contextlogic.wish",
+            "appActivity": "com.contextlogic.wish.activity.browse.BrowseActivity"
+        }
+
+class BBC:
+    def __init__(self):
+        self.appname = 'bbc'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "bbc.mobile.news.ww",
+            "appActivity": "bbc.mobile.news.v3.app.TopLevelActivity"
+        }
+
+class Buzzfeed:
+    def __init__(self):
+        self.appname = 'buzzfeed'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.buzzfeed.android",
+            "appActivity": "com.buzzfeed.android.activity.SplashActivity"
+        }
+
+class Fox:
+    def __init__(self):
+        self.appname = 'fox'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.foxnews.android",
+            "appActivity": "com.foxnews.android.corenav.StartActivity"
+        }
+
+class Reuters:
+    def __init__(self):
+        self.appname = 'reuters'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.thomsonreuters.reuters",
+            "appActivity": "com.thomsonreuters.reuters.activities.SplashActivity"
+        }
+
+class Guardian:
+    def __init__(self):
+        self.appname = 'theguardian'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.guardian",
+            "appActivity": "com.guardian.feature.stream.NewHomeActivity"
+        }
+
+class USAToday:
+    def __init__(self):
+        self.appname = 'usatoday'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.usatoday.android.news",
+            "appActivity": "com.gannett.android.news.ActivityLoading"
+        }
