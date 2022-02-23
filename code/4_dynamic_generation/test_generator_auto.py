@@ -85,11 +85,14 @@ class DestEvent:
 
 
 class TestGenerator:
-    def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False):
+    def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False, eval_flag=False, use_TRUE_label_flag=True):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
-        self.MAX_TEST_NUM = 5
+        self.MAX_TEST_NUM = 2
         self.REMAUI_flag = REMAUI_flag
+        self.eval_flag = eval_flag
+        self.use_TRUE_IR_flag = use_TRUE_label_flag
+
         if text_sim_flag:
             self.text_sim_w2v = SimilarityCalculator_W2V()
             self.text_sim_bert = SimilarityCalculator_BERT()
@@ -97,16 +100,23 @@ class TestGenerator:
             self.text_sim_w2v = None
             self.text_sim_bert = None
 
-    def start(self, output_dir, usage_model_path, appname):
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        else:
-            shutil.rmtree(output_dir)
-            os.makedirs(output_dir)
+        if eval_flag:
+            self.eval_results = {}
+
+    def start(self, dynamic_output_root_dir, usage_model_path, appname):
+        if not os.path.isdir(dynamic_output_root_dir):
+            os.makedirs(dynamic_output_root_dir)
+
         self.appname = appname
-        self.output_dir = os.path.join(output_dir, appname)
+        self.output_dir = os.path.join(dynamic_output_root_dir, appname)
         if not os.path.isdir(self.output_dir):
             os.makedirs(self.output_dir)
+        else:
+            delete_input = input(self.output_dir + ' already existed! delete it? enter y to delete\n')
+            if delete_input == 'y':
+                shutil.rmtree(self.output_dir)
+                os.makedirs(self.output_dir)
+
         self.generated_tests_dir = os.path.join(self.output_dir, 'generated_tests')
         self.MAX_ACTION = 15
         if not os.path.isdir(self.generated_tests_dir):
@@ -225,13 +235,22 @@ class TestGenerator:
         # image = PIL.Image.open(current_state.screenshot_path)
         # image.show()
         # current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
-        current_screenIR = current_state.get_screenIR(self.appname, self.usage_model, self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag)
-        current_screenIR = input('the true IR you want to use')
+        if self.use_TRUE_IR_flag:
+            print('states in usage model:', self.usage_model.states)
+            screenIR_input = input('the TRUE screen IR you want to use\n')
+            current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
+                                                          self.text_sim_w2v, self.text_sim_bert,
+                                                          self.REMAUI_flag, true_IR=screenIR_input)
+        else:
+            current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
+                                                          self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag, true_IR=None)
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
         if len(triggers) == 0:
             print('current screenIR', current_screenIR)
             raise ValueError('current screenIR does not have any triggers...')
         else:
+            print('------------------')
+            print('next possible actions:', triggers)
             return current_screenIR
 
     # def classify_widgetIR(self, element):
@@ -349,22 +368,69 @@ class TestGenerator:
             print('no matching state found in the usage model...')
             return []
         else:
-            all_possible_triggers = self.usage_model.machine.get_triggers(matching_screenIR)
-            if 'self' in all_possible_triggers:
-                # self_actions is a *list* of DestEvent
-                # placeholder context: change find_actions_from_self_transition function
-                self_actions = self.find_actions_from_self_transition(matching_screenIR, current_state)
-                next_event_list.append(self_actions)
-                all_possible_triggers.remove('self')
-            # placeholder context: change find_possible_next_actions function
-            possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers)
-            for possible_action in possible_actions:
-                next_event_list.append(possible_action)
+            if self.use_TRUE_IR_flag: # when using true labels, just pick an interactable widget directly
+                matching_element = None
+                for element in current_state.nodes:
+                    # print(element.get_element_type())
+                    if element.interactable \
+                            and 'scrollview' not in element.get_element_type().lower()\
+                            and 'viewpager' not in element.get_element_type().lower()\
+                            and 'listview' not in element.get_element_type().lower():
+                        image = PIL.Image.open(element.path_to_screenshot)
+                        image.show()
+                        user_input = input('picking this widget? enter any letter to select it (non letter to skip it)\n')
+                        if user_input.isalpha():
+                            matching_element = element
+                            break
+
+                user_input = input('is this the end action? type y to set isEnd flag True. otherwise False\n')
+                if user_input == 'y':
+                    isEnd = True
+                else:
+                    isEnd = False
+
+                input_element_type = ['EditText', 'AutoCompleteTextView', 'Spinner']
+                if matching_element.get_element_type().split('.')[-1] in input_element_type:
+                    user_input = input('type the text input you want to use\n')
+                    next_event_list.append(DestEvent(action='send_keys', exec_id_type=matching_element.get_exec_id_type(),
+                              exec_id_val=matching_element.get_exec_id_val(), text_input=user_input, isEnd=isEnd,
+                              crop_screenshot_path=matching_element.path_to_screenshot,
+                              state_screenshot_path=current_state.screenshot_path))
+                else:
+                    next_event_list.append(
+                        DestEvent(action='click', exec_id_type=matching_element.get_exec_id_type(),
+                                  exec_id_val=matching_element.get_exec_id_val(), text_input='', isEnd=isEnd,
+                                  crop_screenshot_path=matching_element.path_to_screenshot,
+                                  state_screenshot_path=current_state.screenshot_path))
+
+
+                # kill all the images opened by Preview
+                for proc in psutil.process_iter():
+                    # print(proc.name())
+                    if proc.name() == 'Preview':
+                        proc.kill()
+
+            else:
+                all_possible_triggers = self.usage_model.machine.get_triggers(matching_screenIR)
+                if 'self' in all_possible_triggers:
+                    # self_actions is a *list* of DestEvent
+                    # placeholder context: change find_actions_from_self_transition function
+                    self_actions = self.find_actions_from_self_transition(matching_screenIR, current_state)
+                    next_event_list.append(self_actions)
+                    all_possible_triggers.remove('self')
+                # placeholder context: change find_possible_next_actions function
+                possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers)
+                for possible_action in possible_actions:
+                    next_event_list.append(possible_action)
+
         return next_event_list
         # In the end your next event is a combination of a widget (next_event_widget) which is the type of the
         # node object defined in node.py. and and action that can be either "click" or "send_keys" or
         # "send_keys_enter" or "long" or "swipe-up" etc. You can use the code line below to make a DestEvent (which is defined at the top of this file) - if your action type is send keys then the text input
         # argument would be the input ow it would be empty string
+
+
+
 
 if __name__ == "__main__":
     # appPackage and appActivity can be found here for shooping apps: https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv

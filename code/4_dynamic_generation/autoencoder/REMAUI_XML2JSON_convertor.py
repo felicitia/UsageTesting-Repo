@@ -48,6 +48,7 @@ def get_object(data_dict):
 
 def convert_to_json_REMAUI(input_XML_path):
     try:
+
         with open(input_XML_path) as xml_file:
             data_dict = dict(xmltodict.parse(xml_file.read()))
         xml_file.close()
@@ -64,7 +65,9 @@ def convert_to_json_REMAUI(input_XML_path):
         json_file.close()
     except Exception as e:
         print("error", e)
-        pass
+        return e
+
+    return None
 
 
 if __name__ == '__main__':
