@@ -30,7 +30,9 @@ def evaluation_with_true_label(AUT, usage_name):
 
     end = time.time()
 
+    test_gen.eval_results['usage_states'] = test_gen.usage_model.states
     test_gen.eval_results['true_label_time'] = (end - start)
+
 
     with open(os.path.join(output_path, AUT.appname, 'eval_results.json'), 'w+') as outfile:
         json.dump(test_gen.eval_results, outfile)
@@ -46,7 +48,7 @@ def evaluation_with_true_label(AUT, usage_name):
 
 if __name__ == '__main__':
     AUT = Etsy()
-    usage_name = usage_folder_map['signup']
+    usage_name = usage_folder_map['signin'] # this usage_folder_map is defined in global_config.py
     # AUT = Abc()
     # usage_name = '18-TextSize'
     evaluation_with_true_label(AUT, usage_name)

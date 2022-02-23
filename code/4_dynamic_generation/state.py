@@ -226,12 +226,10 @@ class State:
         if true_IR is not None: # using true IR to generate tests (disable screen classifiers)
             XML_basename = os.path.basename(os.path.normpath(self.UIXML_path)).replace('.xml', '')
             if XML_basename in eval_results.keys():
-                eval_results[XML_basename]['true_IR'] = true_IR
-                eval_results[XML_basename]['usage_states'] = usage_model.states
+                eval_results[XML_basename]['true_screen_IR'] = true_IR
             else:
                 eval_results[XML_basename] = {}
-                eval_results[XML_basename]['true_IR'] = true_IR
-                eval_results[XML_basename]['usage_states'] = usage_model.states
+                eval_results[XML_basename]['true_screen_IR'] = true_IR
             return true_IR
 
         else:

@@ -372,18 +372,22 @@ class TestGenerator:
                 matching_element = None
                 for element in current_state.nodes:
                     # print(element.get_element_type())
-                    if element.interactable \
-                            and 'scrollview' not in element.get_element_type().lower()\
-                            and 'viewpager' not in element.get_element_type().lower()\
-                            and 'listview' not in element.get_element_type().lower():
+                    if element.interactable:
                         image = PIL.Image.open(element.path_to_screenshot)
                         image.show()
-                        user_input = input('picking this widget? enter any letter to select it (non letter to skip it)\n')
-                        if user_input.isalpha():
+                        user_input = input('picking this widget? type the TRUE widget IR to select it; type space to skip it\n')
+                        # print('stripping user input', user_input.strip())
+                        if user_input.strip() != '':
                             matching_element = element
+                            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                            if XML_basename in self.eval_results.keys():
+                                self.eval_results[XML_basename]['true_widget_IR'] = user_input
+                            else:
+                                self.eval_results[XML_basename] = {}
+                                self.eval_results[XML_basename]['true_widget_IR'] = user_input
                             break
 
-                user_input = input('is this the end action? type y to set isEnd flag True. otherwise False\n')
+                user_input = input('is this the last action? type y to set isEnd flag True; type anything else to set it False\n')
                 if user_input == 'y':
                     isEnd = True
                 else:
