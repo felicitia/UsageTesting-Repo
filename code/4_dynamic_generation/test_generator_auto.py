@@ -135,6 +135,7 @@ class TestGenerator:
         while i < len(test1):
             if not self.is_event_equal(test1[i], test2[i]):
                 return False
+            i += 1
         return True
 
     def save_test(self, current_generated_test):
@@ -370,6 +371,7 @@ class TestGenerator:
         else:
             if self.use_TRUE_IR_flag: # when using true labels, just pick an interactable widget directly
                 matching_element = None
+                trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer y or n\n')
                 for element in current_state.nodes:
                     # print(element.get_element_type())
                     if element.interactable:
