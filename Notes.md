@@ -5,7 +5,7 @@
 4. add app's configuration in [App_Config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/App_Config.py) -- you can find relevant info in [news_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/news_app_info.csv) and [shopping_app_info.csv](https://github.com/felicitia/UsageTesting-Repo/blob/master/shopping_app_info.csv)
 5. start Android Emulator (same as the one used for data collection) -- make sure the AUT (App Under Test) is installed on the Emulator, e.g., abcnews
 6. start Appium Server
-7. Change file paths in [global_config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/global_config.py)
+7. Change file paths in [global_config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/global_config.py) Final-Artifact can be downloaded [here](https://zenodo.org/record/5940759).
 8. run main method in [dynamic_evaluation.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/evaluation/dynamic_evaluation.py)
 
 **Enabling REMAUI feature**
