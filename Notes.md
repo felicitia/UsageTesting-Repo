@@ -6,7 +6,7 @@
 5. start Android Emulator (same as the one used for data collection) -- make sure the AUT (App Under Test) is installed on the Emulator, e.g., abcnews
 6. start Appium Server
 7. Change file paths in [global_config.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/global_config.py)
-8. run main method in [test_generator_auto.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/test_generator_auto.py)
+8. run main method in [dynamic_evaluation.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/evaluation/dynamic_evaluation.py)
 
 **Enabling REMAUI feature**
 1. download [REMAUI Java program](https://drive.google.com/file/d/1787v_UKwc06yVC7XA8fh47e98PC9CPTv/view?usp=sharing)
