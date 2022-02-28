@@ -1,0 +1,2 @@
+AUT,usage,human_states,human_triggers,human_test_count,generated_states,generated_triggers,state_coverage,transition_coverage
+wish,1-SignIn,"{'pwd_assistant', 'sign_in', 'popup'}","{'password', 'sign_in', 'back', 'continue', 'email'}",4,"{'pwd_assistant', 'sign_in', 'sign_up', 'popup'}","{'password', 'sign_in', 'to_signin_or_signup', 'apply', 'continue', 'email', 'forget_pwd'}",0.75,0.5714285714285714
