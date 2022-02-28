@@ -1,0 +1,13 @@
+AUT,usage,test_id,human_video_id,human_states,generated_states,human_transitions,generated_transitions,state_coverage,transition_coverage,state_recall,transition_recall,core_flag,reduction
+abc,3-Category,0,0,"{'popup', 'get_started', 'category'}","{'popup', 'get_started'}","{'category_i', 'continue', 'popular', 'apply'}","{'bypass', 'continue', 'apply'}",0.6666666666666666,0.5,1.0,0.6666666666666666,,
+abc,3-Category,0,1,"{'home', 'popup', 'get_started', 'menu'}","{'popup', 'get_started'}","{'category_i', 'search_bar', 'continue', 'menu', 'apply'}","{'bypass', 'continue', 'apply'}",0.5,0.4,1.0,0.6666666666666666,,
+abc,3-Category,1,0,"{'popup', 'get_started', 'category'}",{'get_started'},"{'category_i', 'continue', 'popular', 'apply'}",{'continue'},0.3333333333333333,0.25,1.0,1.0,,
+abc,3-Category,1,1,"{'home', 'popup', 'get_started', 'menu'}",{'get_started'},"{'category_i', 'search_bar', 'continue', 'menu', 'apply'}",{'continue'},0.25,0.2,1.0,1.0,,
+usatoday,3-Category,0,0,"{'home', 'bookmark', 'get_started'}","{'home', 'get_started', 'category'}","{'add', 'item_i', 'bookmark', 'continue'}","{'continue', 'category', 'apply'}",0.6666666666666666,0.25,0.6666666666666666,0.3333333333333333,,
+usatoday,3-Category,0,1,"{'home', 'get_started', 'category'}","{'home', 'get_started', 'category'}","{'category_i', 'category', 'continue'}","{'continue', 'category', 'apply'}",1.0,0.6666666666666666,1.0,0.6666666666666666,,
+usatoday,3-Category,1,0,"{'home', 'bookmark', 'get_started'}",{'get_started'},"{'add', 'item_i', 'bookmark', 'continue'}",{'continue'},0.3333333333333333,0.25,1.0,1.0,,
+usatoday,3-Category,1,1,"{'home', 'get_started', 'category'}",{'get_started'},"{'category_i', 'category', 'continue'}",{'continue'},0.3333333333333333,0.3333333333333333,1.0,1.0,,
+6pm,3-Category,0,0,"{'home', 'filter', 'category'}",{'home'},"{'category_i', 'filter'}",{'category'},0.3333333333333333,0.0,1.0,0.0,,
+6pm,3-Category,0,1,"{'filter', 'category'}",{'home'},{'category_i'},{'category'},0.0,0.0,0.0,0.0,,
+6pm,3-Category,1,0,"{'home', 'filter', 'category'}",{'home'},"{'category_i', 'filter'}",{'category'},0.3333333333333333,0.0,1.0,0.0,,
+6pm,3-Category,1,1,"{'filter', 'category'}",{'home'},{'category_i'},{'category'},0.0,0.0,0.0,0.0,,
