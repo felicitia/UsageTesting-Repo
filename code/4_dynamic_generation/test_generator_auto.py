@@ -238,7 +238,7 @@ class TestGenerator:
         # current_screenIR = input('manually type current state IR based on the screenshot that was just opened\n')
         if self.use_TRUE_IR_flag:
             print('states in usage model:', self.usage_model.states)
-            screenIR_input = input('the TRUE screen IR you want to use\n')
+            screenIR_input = input('\nthe TRUE screen IR you want to use\n')
             current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
                                                           self.text_sim_w2v, self.text_sim_bert,
                                                           self.REMAUI_flag, true_IR=screenIR_input)
@@ -392,26 +392,35 @@ class TestGenerator:
         else:
             if self.use_TRUE_IR_flag: # when using true labels, just pick an interactable widget directly
                 matching_element = None
-                trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer n or No; anything else for Yes\n')
-                if trigger_exist_flag == 'n':
-                    print('all possible actions', self.find_all_triggers_in_model())
+                # trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer n or No; anything else for Yes\n')
+                # if trigger_exist_flag == 'n':
+                print('all possible actions in the model', self.find_all_triggers_in_model())
 
                 for element in current_state.nodes:
                     # print(element.get_element_type())
                     if element.interactable:
                         image = PIL.Image.open(element.path_to_screenshot)
                         image.show()
-                        user_input = input('picking this widget? type the TRUE widget IR to select it; type space to skip it\n')
+                        user_input = input('picking this widget? type the TRUE widget IR to select it; type space to skip it\n(Also, you can type up/down/left/right if you need to scroll)\n')
                         # print('stripping user input', user_input.strip())
                         if user_input.strip() != '':
-                            matching_element = element
-                            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
-                            if XML_basename in self.eval_results.keys():
-                                self.eval_results[XML_basename]['true_widget_IR'] = user_input
+                            if user_input == 'up' or user_input == 'down' or user_input == 'left' or user_input == 'right':
+                                next_event_list.append(DestEvent(action='swipe-' + user_input,
+                                          exec_id_type=None,
+                                          exec_id_val=None, text_input='', isEnd=False,
+                                          crop_screenshot_path=None,
+                                          state_screenshot_path=current_state.screenshot_path))
+                                return next_event_list
+
                             else:
-                                self.eval_results[XML_basename] = {}
-                                self.eval_results[XML_basename]['true_widget_IR'] = user_input
-                            break
+                                matching_element = element
+                                XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                                if XML_basename in self.eval_results.keys():
+                                    self.eval_results[XML_basename]['true_widget_IR'] = user_input
+                                else:
+                                    self.eval_results[XML_basename] = {}
+                                    self.eval_results[XML_basename]['true_widget_IR'] = user_input
+                                break
 
                 user_input = input('is this the last action? type y to set isEnd flag True; type anything else to set it False\n')
                 if user_input == 'y':
