@@ -246,9 +246,16 @@ class TestGenerator:
             current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
                                                           self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag, true_IR=None)
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
+
         if len(triggers) == 0:
             print('current screenIR', current_screenIR)
-            raise ValueError('current screenIR does not have any triggers...')
+            if self.use_TRUE_IR_flag:
+                if current_screenIR == 'popup':
+                    print('next possible actions:', 'continue')
+                else:
+                    raise ValueError('current screenIR does not have any triggers...')
+            else:
+                raise ValueError('current screenIR does not have any triggers...')
         else:
             print('------------------')
             print('next possible actions:', triggers)
@@ -361,6 +368,20 @@ class TestGenerator:
                                                   crop_screenshot_path=matching_element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
         return possible_actions
 
+    def find_all_triggers_in_model(self):
+        all_triggers = set()
+        for state in self.usage_model.states:
+            current_triggers = self.usage_model.machine.get_triggers(state)
+            for trigger in current_triggers:
+                if trigger == 'self':
+                    self_transitions = self.usage_model.machine.get_transitions(trigger='self', source=state, dest=state)
+                    for condition in self.usage_model.get_condition_list(self_transitions):
+                        all_triggers.add(condition)
+                else:
+                    all_triggers.add(trigger)
+        excluding_trigger = {'to_start', 'initial'}
+        return all_triggers - excluding_trigger
+
     def find_next_event_list(self, current_state):
         next_event_list = []
         # placeholder context: change find_matching_state_in_usage_model function
@@ -371,7 +392,10 @@ class TestGenerator:
         else:
             if self.use_TRUE_IR_flag: # when using true labels, just pick an interactable widget directly
                 matching_element = None
-                # trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer y or n\n')
+                trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer n or No; anything else for Yes\n')
+                if trigger_exist_flag == 'n':
+                    print('all possible actions', self.find_all_triggers_in_model())
+
                 for element in current_state.nodes:
                     # print(element.get_element_type())
                     if element.interactable:
