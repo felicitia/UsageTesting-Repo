@@ -3,6 +3,9 @@ import pandas as pd
 import json
 import glob
 import pickle
+import numpy as np
+import math
+import copy
 
 current_dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(current_dir_path, '..'))
@@ -13,6 +16,38 @@ sys.path.insert(0, os.path.join(current_dir_path, '..', '4_dynamic_generation'))
 from global_config import *
 from App_Config import *
 
+
+# return the levenshtein distance
+def levenshtein(test1, test2):
+
+    transitions1 = copy.deepcopy(test1['transitions'])
+    transitions2 = copy.deepcopy(test2['transitions'])
+
+    size_x = len(transitions1) + 1
+    size_y = len(transitions2) + 1
+    matrix = np.zeros((size_x, size_y))
+
+    for x in range(size_x):
+        matrix[x, 0] = x
+    for y in range(size_y):
+        matrix[0, y] = y
+
+    for x in range(1, size_x):
+        for y in range(1, size_y):
+            if transitions1[x - 1] == transitions2[y - 1]:
+                matrix[x, y] = min(
+                    matrix[x - 1, y] + 1,
+                    matrix[x - 1, y - 1],
+                    matrix[x, y - 1] + 1
+                )
+            else:
+                matrix[x, y] = min(
+                    matrix[x - 1, y] + 1,
+                    matrix[x - 1, y - 1] + 1,
+                    matrix[x, y - 1] + 1
+                )
+
+    return (matrix[size_x - 1, size_y - 1])
 
 def find_linear_states_and_triggers(linear_model):
     states = []
@@ -115,6 +150,8 @@ def eval_test_pairs(appname, usage_name, human_test_list, generated_test_list):
     transition_coverage_list = []
     state_recall_list = []
     transition_recall_list = []
+    effort_list = []
+    reduction_list = []
 
     for test_id in range(len(generated_test_list)):
         for human_video_id in range(len(human_test_list)):
@@ -136,11 +173,19 @@ def eval_test_pairs(appname, usage_name, human_test_list, generated_test_list):
             state_recall_list.append(state_recall)
             transition_recall_list.append(trans_recall)
 
+            effort = levenshtein(human_test, generated_test)
+            effort_list.append(effort)
+            reduction = (len(human_test['transitions']) - effort ) / len(human_test['transitions'])
+            reduction_list.append(reduction)
+
+
+
     result_rows = {'AUT': AUT_list, 'usage': usage_list, 'test_id': test_id_list, 'human_video_id': human_video_id_list,
                    'human_states': human_states_list, 'generated_states': generated_states_list,
                    'human_transitions': human_transitions_list, 'generated_transitions': generated_transitions_list,
                    'state_coverage': state_coverage_list, 'transition_coverage': transition_coverage_list,
-                   'state_recall': state_recall_list, 'transition_recall': transition_recall_list}
+                   'state_recall': state_recall_list, 'transition_recall': transition_recall_list,
+                   'effort': effort_list, 'reduction': reduction_list}
 
     df = pd.DataFrame(result_rows)
 
