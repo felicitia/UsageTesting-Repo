@@ -14,27 +14,38 @@ from global_config import *
 from App_Config import *
 
 
-def find_all_triggers(ir_model):
-    all_triggers = set()
-    for state in ir_model.states:
-        current_triggers = ir_model.machine.get_triggers(state)
-        for trigger in current_triggers:
-            if trigger == 'self':
-                self_transitions = ir_model.machine.get_transitions(trigger='self', source=state, dest=state)
-                for condition in ir_model.get_condition_list(self_transitions):
-                    if '#' in condition:
-                        all_triggers.add(condition.split('#')[0])
-            elif '#' in trigger:
-                all_triggers.add(trigger.split('#')[0])
-    return all_triggers
+def find_linear_states_and_triggers(linear_model):
+    states = []
+    triggers = []
+
+    linear_model.states.remove('start')
+    linear_model.states.remove('end')
+    linear_model.states.sort(key=lambda x: x.split('#')[1])
+
+    for sorted_state in linear_model.states:
+        # print(sorted_state)
+        states.append(sorted_state.split('#')[0])
+        trigger_list = linear_model.machine.get_triggers(sorted_state)
+        if len(trigger_list) == 1:
+            triggers.append(trigger_list[0].split('#')[0])
+        else:
+            print(trigger_list, 'is not only 1')
+            raise ValueError
+
+    return states, triggers
 
 
 def clean_test(test):
-    excluding_states = {'start', 'end', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup'}
-    excluding_triggers = {'initial', 'to_start', 'by_amazon', 'by_facebook', 'by_google', 'pick_google_account'}
+    excluding_states = ['start', 'end', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']
+    excluding_triggers = ['initial', 'to_start', 'by_amazon', 'by_facebook', 'by_google', 'pick_google_account']
 
-    test['states'] = test['states'] - excluding_states
-    test['transitions'] = test['transitions'] - excluding_triggers
+    for state in test['states']:
+        if state in excluding_states:
+            test['states'].remove(state)
+
+    for transition in test['transitions']:
+        if transition in excluding_triggers:
+            test['transitions'].remove(transition)
 
     return test
 
@@ -47,28 +58,28 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
 
     test1 = {}
     test2 = {}
-    test1['states'] = set()
-    test1['transitions'] = set()
-    test2['states'] = set()
-    test2['transitions'] = set()
+    test1['states'] = []
+    test1['transitions'] = []
+    test2['states'] = []
+    test2['transitions'] = []
 
     for key in eval_json:
+        print('key in order:', key)
         if '0-' in key:
-            test1['states'].add(eval_json[key]['true_screen_IR'])
-            test1['transitions'].add(eval_json[key]['true_widget_IR'])
+            test1['states'].append(eval_json[key]['true_screen_IR'])
+            test1['transitions'].append(eval_json[key]['true_widget_IR'])
         elif '1-' in key:
-            test2['states'].add(eval_json[key]['true_screen_IR'])
-            test2['transitions'].add(eval_json[key]['true_widget_IR'])
+            test2['states'].append(eval_json[key]['true_screen_IR'])
+            test2['transitions'].append(eval_json[key]['true_widget_IR'])
 
 
     generated_test_list = [clean_test(test1), clean_test(test2)]
 
     human_test_list = []
-    for ir_model_path in glob.glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'ir_model.pickle')):
-        ir_model = pickle.load(open(ir_model_path, 'rb'))
+    for linear_model_path in glob.glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'linear_model.pickle')):
+        linear_model = pickle.load(open(linear_model_path, 'rb'))
         human_test = {}
-        human_test['states'] = set(ir_model.states)
-        human_test['transitions'] = find_all_triggers(ir_model)
+        human_test['states'], human_test['transitions'] = find_linear_states_and_triggers(linear_model)
         human_test_list.append(clean_test(human_test))
 
     all_pair_results_df = eval_test_pairs(appname, usage_name, human_test_list, generated_test_list)
@@ -76,14 +87,14 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
 
 
 def calculate_coverage(human_test, generated_test):
-    overlapping_states = human_test['states'].intersection(generated_test['states'])
-    overlapping_trans = human_test['transitions'].intersection(generated_test['transitions'])
+    overlapping_states = set(human_test['states']).intersection(set(generated_test['states']))
+    overlapping_trans = set(human_test['transitions']).intersection(set(generated_test['transitions']))
 
-    state_coverage = len(overlapping_states) / len(human_test['states'])
-    trans_coverage = len(overlapping_trans) / len(human_test['transitions'])
+    state_coverage = len(set(overlapping_states)) / len(set(human_test['states']))
+    trans_coverage = len(set(overlapping_trans)) / len(set(human_test['transitions']))
 
-    state_recall = len(overlapping_states) / len(generated_test['states'])
-    trans_recall = len(overlapping_trans) / len(generated_test['transitions'])
+    state_recall = len(set(overlapping_states)) / len(set(generated_test['states']))
+    trans_recall = len(set(overlapping_trans)) / len(set(generated_test['transitions']))
 
     return state_coverage, trans_coverage, state_recall, trans_recall
 
@@ -153,7 +164,7 @@ def eval_usage_batch(usage_name): # 1-SignIn
 
 if __name__ == '__main__':
 
-    usage_name = usage_folder_map['account']
+    usage_name = usage_folder_map['signin']
     eval_usage_batch(usage_name)
 
     print('all done! :)')
