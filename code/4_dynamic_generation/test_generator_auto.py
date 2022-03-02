@@ -410,6 +410,14 @@ class TestGenerator:
                                           exec_id_val=None, text_input='', isEnd=False,
                                           crop_screenshot_path=None,
                                           state_screenshot_path=current_state.screenshot_path))
+
+                                XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
+                                    '.xml', '')
+                                if XML_basename in self.eval_results.keys():
+                                    self.eval_results[XML_basename]['true_widget_IR'] = user_input
+                                else:
+                                    self.eval_results[XML_basename] = {}
+                                    self.eval_results[XML_basename]['true_widget_IR'] = user_input
                                 return next_event_list
 
                             else:
