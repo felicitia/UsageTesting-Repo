@@ -72,7 +72,7 @@ def find_linear_states_and_triggers(linear_model):
 
 def clean_test(test):
     excluding_states = ['start', 'end', 'signin_amazon', 'signin_fb', 'signin_google', 'signin_google_popup']
-    excluding_triggers = ['initial', 'to_start', 'by_amazon', 'by_facebook', 'by_google', 'pick_google_account']
+    excluding_triggers = ['initial', 'to_start', 'by_amazon', 'by_facebook', 'by_google', 'pick_google_account', 'up', 'down', 'left', 'right']
 
     for state in test['states']:
         if state in excluding_states:
@@ -207,9 +207,33 @@ def eval_usage_batch(usage_name): # 1-SignIn
 
     all_results.to_csv(usage_result_path, index=False, header=True)
 
+# input: the root dir of all the results for each usage
+def calculate_final_results(usage_result_root):
+    for file in glob.glob(os.path.join(usage_result_root, '*.csv')):
+        print('results for', file)
+        df = pd.read_csv(file)
+        grouped_df = df.groupby(['AUT', 'usage', 'test_id']).agg({'state_coverage': ['max'], 'transition_coverage': ['max'],
+                                                                  'state_recall': ['max'], 'transition_recall': ['max'],
+                                                                  'effort': ['min'], 'reduction': ['max']})
+
+
+        grouped_df.columns = ['state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']
+        grouped_df = grouped_df.reset_index()
+        grouped_df = grouped_df.groupby('AUT').agg({'state_coverage': ['mean'], 'transition_coverage': ['mean'],
+                                                                  'state_recall': ['mean'], 'transition_recall': ['mean'],
+                                                                  'effort': ['mean'], 'reduction': ['mean']})
+        # pd.set_option("display.max_rows", None, "display.max_columns", None)
+        print(grouped_df.mean().round(2))
+        input('copy results from console :)')
+
 if __name__ == '__main__':
 
-    usage_name = usage_folder_map['signin']
-    eval_usage_batch(usage_name)
+    # usage_name = usage_folder_map['signin']
+    usage_list = [usage_folder_map['signup'], usage_folder_map['category'], usage_folder_map['account'], usage_folder_map['detail'], usage_folder_map['help']]
+    # for usage_name in usage_list:
+    #     print('usage name:', usage_name)
+    #     eval_usage_batch(usage_name)
 
+
+    calculate_final_results(os.path.join(current_dir_path, 'raw_results'))
     print('all done! :)')
