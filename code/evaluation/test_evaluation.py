@@ -17,6 +17,11 @@ from global_config import *
 from App_Config import *
 
 
+def insensitive_glob(pattern):
+    def either(c):
+        return '[%s%s]' % (c.lower(), c.upper()) if c.isalpha() else c
+    return glob.glob(''.join(map(either, pattern)))
+
 # return the levenshtein distance
 def levenshtein(test1, test2):
 
@@ -115,7 +120,7 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
         generated_test_list = [clean_test(test1)]
 
     human_test_list = []
-    for linear_model_path in glob.glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'linear_model.pickle')):
+    for linear_model_path in insensitive_glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'linear_model.pickle')):
         linear_model = pickle.load(open(linear_model_path, 'rb'))
         human_test = {}
         human_test['states'], human_test['transitions'] = find_linear_states_and_triggers(linear_model)
@@ -240,12 +245,12 @@ def calculate_final_results(usage_result_root):
 
 if __name__ == '__main__':
 
-    # usage_name = usage_folder_map['category']
-    # eval_usage_batch(usage_name)
+    usage_name = usage_folder_map['addcart']
+    eval_usage_batch(usage_name)
     # usage_list = [usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['menu']]
     # for usage_name in usage_list:
     #     print('usage name:', usage_name)
     #     eval_usage_batch(usage_name)
 
-    calculate_final_results(os.path.join(current_dir_path, 'raw_results'))
+    # calculate_final_results(os.path.join(current_dir_path, 'raw_results'))
     print('all done! :)')
