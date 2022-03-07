@@ -9,4 +9,4 @@ googleshopping.apk,com.google.android.apps.shopping.express,com.google.android.a
 groupon.apk,com.groupon,.onboarding.main.activities.Onboarding,
 home.apk,com.contextlogic.home,com.contextlogic.wish.activity.browse.BrowseActivity,
 wish.apk,com.contextlogic.wish,com.contextlogic.wish.activity.browse.BrowseActivity,
-zappos.apk,,,v10.4.0
+zappos.apk,com.zappos.android,com.zappos.android.activities.HomeActivity,v10.4.0
