@@ -196,3 +196,14 @@ class DailyHunt:
             "appPackage": "com.eterno",
             "appActivity": "com.newshunt.onboarding.view.activity.OnBoardingActivity"
         }
+
+class Zappos:
+    def __init__(self):
+        self.appname = 'zappos'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.zappos.android",
+            "appActivity": "com.zappos.android.activities.HomeActivity"
+        }
