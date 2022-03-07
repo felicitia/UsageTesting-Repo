@@ -185,3 +185,14 @@ class USAToday:
             "appPackage": "com.usatoday.android.news",
             "appActivity": "com.gannett.android.news.ActivityLoading"
         }
+
+class DailyHunt:
+    def __init__(self):
+        self.appname = 'dailyhunt'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.eterno",
+            "appActivity": "com.newshunt.onboarding.view.activity.OnBoardingActivity"
+        }
