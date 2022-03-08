@@ -47,8 +47,8 @@ def evaluation_with_true_label(AUT, usage_name):
 
 
 if __name__ == '__main__':
-    AUT = Etsy()
-    usage_name = usage_folder_map['signin'] # this usage_folder_map is defined in global_config.py
+    AUT = Guardian()
+    usage_name = usage_folder_map['textsize'] # this usage_folder_map is defined in global_config.py
     # AUT = Abc()
     # usage_name = '18-TextSize'
     evaluation_with_true_label(AUT, usage_name)

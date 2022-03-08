@@ -32,6 +32,18 @@ class SixPM:
             "appActivity": "com.zappos.android.activities.HomeActivity"
         }
 
+class Zappos:
+    def __init__(self):
+        self.appname = 'zappos'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.zappos.android",
+            "appActivity": "com.zappos.android.activities.HomeActivity"
+        }
+
+
 class Home:
     def __init__(self):
         self.appname = 'home'
@@ -164,9 +176,20 @@ class Reuters:
             "appActivity": "com.thomsonreuters.reuters.activities.SplashActivity"
         }
 
+class DailyHunt:
+    def __init__(self):
+        self.appname = 'Dailyhunt'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.eterno",
+            "appActivity": "com.newshunt.appview.common.ui.activity.HomeActivity"
+        }
+
 class Guardian:
     def __init__(self):
-        self.appname = 'theguardian'
+        self.appname = 'guardian'
         self.desiredCapabilities = {
             "platformName": "Android",
             "deviceName": "emulator-5554",  # adb devices

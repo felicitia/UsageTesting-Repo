@@ -13,6 +13,7 @@ from global_config import *
 from bert_similarity_calc import SimilarityCalculator_BERT
 from text_similarity_calculator import SimilarityCalculator_W2V
 from App_Config import *
+from sentence_transformers import SentenceTransformer
 from sys import argv
 
 import re
@@ -27,6 +28,7 @@ from entities import IR_Model
 import glob
 import random
 import pandas as pd
+import nltk
 import webbrowser
 
 class TestCase:
@@ -85,13 +87,17 @@ class DestEvent:
 
 
 class TestGenerator:
-    def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False, eval_flag=False, use_TRUE_label_flag=True):
+    def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False, eval_flag=False, use_TRUE_label_flag=False):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
         self.MAX_TEST_NUM = 2
         self.REMAUI_flag = REMAUI_flag
         self.eval_flag = eval_flag
         self.use_TRUE_IR_flag = use_TRUE_label_flag
+        self.bert = SentenceTransformer('bert-base-nli-mean-tokens').to('cpu')
+        nltk.download('words')
+        nltk.download('punkt')
+        self.words = set(nltk.corpus.words.words())
 
         if text_sim_flag:
             self.text_sim_w2v = SimilarityCalculator_W2V()
@@ -118,7 +124,7 @@ class TestGenerator:
                 os.makedirs(self.output_dir)
 
         self.generated_tests_dir = os.path.join(self.output_dir, 'generated_tests')
-        self.MAX_ACTION = 15
+        self.MAX_ACTION = 25
         if not os.path.isdir(self.generated_tests_dir):
             os.makedirs(self.generated_tests_dir)
         self.load_usage_model(usage_model_path)
@@ -127,6 +133,7 @@ class TestGenerator:
     def load_usage_model(self, usage_model_path):
         pickle_filepath = os.path.join(usage_model_path)
         self.usage_model = pickle.load(open(pickle_filepath, 'rb'))
+
 
     def is_test_equal(self, test1, test2):
         if not len(test1) == len(test2):
@@ -164,7 +171,7 @@ class TestGenerator:
             self.explorer.test_num = self.test_num
             self.explorer.screenshot_idx = 0
             while step_index < self.MAX_ACTION and not isEnd_flag:
-                time.sleep(2)
+                time.sleep(15)
                 current_state = self.explorer.extract_state(self.output_dir)
                 current_state.print_state()
                 # placeholder context: you only need to care about find_next_event_list function
@@ -243,8 +250,14 @@ class TestGenerator:
                                                           self.text_sim_w2v, self.text_sim_bert,
                                                           self.REMAUI_flag, true_IR=screenIR_input)
         else:
-            current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
-                                                          self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag, true_IR=None)
+            # current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
+            #                                               self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag, true_IR=None)
+            top1, top5, top10 = current_state.get_screen_IR(self.appname, self.bert, self.words)
+            print("The screen classifier top1 guess for the screen: ")
+            print(top1)
+            print("The screen classifier top5 guesses for the screen: ")
+            print(top5)
+            current_screenIR = input('\nChoose the closest screen tag from the top5 guesses:\n')
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
 
         if len(triggers) == 0:
@@ -493,8 +506,8 @@ if __name__ == "__main__":
 
     # AUT = Etsy()
     # usage_name = '1-SignIn'
-    AUT = Abc()
-    usage_name = '18-TextSize'
+    AUT = Home()
+    usage_name = '8-Menu'
     start = time.time()
     test_gen = TestGenerator(AUT.desiredCapabilities)
 
