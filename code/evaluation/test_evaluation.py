@@ -17,6 +17,11 @@ from global_config import *
 from App_Config import *
 
 
+def insensitive_glob(pattern):
+    def either(c):
+        return '[%s%s]' % (c.lower(), c.upper()) if c.isalpha() else c
+    return glob.glob(''.join(map(either, pattern)))
+
 # return the levenshtein distance
 def levenshtein(test1, test2):
 
@@ -97,6 +102,7 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
     test1['transitions'] = []
     test2['states'] = []
     test2['transitions'] = []
+    test2_exist_flag = False
 
     for key in eval_json:
         print('key in order:', key)
@@ -104,14 +110,17 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
             test1['states'].append(eval_json[key]['true_screen_IR'])
             test1['transitions'].append(eval_json[key]['true_widget_IR'])
         elif '1-' in key:
+            test2_exist_flag = True
             test2['states'].append(eval_json[key]['true_screen_IR'])
             test2['transitions'].append(eval_json[key]['true_widget_IR'])
 
-
-    generated_test_list = [clean_test(test1), clean_test(test2)]
+    if test2_exist_flag:
+        generated_test_list = [clean_test(test1), clean_test(test2)]
+    else:
+        generated_test_list = [clean_test(test1)]
 
     human_test_list = []
-    for linear_model_path in glob.glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'linear_model.pickle')):
+    for linear_model_path in insensitive_glob(os.path.join(FINAL_ARTIFACT_ROOT_DIR, 'usage_data', usage_name, appname+'*', 'linear_model.pickle')):
         linear_model = pickle.load(open(linear_model_path, 'rb'))
         human_test = {}
         human_test['states'], human_test['transitions'] = find_linear_states_and_triggers(linear_model)
@@ -209,6 +218,7 @@ def eval_usage_batch(usage_name): # 1-SignIn
 
 # input: the root dir of all the results for each usage
 def calculate_final_results(usage_result_root):
+    mean_df_list = []
     for file in glob.glob(os.path.join(usage_result_root, '*.csv')):
         print('results for', file)
         df = pd.read_csv(file)
@@ -223,17 +233,24 @@ def calculate_final_results(usage_result_root):
                                                                   'state_recall': ['mean'], 'transition_recall': ['mean'],
                                                                   'effort': ['mean'], 'reduction': ['mean']})
         # pd.set_option("display.max_rows", None, "display.max_columns", None)
-        print(grouped_df.mean().round(2))
-        input('copy results from console :)')
+        mean_df_list.append(grouped_df.mean().round(2))
+        print(grouped_df.mean(axis=0).round(2))
+        # input('copy results from console :)')
+
+    mean_df = pd.concat(mean_df_list, axis=1)
+    print('-----Final Average Results-----')
+    print(mean_df.mean(axis=1).round(2))
+
+
 
 if __name__ == '__main__':
 
-    # usage_name = usage_folder_map['signin']
-    usage_list = [usage_folder_map['signup'], usage_folder_map['category'], usage_folder_map['account'], usage_folder_map['detail'], usage_folder_map['help']]
+    usage_name = usage_folder_map['addcart']
+    eval_usage_batch(usage_name)
+    # usage_list = [usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['menu']]
     # for usage_name in usage_list:
     #     print('usage name:', usage_name)
     #     eval_usage_batch(usage_name)
 
-
-    calculate_final_results(os.path.join(current_dir_path, 'raw_results'))
+    # calculate_final_results(os.path.join(current_dir_path, 'raw_results'))
     print('all done! :)')

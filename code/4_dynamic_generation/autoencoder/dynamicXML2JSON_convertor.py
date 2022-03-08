@@ -70,7 +70,7 @@ def convert_to_json_dynamic(input_XML_path):
         with open(input_XML_path) as xml_file:
             data_dict = dict(xmltodict.parse(xml_file.read()))
         xml_file.close()
-        package_name = (input_XML_path.split("/")[1]).split("-")[0]
+        package_name = "Users" # (input_XML_path.split("/")[1]).split("-")[0]
         json_dict = {"activity_name": package_name, "request_id": 3, "is_keyboard_deployed": False}
         # print(json_dict)
         activity = {"added_fragments": ["1"], "active_fragments": ["1"]}

@@ -208,3 +208,25 @@ class USAToday:
             "appPackage": "com.usatoday.android.news",
             "appActivity": "com.gannett.android.news.ActivityLoading"
         }
+
+class DailyHunt:
+    def __init__(self):
+        self.appname = 'dailyhunt'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.eterno",
+            "appActivity": "com.newshunt.onboarding.view.activity.OnBoardingActivity"
+        }
+
+class Zappos:
+    def __init__(self):
+        self.appname = 'zappos'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.zappos.android",
+            "appActivity": "com.zappos.android.activities.HomeActivity"
+        }
