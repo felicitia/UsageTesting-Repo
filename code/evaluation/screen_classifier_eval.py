@@ -107,6 +107,7 @@ def get_model(app):
 def get_remaui_ae_embedding(xml_path):
     REMAUI_error = convert_to_json_REMAUI(xml_path)
     while REMAUI_error is not None:
+        print(xml_path)
         print('REMAUI error:', REMAUI_error)
         input('please fix the XML and continue')
         REMAUI_error = convert_to_json_REMAUI(xml_path)
@@ -171,8 +172,12 @@ def evaluate_dynamic_screen_classifiers():
                 if app == ".DS_Store":
                     continue
                 else:
+                    if app == "theguardian":
+                        app = "guardian"
                     screen_classifier = get_model(app)
                     eval_json_path = os.path.join(recorded_data_path, usage, app, "eval_results.json")
+                    print("**********")
+                    print(app)
                     screen_classifier_KNN = KNN_screen_classifier(app, embeddings_path, labels_path, 5, 5)
 
                     with open(eval_json_path) as eval_json_file:
@@ -245,44 +250,44 @@ def evaluate_dynamic_screen_classifiers():
                             if correct_tag in top_n_remaui_screenIR_mlp:
                                 correct_r_mlp_top_5 += 1
 
+            print("from scratch dynamic results:")
+            print("top1: " + str(correct_d_top_1 / all_count))
+            print("top5: " + str(correct_d_top_5 / all_count))
+            print("top10: " + str(correct_d_top_10 / all_count))
 
+            print("--------------------------")
+            print("from scratch ro results:")
+            print("top1: " + str(correct_ro_top_1 / all_count))
+            print("top5: " + str(correct_ro_top_5 / all_count))
+            print("top10: " + str(correct_ro_top_10 / all_count))
+
+            print("--------------------------")
+            print("knn results dynamic:")
+            print("top1: " + str(correct_d_KNN_top_1 / all_count))
+            print("top5: " + str(correct_d_KNN_top_5 / all_count))
+
+            print("--------------------------")
+            print("knn results remaui:")
+            print("top1: " + str(correct_r_KNN_top_1 / all_count))
+            print("top5: " + str(correct_r_KNN_top_5 / all_count))
+
+            print("--------------------------")
+            print("mlp results dynamic:")
+            print("top1: " + str(correct_d_mlp_top_1 / all_count))
+            print("top5: " + str(correct_d_mlp_top_5 / all_count))
+
+            print("--------------------------")
+            print("mlp results remaui:")
+            print("top1: " + str(correct_r_mlp_top_1 / all_count))
+            print("top5: " + str(correct_r_mlp_top_5 / all_count))
+
+            print("all count:")
+            print(all_count)
+            print("------------")
         else:
             print("already evaluated usage: " + usage)
 
-        print("from scratch dynamic results:")
-        print("top1: " + str(correct_d_top_1/all_count))
-        print("top5: " + str(correct_d_top_5/all_count))
-        print("top10: " + str(correct_d_top_10/all_count))
 
-        print("--------------------------")
-        print("from scratch ro results:")
-        print("top1: " + str(correct_ro_top_1/all_count))
-        print("top5: " + str(correct_ro_top_5/all_count))
-        print("top10: " + str(correct_ro_top_10/all_count))
-
-        print("--------------------------")
-        print("knn results dynamic:")
-        print("top1: " + str(correct_d_KNN_top_1/all_count))
-        print("top5: " + str(correct_d_KNN_top_5/all_count))
-
-        print("--------------------------")
-        print("knn results remaui:")
-        print("top1: " + str(correct_r_KNN_top_1/all_count))
-        print("top5: " + str(correct_r_KNN_top_5/all_count))
-
-        print("--------------------------")
-        print("mlp results dynamic:")
-        print("top1: " + str(correct_d_mlp_top_1/all_count))
-        print("top5: " + str(correct_d_mlp_top_5/all_count))
-
-        print("--------------------------")
-        print("mlp results remaui:")
-        print("top1: " + str(correct_r_mlp_top_1/all_count))
-        print("top5: " + str(correct_r_mlp_top_5/all_count))
-
-        print("all count:")
-        print(all_count)
-        print("------------")
 
 
 if __name__ == '__main__':

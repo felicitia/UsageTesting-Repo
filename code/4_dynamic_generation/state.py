@@ -6,15 +6,34 @@ sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder'))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder', 'aeSrc'))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_KNN'))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_MLP'))
-
+sys.path.insert(0, os.path.join(current_dir_path, 'screen_classifier'))
 import PIL, psutil
 import pandas as pd
+import torch
+import cv2
+import json
+import pytesseract
 from dynamicXML2JSON_convertor import convert_to_json_dynamic
 from REMAUI_XML2JSON_convertor import convert_to_json_REMAUI
 from createSilhouette import createUIImage
 from getEmbeddings import getAEembeddings
 from screen_classifier_KNN_autoencoder import KNN_screen_classifier
 from MLP_classify import MLP_ScreenClassifierForAUT
+from model import ScreenClassifier
+
+
+def OCR(path, words_only=True):
+    image = cv2.imread(path)
+    image = cv2.medianBlur(image, 3)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    text = pytesseract.image_to_string(PIL.Image.fromarray(image))
+    text = text.split()
+    return [word.lower() for word in text]
+
+def process_text_data(raw_data, words):
+    remove_none_english = [w for w in raw_data if w in words]
+    sentence = " ".join(remove_none_english)
+    return sentence
 
 class State:
     def __init__(self, screenshot):
@@ -73,15 +92,30 @@ class State:
             pickle.dump(dynamic_embedding, file)
         return dynamic_embedding
 
+    def get_ocr_text_embedding(self, bert, words):
+        text = OCR(self.screenshot_path)
+        processed_ocr_text = process_text_data(text, words)
+        text_embedding = torch.as_tensor(bert.encode(processed_ocr_text),
+                                         device='cpu').reshape(1,
+                                                                768)
+        return text_embedding
+
+    def get_screen_tag(self, screen_id):
+        screen_dict_path = "screen_classifier/screen_dict.json"
+        with open(screen_dict_path) as screen_dict_file:
+            screen_dict = json.load(screen_dict_file)
+            for k,v in screen_dict.items():
+                if v == screen_id:
+                    return k
 
     def get_REMAUI_embedding(self):
         # call Java program REMAUI to reverse engineering the UI first (you need to find out your Java command line to run the REMAUI program and replace REMAUI_command)
         image_file_to_REMAUI = self.UIXML_path.replace('xml', 'png')
-        REMAUI_cmd = '/Library/Java/JavaVirtualMachines/openjdk-13.0.1.jdk/Contents/Home/bin/java ' \
-                     '-Djava.library.path=/Users/yixue/Documents/Research/UsageTesting/opencv-4.5.2/build/lib:/Users/yixue/Documents/Research/UsageTesting/opencv-4.5.2/build/lib ' \
+        REMAUI_cmd = '/Library/Java/JavaVirtualMachines/adoptopenjdk-16.jdk/Contents/Home/bin/java ' \
+                     '-Djava.library.path=/Users/saghar/Documents/dev/opencv-4.5.2/build/lib ' \
                      '-Dfile.encoding=UTF-8 ' \
-                     '-p /Users/yixue/Documents/Research/UsageTesting/REMAUI/javax.persistence-2.2.0.jar ' \
-                     '-classpath /Users/yixue/Documents/Research/UsageTesting/REMAUI/bin:/Users/yixue/Documents/Research/UsageTesting/opencv-4.5.2/build/bin/opencv-452.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/jdom/xercesImpl.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/guava-19.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/ij.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/gson-2.8.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/Android-Core-1.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/SEMERU-Core-1.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/commons-exec-1.3.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/commons-lang-2.6.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/commons-io-2.5.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/jsoup-1.9.2.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/android-stubs-src.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/javacpp-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/artoolkitplus-2.3.1-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-android-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-android-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/protobuf-java-2.6.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-calibration-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-calibration-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-feature-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-feature-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-geo-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-geo-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-io-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-io-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-ip-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-ip-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-javacv-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-javacv-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-jcodec-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-jcodec-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-learning-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-learning-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-recognition-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-recognition-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-sfm-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-sfm-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-visualize-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-visualize-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-WebcamCapture-0.26-sources.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/BoofCV-WebcamCapture-0.26.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/bridj-0.7.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/commons-compress-1.7.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/core-0.30.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/ddogleg-0.10.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/dense64-0.30.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/equation-0.30.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-linux-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-macosx-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-windows-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/opencv-3.0.0-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/flandmark-1.07-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/flycapture-2.8.3.1-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/georegression-0.12.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/io-0.3.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/jarchivelib-0.5.0.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/libdc1394-2.2.3-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/libfreenect-0.5.3-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/videoinput-0.200-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/javacv-1.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/jcodec-0.1.9.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/learning-0.3.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/main-0.3.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/models-0.3.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/opencv-3.0.0-1.1-linux-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/opencv-3.0.0-1.1-macosx-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/opencv-3.0.0-1.1-windows-x86_64.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/simple-0.30.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/slf4j-api-1.7.2.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/snakeyaml-1.17.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/uiautomator.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/webcam-capture-0.3.11.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/xmlpull-1.1.3.1.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/xpp3_min-1.1.4c.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/xstream-1.4.7.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/xz-1.4.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/boofcv/zip4j-1.3.2.jar:/Users/yixue/Documents/Research/UsageTesting/REMAUI/lib/jdom/jdom-2.0.6.jar edu.wm.cs.semeru.redraw.REMAUI ' \
+                     '-p /Users/saghar/Documents/dev/REMAUI/javax.persistence-2.2.0.jar ' \
+                     '-classpath /Users/saghar/Documents/dev/REMAUI/bin:/Users/saghar/Documents/dev/opencv-4.5.2/build/bin/opencv-452.jar:/Users/saghar/Documents/dev/REMAUI/lib/jdom/xercesImpl.jar:/Users/saghar/Documents/dev/REMAUI/lib/guava-19.0.jar:/Users/saghar/Documents/dev/REMAUI/lib/ij.jar:/Users/saghar/Documents/dev/REMAUI/lib/gson-2.8.0.jar:/Users/saghar/Documents/dev/REMAUI/Android-Core-1.0.jar:/Users/saghar/Documents/dev/REMAUI/SEMERU-Core-1.0.jar:/Users/saghar/Documents/dev/REMAUI/commons-exec-1.3.jar:/Users/saghar/Documents/dev/REMAUI/commons-lang-2.6.jar:/Users/saghar/Documents/dev/REMAUI/lib/commons-io-2.5.jar:/Users/saghar/Documents/dev/REMAUI/lib/jsoup-1.9.2.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/android-stubs-src.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/javacpp-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/artoolkitplus-2.3.1-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-android-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-android-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/protobuf-java-2.6.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-calibration-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-calibration-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-feature-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-feature-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-geo-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-geo-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-io-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-io-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-ip-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-ip-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-javacv-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-javacv-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-jcodec-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-jcodec-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-learning-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-learning-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-recognition-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-recognition-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-sfm-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-sfm-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-visualize-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-visualize-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-WebcamCapture-0.26-sources.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/BoofCV-WebcamCapture-0.26.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/bridj-0.7.0.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/commons-compress-1.7.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/core-0.30.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/ddogleg-0.10.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/dense64-0.30.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/equation-0.30.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-linux-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-macosx-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1-windows-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/ffmpeg-2.8.1-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/opencv-3.0.0-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/flandmark-1.07-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/flycapture-2.8.3.1-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/georegression-0.12.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/io-0.3.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/jarchivelib-0.5.0.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/libdc1394-2.2.3-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/libfreenect-0.5.3-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/videoinput-0.200-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/javacv-1.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/jcodec-0.1.9.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/learning-0.3.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/main-0.3.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/models-0.3.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/opencv-3.0.0-1.1-linux-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/opencv-3.0.0-1.1-macosx-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/opencv-3.0.0-1.1-windows-x86_64.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/simple-0.30.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/slf4j-api-1.7.2.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/snakeyaml-1.17.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/uiautomator.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/webcam-capture-0.3.11.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/xmlpull-1.1.3.1.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/xpp3_min-1.1.4c.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/xstream-1.4.7.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/xz-1.4.jar:/Users/saghar/Documents/dev/REMAUI/lib/boofcv/zip4j-1.3.2.jar:/Users/saghar/Documents/dev/REMAUI/lib/jdom/jdom-2.0.6.jar edu.wm.cs.semeru.redraw.REMAUI ' \
                      + image_file_to_REMAUI
         os.system(REMAUI_cmd)
         XML_basename = os.path.basename(os.path.normpath(self.UIXML_path)).replace('.xml', '')
@@ -237,6 +271,40 @@ class State:
                                    AUT, usage_model, text_sim_w2v, text_sim_bert, REMAUI_flag, true_IR)
 
         return None
+
+    def get_model(self, app):
+        model_path = "screen_classifier/screen_classifier_models_pretrain_scratch/" + app + "_screen_model"
+        screen_classifier = ScreenClassifier()
+        screen_classifier.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        screen_classifier.eval()
+        return screen_classifier
+
+    def get_label_with_fs_model(self, classifier_model, layout_emb, text_emb):
+        out = classifier_model(text_emb, layout_emb)
+        y_pred_softmax = torch.log_softmax(out, dim=1)
+        top_10 = torch.argsort(y_pred_softmax)[:, -10:]
+        top_5 = torch.argsort(y_pred_softmax)[:, -5:]
+        _, y_pred = torch.max(y_pred_softmax, dim=1)
+        return y_pred, top_5, top_10
+
+    def get_screen_IR(self, AUT, bert, words):
+        REMAUI_embedding_autoencoder = torch.Tensor(self.get_REMAUI_embedding())
+        ocr_text_embedding = self.get_ocr_text_embedding(bert, words)
+        screen_classifier = self.get_model(AUT)
+        remaui_ocr_top1, remaui_ocr_top5, remaui_ocr_top10 = self.get_label_with_fs_model(screen_classifier, REMAUI_embedding_autoencoder, ocr_text_embedding)
+
+        for screen_id in remaui_ocr_top1:
+            top_1_tag = self.get_screen_tag(screen_id)
+
+        top_5_tags = []
+        for screen_id in remaui_ocr_top5[0]:
+            top_5_tags.append(self.get_screen_tag(screen_id))
+
+        top_10_tags = []
+        for screen_id in remaui_ocr_top10[0]:
+            top_10_tags.append(self.get_screen_tag(screen_id))
+
+        return top_1_tag, top_5_tags, top_10_tags
 
 
     def get_wordlist(self, screenIR):
