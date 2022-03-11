@@ -427,6 +427,9 @@ class State:
     def look_for_exact_match(self, trigger, text):
         if trigger in text:
             return True
+        if trigger == "to_signin_or_signup":
+            if ("sign in" in text) or ("sign up" in text) or ("signin" in text) or ("signup" in text) or ("get started" in text):
+                return True
         return False
 
 
