@@ -11,15 +11,17 @@
 **Enabling REMAUI feature**
 1. download [REMAUI Java program](https://drive.google.com/file/d/1787v_UKwc06yVC7XA8fh47e98PC9CPTv/view?usp=sharing)
 2. install [Eclipse](https://www.eclipse.org/) for Java if you don't already have it
-3. configure all the build paths (the REMAUI repo should already contain all the necessary jars except for openCV) -- see screenshots below regarding build path. you need to edit the paths of jar files to the file paths on your machine
+3. use Eclipse to import the REMAUI Java program
+4. configure all the build paths (the REMAUI repo should already contain all the necessary jars except for openCV) -- see screenshots below regarding build path. you need to edit the paths of jar files to the file paths on your machine
 
 <img width="689" alt="image" src="https://user-images.githubusercontent.com/5572614/155231533-66c8ec47-a101-4396-bfe7-95e4518b333d.png">
 <img width="1007" alt="image" src="https://user-images.githubusercontent.com/5572614/155231617-2f6c6b5d-20f4-4ce2-920a-dbb5d2a20d6e.png">
 
 
 4. follow this [tutorial](https://docs.opencv.org/2.4/doc/tutorials/introduction/java_eclipse/java_eclipse.html) to enable openCV (see notes below first if using Mac)
-5. run the main method in `edu.wm.cs.semeru.redraw.REMAUI` through Eclipse's "run configurations" and give one argument which is the path of a screen image (see below). (Make sure to change file path in `run_REMAUI_single_image` function, including `projectRootDirectory`, and `screenshots` String which should be the folder name that contains the image). REMAUI output should be in the parent folder of the image path. 
-6. After running sccessfully, copy the command and replace `REMAUI_cmd` in [state.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/state.py)
+5. double check the main method in `edu.wm.cs.semeru.redraw.REMAUI`, it should only have `run_REMAUI_single_image(args[0]);`.
+6. run the main method in `edu.wm.cs.semeru.redraw.REMAUI` through Eclipse's "run configurations" and give one argument which is the path of a screen image (see below). (Make sure to change file path in `run_REMAUI_single_image` function, including `projectRootDirectory`, and `screenshots` String which should be the folder name that contains the image). REMAUI output should be in the parent folder of the image path. 
+7. After running sccessfully, copy the command and replace `REMAUI_cmd` in [state.py](https://github.com/felicitia/UsageTesting-Repo/blob/master/code/4_dynamic_generation/state.py)
 
 If you're using Mac, you need to build openCV yourself in order to have that "build" folder. follow steps below:
 1. after downloading openCV's source, make a `build` directory in it. 
