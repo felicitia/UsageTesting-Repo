@@ -203,7 +203,7 @@ class Explorer:
 
         if event.exec_id_type == "xPath":
             time.sleep(3)
-            element = self.driver.find_element_by_xpath(event.exec_id_val[0])
+            element = self.driver.find_element_by_xpath(event.exec_id_val)
 
         if event.exec_id_type == "resource-id":
             time.sleep(3)
