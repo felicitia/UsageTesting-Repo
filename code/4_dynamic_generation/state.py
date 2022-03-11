@@ -434,7 +434,13 @@ class State:
         if trigger in text:
             return True
         if trigger == "to_signin_or_signup":
-            if ("sign in" in text) or ("sign up" in text) or ("signin" in text) or ("signup" in text) or ("get started" in text):
+            if ("sign in" in text) or ("sign up" in text) or ("signin" in text) or ("signup" in text) or ("get started" in text) or ("register" in text) or ("create account" in text) or ("login" in text):
+                return True
+        if trigger == "sign_up":
+            if ("register" in text) or ("create account" in text) or ("join" in text):
+                return True
+        if trigger == "continue" or trigger == "apply":
+            if ("ok" in text) or ("accept" in text) or ("deny" in text):
                 return True
         if trigger == "menu" and ("drawer" in text):
             return True
