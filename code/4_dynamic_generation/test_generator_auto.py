@@ -232,6 +232,7 @@ class TestGenerator:
                         # current_ir_model.machine.add_transition(next_event_list[0].transition)
                         self.explorer.execute_event(next_event_list[0])
                 else:
+                    added_in_step = 1
                     for next_event in next_event_list:
                         if type(next_event) is list: # trigger self actions first
                             for self_action in next_event:
@@ -239,14 +240,15 @@ class TestGenerator:
 
                                 # current_ir_model.machine.add_transition(self_action.transition)
                                 self.explorer.execute_event(self_action)
-                                # correct_widgetIR = input('Please enter the ground truth IR for the widget the input was typed on:')
-                                # XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
-                                #     '.xml', '')
-                                # if XML_basename in self.eval_results.keys():
-                                #     self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                                # else:
-                                #     self.eval_results[XML_basename] = {}
-                                #     self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                correct_widgetIR = input('Please enter the ground truth IR for the widget the input was typed on:')
+                                XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
+                                    '.xml', '') + "-" + str(added_in_step)
+                                if XML_basename in self.eval_results.keys():
+                                    self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                else:
+                                    self.eval_results[XML_basename] = {}
+                                    self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                added_in_step += 1
                             next_event_list.remove(next_event)
                     # randomly pick one path after executing the self actions
                     # random_idx = random.randint(0, len(next_event_list)-1)
@@ -259,6 +261,8 @@ class TestGenerator:
                     next_event = next_event_list[int(event_indx)]
                     correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
                     XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                    if added_in_step != 1:
+                        XML_basename += "-" + str(added_in_step)
                     if XML_basename in self.eval_results.keys():
                         self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                     else:
