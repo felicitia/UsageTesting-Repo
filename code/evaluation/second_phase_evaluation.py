@@ -47,7 +47,7 @@ def evaluation_with_classifiers(AUT, usage_name):
 
 
 if __name__ == '__main__':
-    AUT = Etsy()
-    usage_name = usage_folder_map['signin'] # this usage_folder_map is defined in global_config.py
+    AUT = Abc()
+    usage_name = usage_folder_map['menu'] # this usage_folder_map is defined in global_config.py
     evaluation_with_classifiers(AUT, usage_name)
     print('all done! :)')
