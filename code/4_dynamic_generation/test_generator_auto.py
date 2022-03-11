@@ -14,22 +14,18 @@ from bert_similarity_calc import SimilarityCalculator_BERT
 from text_similarity_calculator import SimilarityCalculator_W2V
 from App_Config import *
 from sentence_transformers import SentenceTransformer
-from sys import argv
 
-import re
 import explorer
 import time
-import json
-import selenium
-import test_generator_manual
+
 import os.path
 import pickle
-from entities import IR_Model
 import glob
-import random
 import pandas as pd
 import nltk
-import webbrowser
+import random
+
+os.environ['TOKENIZERS_PARALLELISM'] = "False"
 
 class TestCase:
     def __init__(self, test_folder_path):
@@ -90,7 +86,7 @@ class TestGenerator:
     def __init__(self, desiredCapabilities, text_sim_flag=False, REMAUI_flag=False, eval_flag=False, use_TRUE_label_flag=False):
         self.explorer = explorer.Explorer(desiredCapabilities)
         self.test_num = 0
-        self.MAX_TEST_NUM = 2
+        self.MAX_TEST_NUM = 1
         self.REMAUI_flag = REMAUI_flag
         self.eval_flag = eval_flag
         self.use_TRUE_IR_flag = use_TRUE_label_flag
@@ -177,7 +173,6 @@ class TestGenerator:
                 # placeholder context: you only need to care about find_next_event_list function
                 next_event_list = self.find_next_event_list(current_state)
                 if next_event_list is None or len(next_event_list) == 0:
-
                     element_candidates = []
                     for element in current_state.nodes:
                         if element.interactable:
@@ -207,7 +202,31 @@ class TestGenerator:
                             print(event.exec_id_val, event.exec_id_val, event.action)
                             current_generated_test.append(event)
                             self.explorer.execute_event(event)
+                            correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml',
+                                                                                                                '')
+                            if XML_basename in self.eval_results.keys():
+                                self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                            else:
+                                self.eval_results[XML_basename] = {}
+                                self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                            for proc in psutil.process_iter():
+                                if proc.name() == 'Preview':
+                                    proc.kill()
                     else:
+                        print("only one action is possible in this step.")
+                        image = PIL.Image.open(next_event_list[0].crop_screenshot_path)
+                        image.show()
+                        correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                        XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                        if XML_basename in self.eval_results.keys():
+                            self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                        else:
+                            self.eval_results[XML_basename] = {}
+                            self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                        for proc in psutil.process_iter():
+                            if proc.name() == 'Preview':
+                                proc.kill()
                         isEnd_flag = (next_event_list[0]).isEnd
                         current_generated_test.append(next_event_list[0])
                         # current_ir_model.machine.add_transition(next_event_list[0].transition)
@@ -217,14 +236,39 @@ class TestGenerator:
                         if type(next_event) is list: # trigger self actions first
                             for self_action in next_event:
                                 current_generated_test.append(self_action)
+
                                 # current_ir_model.machine.add_transition(self_action.transition)
                                 self.explorer.execute_event(self_action)
+                                # correct_widgetIR = input('Please enter the ground truth IR for the widget the input was typed on:')
+                                # XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
+                                #     '.xml', '')
+                                # if XML_basename in self.eval_results.keys():
+                                #     self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                # else:
+                                #     self.eval_results[XML_basename] = {}
+                                #     self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                             next_event_list.remove(next_event)
                     # randomly pick one path after executing the self actions
-                    random_idx = random.randint(0, len(next_event_list)-1)
-                    next_event = next_event_list[random_idx]
+                    # random_idx = random.randint(0, len(next_event_list)-1)
+                    for i, event in enumerate(next_event_list):
+                        print(event.exec_id_val)
+                        print("id:"+str(i)+" - val: "+ event.exec_id_val)
+                        image = PIL.Image.open(event.crop_screenshot_path)
+                        image.show()
+                    event_indx = input('Choose the id of the widget you want to interact with:')
+                    next_event = next_event_list[int(event_indx)]
+                    correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                    XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                    if XML_basename in self.eval_results.keys():
+                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                    else:
+                        self.eval_results[XML_basename] = {}
+                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                     isEnd_flag = next_event.isEnd
                     current_generated_test.append(next_event)
+                    for proc in psutil.process_iter():
+                        if proc.name() == 'Preview':
+                            proc.kill()
                     # current_ir_model.machine.add_transition(next_event.transition)
                     self.explorer.execute_event(next_event)
                 step_index += 1
@@ -252,12 +296,21 @@ class TestGenerator:
         else:
             # current_screenIR = current_state.get_screenIR(self.eval_results, self.appname, self.usage_model,
             #                                               self.text_sim_w2v, self.text_sim_bert, self.REMAUI_flag, true_IR=None)
-            top1, top5, top10 = current_state.get_screen_IR(self.appname, self.bert, self.words)
+            top1, top5, top10 = current_state.get_screen_IR(self.appname, self.bert, self.words, self.usage_model)
             print("The screen classifier top1 guess for the screen: ")
             print(top1)
             print("The screen classifier top5 guesses for the screen: ")
             print(top5)
             current_screenIR = input('\nChoose the closest screen tag from the top5 guesses:\n')
+            correct_screenIR = input('\nType in the correct screen tag:\n')
+
+            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+            if XML_basename in self.eval_results.keys():
+                self.eval_results[XML_basename]['true_screen_IR'] = correct_screenIR
+            else:
+                self.eval_results[XML_basename] = {}
+                self.eval_results[XML_basename]['true_screen_IR'] = correct_screenIR
+
         triggers = self.usage_model.machine.get_triggers(current_screenIR)
 
         if len(triggers) == 0:
@@ -280,13 +333,6 @@ class TestGenerator:
             print('------------------')
             print('next possible actions:', triggers)
             return current_screenIR
-
-    # def classify_widgetIR(self, element):
-    #     ### placeholder for widget classifier ###
-    #     ### element.path_to_screenshot gives you the croped image
-    #     elementIR = input('manually type widget IR based on crop here' + element.path_to_screenshot + '\n')
-    #     print('you typed', elementIR)
-    #     return elementIR
 
     def is_final_trigger(self, trigger, source):
         if len(self.usage_model.machine.get_transitions(trigger=trigger, source=source, dest='end')) == 0:
@@ -330,16 +376,19 @@ class TestGenerator:
                     #         image.show()
                     #         is_matched = input('check element that was just opened and enter y if matched')
                     #         if is_matched == 'y':
-                    element = current_state.find_widget_to_trigger(widgetIR)
-                    if element is not None:
+                    top_candidates, secondary_candidates = current_state.find_widget_to_trigger(widgetIR, matching_screenIR, self.bert, self.appname)
+                    for element in top_candidates:
+                        print("adding in self")
+                        print(element.get_exec_id_val)
                         self_actions.append(DestEvent(action=action, exec_id_type=element.get_exec_id_type(),
                                                               exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
                                                               crop_screenshot_path=element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
             else:
-                action = 'swipe-' + condition
-                print('generated action', action)
-                self_actions.append(DestEvent(action=action, exec_id_val='', exec_id_type='', text_input='', isEnd=False, crop_screenshot_path=None,
-                                              state_screenshot_path=current_state.screenshot_path))
+                # action = 'swipe-' + condition
+                # print('generated action', action)
+                # self_actions.append(DestEvent(action=action, exec_id_val='', exec_id_type='', text_input='', isEnd=False, crop_screenshot_path=None,
+                #                               state_screenshot_path=current_state.screenshot_path))
+                pass
 
         # generate actions for EditText fields and fill the form
         if needs_user_input:
@@ -354,39 +403,91 @@ class TestGenerator:
                                                       exec_id_val=element.get_exec_id_val(),
                                                       text_input=user_input, isEnd=False, crop_screenshot_path=element.path_to_screenshot,
                                                       state_screenshot_path=current_state.screenshot_path))
+                    for proc in psutil.process_iter():
+                        if proc.name() == 'Preview':
+                            proc.kill()
 
         return self_actions
 
-    def find_matching_element_per_trigger(self, current_state, trigger):
+    def find_matching_element_per_trigger(self, current_state, trigger, screenIR):
         print('finding matching action for trigger', trigger)
         widgetIR = trigger.split('#')[0]
-        # The elements (widgets) are of type of node objects defined in node.py
-        # for element in current_state.nodes:
-        #     if element.interactable:
-        #         ### placeholder to find matching element based on widgetIR. change code below ###
-        #         image = PIL.Image.open(element.path_to_screenshot)
-        #         image.show()
-        #         is_matched = input('check element that was just opened. enter y if matched')
-        #         if is_matched == 'y':
-        #             return element
-        element = current_state.find_widget_to_trigger(widgetIR)
-        return element
 
-    def find_possible_next_actions(self, current_state, matching_screenIR, triggers):
-        possible_actions = []
+        top_candidates, secondary_candidates = current_state.find_widget_to_trigger(widgetIR, screenIR, self.bert, self.appname)
+        print("-------------")
+        print("trigger:")
+        print(trigger)
+        return top_candidates, secondary_candidates
+
+    def find_possible_next_actions(self, current_state, matching_screenIR, triggers, added_from_self):
+        SUGGESTION_CNT = 5
+        top_actions = []
+        secondary_actions = []
+        tops = set()
+        secondaries = set()
+        for event in added_from_self:
+            if type(event) is list:
+                for e in event:
+                    tops.add(e.exec_id_val)
+            else:
+                tops.add(event.exec_id_val)
         for trigger in triggers:
             if trigger == 'self':
-                raise ValueError('self trigger should be removed already, check triggers of ', matching_screenIR)
+                raise ValueError( 'self trigger should be removed already, check triggers of ', matching_screenIR)
             isEnd = self.is_final_trigger(trigger=trigger, source=matching_screenIR)
-            # placeholder context: change find_matching_element_per_trigger function
-            matching_element = self.find_matching_element_per_trigger(current_state, trigger)
-            if matching_element is not None:
-                # transition = {'trigger': trigger, 'source': matching_screenIR, 'dest': 'aaa', 'conditions': ['con1', 'con2'],
-                #               'label': ['label1']}
-                possible_actions.append(DestEvent(action=trigger.split('#')[1], exec_id_type=matching_element.get_exec_id_type(),
-                                                  exec_id_val=matching_element.get_exec_id_val(), text_input='', isEnd=isEnd,
-                                                  crop_screenshot_path=matching_element.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
-        return possible_actions
+            top_matches, secondary_matches = self.find_matching_element_per_trigger(current_state, trigger, matching_screenIR)
+            if len(top_matches)>0:
+                for match in top_matches:
+                    action = trigger.split('#')[-1]
+                    if match.get_element_type().split('.')[-1] == "EditText":
+                        action == "send_keys"
+                    print(tops)
+                    print(match.get_exec_id_val())
+                    if match.get_exec_id_val() not in tops:
+                        print("not in self it is a top:")
+                        print(match.get_exec_id_val())
+                        top_actions.append(DestEvent(action=action, exec_id_type=match.get_exec_id_type(),
+                                                          exec_id_val=match.get_exec_id_val(), text_input='', isEnd=isEnd,
+                                                          crop_screenshot_path=match.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
+                        tops.add(match.get_exec_id_val())
+                        if match.get_exec_id_val() in secondaries:
+                            print("it was a secondary before I removed it")
+                            secondaries.remove(match)
+            if len(secondary_matches)>0:
+                for match in secondary_matches:
+                    action = trigger.split('#')[-1]
+
+                    if match.get_element_type().split('.')[-1] == "EditText":
+                        action == "send_keys"
+                    if (match.get_exec_id_val() not in secondaries) and (match.get_exec_id_val() not in tops):
+                        print("adding a secondary:")
+                        print(match.get_exec_id_val())
+                        secondary_actions.append(DestEvent(action=action, exec_id_type=match.get_exec_id_type(),
+                                                      exec_id_val=match.get_exec_id_val(), text_input='', isEnd=isEnd,
+                                                      crop_screenshot_path=match.path_to_screenshot, state_screenshot_path=current_state.screenshot_path))
+
+
+
+        print("top actions:")
+        print(top_actions)
+        for action in top_actions:
+            action.print_event()
+        print("secondary actions:")
+        print(secondary_actions)
+        for action in secondary_actions:
+            action.print_event()
+        if len(top_actions)>=SUGGESTION_CNT:
+            return top_actions
+        elif len(secondary_actions)< SUGGESTION_CNT+len(top_actions):
+            if len(top_actions+secondary_actions) == 0:
+                print("No possible actions at this point!:(")
+            else:
+                return top_actions + secondary_actions
+        else:
+            chosen_secondary_actions = random.choices(secondary_actions, k=(SUGGESTION_CNT - len(top_actions)))
+            final_actions = top_actions + chosen_secondary_actions
+            return final_actions
+
 
     def find_all_triggers_in_model(self):
         all_triggers = set()
@@ -486,7 +587,7 @@ class TestGenerator:
                     next_event_list.append(self_actions)
                     all_possible_triggers.remove('self')
                 # placeholder context: change find_possible_next_actions function
-                possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers)
+                possible_actions = self.find_possible_next_actions(current_state, matching_screenIR, all_possible_triggers, next_event_list)
                 for possible_action in possible_actions:
                     next_event_list.append(possible_action)
 
@@ -513,8 +614,8 @@ if __name__ == "__main__":
 
     # AUT = Etsy()
     # usage_name = '1-SignIn'
-    AUT = Home()
-    usage_name = '8-Menu'
+    AUT = Zappos()
+    usage_name = '15-Filter'
     start = time.time()
     test_gen = TestGenerator(AUT.desiredCapabilities)
 

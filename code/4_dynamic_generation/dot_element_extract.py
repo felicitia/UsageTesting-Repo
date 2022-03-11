@@ -36,9 +36,9 @@ def findXPath(inputImagePath, dotPath):
                 if match:
                     linenum = int(match.group(1))
                     matchedList.append(int(linenum))
-    print("The list is:{}".format(matchedList))
+    # print("The list is:{}".format(matchedList))
     maxlinenum = max(matchedList)
-    print("The max line number is:{}".format(maxlinenum))
+    # print("The max line number is:{}".format(maxlinenum))
 
     dic = defaultdict(list)
 
@@ -56,7 +56,7 @@ def findXPath(inputImagePath, dotPath):
     contentRegex = re.compile(r"\|(.+) = (.*)")
     path = find_path(dic, str(0), str(maxlinenum))
 
-    print("The path is:{}".format(path))
+    # print("The path is:{}".format(path))
     trans = re.compile(r"\[label=\"(.+)\"\]")
 
     jsonlist = []
@@ -85,8 +85,8 @@ def findXPath(inputImagePath, dotPath):
                 xpath += "/{}".format(elem["class"])
         else:
             xpath += "/{}".format(elem["class"])
-    print(xpath)
-    return xpath, jsonlist
+    # print(xpath)
+    return xpath
 
 
 if __name__ == "__main__":

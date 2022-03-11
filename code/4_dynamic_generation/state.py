@@ -7,6 +7,8 @@ sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder', 'aeSrc'))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_KNN'))
 sys.path.insert(0, os.path.join(current_dir_path, 'autoencoder_MLP'))
 sys.path.insert(0, os.path.join(current_dir_path, 'screen_classifier'))
+sys.path.insert(0, os.path.join(current_dir_path, 'widget_classifier'))
+
 import PIL, psutil
 import pandas as pd
 import torch
@@ -20,6 +22,8 @@ from getEmbeddings import getAEembeddings
 from screen_classifier_KNN_autoencoder import KNN_screen_classifier
 from MLP_classify import MLP_ScreenClassifierForAUT
 from model import ScreenClassifier
+from models import UIEmbedder
+import classifier_utils
 
 
 def OCR(path, words_only=True):
@@ -101,7 +105,7 @@ class State:
         return text_embedding
 
     def get_screen_tag(self, screen_id):
-        screen_dict_path = "screen_classifier/screen_dict.json"
+        screen_dict_path = "../4_dynamic_generation/screen_classifier/screen_dict.json"
         with open(screen_dict_path) as screen_dict_file:
             screen_dict = json.load(screen_dict_file)
             for k,v in screen_dict.items():
@@ -273,7 +277,7 @@ class State:
         return None
 
     def get_model(self, app):
-        model_path = "screen_classifier/screen_classifier_models_pretrain_scratch/" + app + "_screen_model"
+        model_path = "../4_dynamic_generation/screen_classifier/screen_classifier_models_pretrain_scratch/" + app + "_screen_model"
         screen_classifier = ScreenClassifier()
         screen_classifier.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         screen_classifier.eval()
@@ -284,14 +288,15 @@ class State:
         y_pred_softmax = torch.log_softmax(out, dim=1)
         top_10 = torch.argsort(y_pred_softmax)[:, -10:]
         top_5 = torch.argsort(y_pred_softmax)[:, -5:]
+        top_sorted = torch.argsort(y_pred_softmax)[:, -31:]
         _, y_pred = torch.max(y_pred_softmax, dim=1)
-        return y_pred, top_5, top_10
+        return y_pred, top_5, top_10, top_sorted
 
-    def get_screen_IR(self, AUT, bert, words):
+    def get_screen_IR(self, AUT, bert, words, usage_model):
         REMAUI_embedding_autoencoder = torch.Tensor(self.get_REMAUI_embedding())
         ocr_text_embedding = self.get_ocr_text_embedding(bert, words)
         screen_classifier = self.get_model(AUT)
-        remaui_ocr_top1, remaui_ocr_top5, remaui_ocr_top10 = self.get_label_with_fs_model(screen_classifier, REMAUI_embedding_autoencoder, ocr_text_embedding)
+        remaui_ocr_top1, remaui_ocr_top5, remaui_ocr_top10, top_sorted = self.get_label_with_fs_model(screen_classifier, REMAUI_embedding_autoencoder, ocr_text_embedding)
 
         for screen_id in remaui_ocr_top1:
             top_1_tag = self.get_screen_tag(screen_id)
@@ -304,7 +309,23 @@ class State:
         for screen_id in remaui_ocr_top10[0]:
             top_10_tags.append(self.get_screen_tag(screen_id))
 
-        return top_1_tag, top_5_tags, top_10_tags
+        print(top_sorted)
+        all_tags = []
+        for screen_id in top_sorted[0]:
+            all_tags.append(self.get_screen_tag(screen_id))
+
+        new_top_5 = []
+        added = 0
+        i = 1
+        while added<5:
+            if all_tags[-1*i] in usage_model.states:
+                new_top_5.append(all_tags[-1*i])
+                added += 1
+            i+=1
+
+        # print(new_top_5)
+
+        return top_1_tag, new_top_5, top_10_tags
 
 
     def get_wordlist(self, screenIR):
@@ -353,6 +374,60 @@ class State:
         if i >= len(element_candidates):
             return None
         return element_candidates[i]
+
+    def find_widget_to_trigger(self, widgetIR, screenIR, bert, app_name):
+        widget_classifier = UIEmbedder()
+        model_path = "../4_dynamic_generation/widget_classifier/widget_classifiers_pretrained/"+app_name+"_widget_model_with_image"
+        widget_classifier.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        widget_classifier.eval()
+
+        top_candidates = []
+        secondary_candidates = []
+        predicted_irs = {}
+        for element in self.nodes:
+            if element.interactable:
+                text = element.get_processed_textual_info()
+                text_embedding = torch.as_tensor(bert.encode(text))
+                text_embedding = text_embedding.resize(1, 768)
+                # print("text:")
+                # print(text)
+                screen_id = torch.tensor([classifier_utils.get_screen_id(screenIR)])
+                location_id = torch.tensor([classifier_utils.convert_bounds_to_screen_zone(element.get_middle_point())])
+                element_type = element.get_element_type().split('.')[-1]
+                # print(element_type)
+                if element_type == "ScrollView" or element_type == "ViewGroup" or element_type == "RecyclerView":
+                    continue
+                if (("email" in text) and element_type == "EditText") or (("password" in text) and element_type == "EditText"):
+                    continue
+                if self.look_for_exact_match(widgetIR, text):
+                    top_candidates.append(element)
+                    continue
+                #     top_candidates.append(element)
+                type_id = torch.tensor([classifier_utils.convert_class_to_text_label(element_type)])
+                image = classifier_utils.convert_image_to_input_vector(element.path_to_screenshot)
+                image = image.resize(1, 3, 244, 244)
+                out = widget_classifier(text_embedding, type_id, screen_id, image, location_id)
+
+                y_pred_softmax = torch.log_softmax(out, dim=1)
+                top_n = torch.argsort(y_pred_softmax)[:, -5:]
+                _, y_pred_tags = torch.max(y_pred_softmax, dim=1)
+                top_5 = classifier_utils.get_widget_tag(top_n[0])
+                top_1 = classifier_utils.get_widget_tag(y_pred_tags)
+                # print(top_5)
+                # print(top_1)
+
+                if widgetIR in top_1:
+                    top_candidates.append(element)
+                elif widgetIR in top_5:
+                    secondary_candidates.append(element)
+
+        return top_candidates, secondary_candidates
+
+
+    def look_for_exact_match(self, trigger, text):
+        if trigger in text:
+            return True
+        return False
 
 
 

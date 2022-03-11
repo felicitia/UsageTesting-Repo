@@ -1,5 +1,10 @@
 import re
 import dot_element_extract as dotElementExtractor
+import nltk
+import cv2
+import pytesseract
+import PIL
+
 
 class Node:
     def __init__(self, id, attributes, interactable, interactions, num_of_children, tag, screenshot):
@@ -32,6 +37,16 @@ class Node:
 
     def add_data(self, key, value):
         self.data[key]=value
+
+    def add_ocr_to_data(self):
+        image = cv2.imread(self.path_to_screenshot)
+        image = cv2.medianBlur(image, 3)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        text = pytesseract.image_to_string(PIL.Image.fromarray(image))
+        text = text.split()
+        word_list = [word.lower() for word in text]
+        ocr_val = " ".join(word_list)
+        self.data["ocr"] = ocr_val
 
     def get_node_date(self):
         return self.data
@@ -78,9 +93,40 @@ class Node:
         else:
             return self.exec_identifier[list(self.exec_identifier.keys())[0]]
 
+    def get_middle_point(self):
+        bounds = self.attributes["bounds"]
+        points = bounds.split("][")
+        tlx = float(points[0].split(",")[0][1:])
+        tly = float(points[0].split(",")[1])
+        brx = float(points[1].split(",")[0][1:])
+        bry = float(points[0].split(",")[1])
+        x = (tlx + brx) // 2
+        y = (tly + bry) // 2
+        return [x, y]
+
+    def get_processed_textual_info(self):
+        processed_data = []
+        self.add_ocr_to_data()
+        for key, value in self.data.items():
+            if key == 'resource-id':
+                value = value.split("/")[-1]
+            value = value.replace("_", " ")
+            value = self.camel_case_split(value)
+            value = " ".join(value)
+            tokens = [t.lower() for t in nltk.word_tokenize(value)]
+            COMMON = {"selected", "tab", "not selected", "bar", "button", "menubar", "icon", "view", "ub", "container",
+                      "row", "scroll", "horizontal", "imageview", "icn", "btn", "recycler", "module", "onclick", "fragment"}
+            tokens_without_stop_common = [t for t in tokens if t not in COMMON]
+            processed_data += tokens_without_stop_common
+
+        processed_data = list(dict.fromkeys(processed_data))
+        return " ".join(processed_data) + "."
+
+    def camel_case_split(self, identifier):
+        matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
+        return [m.group(0) for m in matches]
 
     def get_path_to_dot(self):
-        print(self.path_to_screenshot)
         dot_path = self.path_to_screenshot.rsplit("/",2)[0]
         dot_path = dot_path+"/graph.dot"
         return dot_path

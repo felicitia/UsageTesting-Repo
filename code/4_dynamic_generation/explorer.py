@@ -135,6 +135,8 @@ class Explorer:
 
                 if 'text' in element.attributes.keys():
                     element.add_data('text', element.attributes['text'])
+
+
         if not os.path.isdir(os.path.join(output_dir, 'screenshots')):
             os.makedirs(os.path.join(output_dir, 'screenshots'))
         screenshot_path = os.path.join(output_dir, 'screenshots', str(self.test_num) + '-' + str(self.screenshot_idx) + '.png')
