@@ -11,7 +11,8 @@
 **Enabling REMAUI feature**
 1. download [REMAUI Java program](https://drive.google.com/file/d/1787v_UKwc06yVC7XA8fh47e98PC9CPTv/view?usp=sharing)
 2. install [Eclipse](https://www.eclipse.org/) for Java if you don't already have it
-3. configure all the build paths (the REMAUI repo should already contain all the necessary jars except for openCV) -- see screenshots below regarding build path. you need to edit the paths of jar files to the file paths on your machine
+3. use Eclipse to import the REMAUI Java program
+4. configure all the build paths (the REMAUI repo should already contain all the necessary jars except for openCV) -- see screenshots below regarding build path. you need to edit the paths of jar files to the file paths on your machine
 
 <img width="689" alt="image" src="https://user-images.githubusercontent.com/5572614/155231533-66c8ec47-a101-4396-bfe7-95e4518b333d.png">
 <img width="1007" alt="image" src="https://user-images.githubusercontent.com/5572614/155231617-2f6c6b5d-20f4-4ce2-920a-dbb5d2a20d6e.png">
