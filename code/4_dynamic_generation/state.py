@@ -389,6 +389,7 @@ class State:
 
         top_candidates = []
         secondary_candidates = []
+        heuristic_matches = []
         predicted_irs = {}
         for element in self.nodes:
             if element.interactable:
@@ -405,10 +406,20 @@ class State:
                     continue
                 if (("email" in text) and element_type == "EditText") or (("password" in text) and element_type == "EditText"):
                     continue
+                print("-----")
+                print(widgetIR)
+                print(text)
+                print(element.get_exec_id_val())
                 if self.look_for_exact_match(widgetIR, text):
-                    top_candidates.append(element)
+                    if widgetIR == "search_bar":
+                        if element_type == "EditText":
+                            heuristic_matches.append(element)
+                    elif widgetIR == "to_search":
+                        if element_type != "EditText":
+                            heuristic_matches.append(element)
+                    else:
+                        heuristic_matches.append(element)
                     continue
-                #     top_candidates.append(element)
                 type_id = torch.tensor([classifier_utils.convert_class_to_text_label(element_type)])
                 image = classifier_utils.convert_image_to_input_vector(element.path_to_screenshot)
                 image = image.resize(1, 3, 244, 244)
@@ -427,15 +438,24 @@ class State:
                 elif widgetIR in top_5:
                     secondary_candidates.append(element)
 
-        return top_candidates, secondary_candidates
+        return top_candidates, secondary_candidates, heuristic_matches
 
 
     def look_for_exact_match(self, trigger, text):
         if trigger in text:
             return True
+        if "_" in trigger:
+            v1 = trigger.replace("_", "")
+            if v1 in text:
+                return True
+            v2 = trigger.replace("_", " ")
+            if v2 in text:
+                return True
         if trigger == "to_signin_or_signup":
             if ("sign in" in text) or ("sign up" in text) or ("signin" in text) or ("signup" in text) or ("get started" in text) or ("register" in text) or ("create account" in text) or ("login" in text):
                 return True
+            if ("google" in text) or ("facebook" in text):
+                return False
         if trigger == "sign_up":
             if ("register" in text) or ("create account" in text) or ("join" in text):
                 return True
@@ -444,6 +464,9 @@ class State:
                 return True
         if trigger == "menu" and ("drawer" in text):
             return True
+        if trigger == "to_search" or trigger == "search_bar":
+            if "search" in text:
+                return True
         return False
 
 

@@ -68,7 +68,7 @@ def findXPath(inputImagePath, dotPath):
                     json = {}
                     if match:
                         content = match.group(1).replace('\\l','\n').replace('}','').replace('{','|')
-                        #print(content)
+                        # print(content)
                         for sline in content.splitlines():
                             mat = contentRegex.search(sline)
                             if mat:
@@ -79,10 +79,10 @@ def findXPath(inputImagePath, dotPath):
     xpath = ""
     for elem in jsonlist:
         if "numInParentLayout" in elem:
-            if elem["numInParentLayout"] != "0":
-                xpath += "/{}[{}]".format(elem["class"], str(int(elem["numInParentLayout"]) + 1))
-            else:
-                xpath += "/{}".format(elem["class"])
+            # if elem["numInParentLayout"] != "0":
+            xpath += "/{}[{}]".format(elem["class"], str(int(elem["numInParentLayout"]) + 1))
+            # else:
+            #     xpath += "/{}".format(elem["class"])
         else:
             xpath += "/{}".format(elem["class"])
     # print(xpath)
@@ -90,7 +90,6 @@ def findXPath(inputImagePath, dotPath):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Given an cropped element path, Find element\'s xPath in the layout from existing dot file ")
     parser.add_argument('inputImagePath', action="store")
     parser.add_argument('dotPath', action="store")
