@@ -63,7 +63,7 @@ class Event:
 
 class DestEvent:
     def __init__(self, action, exec_id_type, exec_id_val, text_input, isEnd, crop_screenshot_path,
-                 state_screenshot_path, matched_trigger="N/A"):
+                 state_screenshot_path, matched_trigger="unknown"):
         self.action = action
         self.exec_id_type = exec_id_type
         self.exec_id_val = exec_id_val
@@ -168,44 +168,77 @@ class TestGenerator:
             self.explorer.test_num = self.test_num
             self.explorer.screenshot_idx = 0
             while step_index < self.MAX_ACTION and not isEnd_flag:
-                time.sleep(15)
+                time.sleep(10)
                 current_state = self.explorer.extract_state(self.output_dir)
+                scroll = input('Do you want to scroll down to see more widgets first?')
                 next_event_list, recorded_states_and_triggers = self.find_next_event_list(current_state)
-                if next_event_list is None or len(next_event_list) == 0:
-                    element_candidates = []
-                    for element in current_state.nodes:
-                        if element.interactable:
-                            image = PIL.Image.open(element.path_to_screenshot)
-                            image.show()
-                            element_candidates.append(element)
-                    event_index = int(input(
-                        'no next event found based on the usage model, please provide the index of the event to trigger (enter any out of range index to end current test)\n'))
-                    # kill all the images opened by Preview
-                    for proc in psutil.process_iter():
-                        # print(proc.name())
-                        if proc.name() == 'Preview':
-                            proc.kill()
-                    if event_index >= len(element_candidates):
-                        break
-                    else:
-                        element = element_candidates[event_index]
-                        guided_event = DestEvent(action='click', exec_id_type=element.get_exec_id_type(),
-                                                 exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
-                                                 crop_screenshot_path=element.path_to_screenshot,
-                                                 state_screenshot_path=current_state.screenshot_path)
-                        current_generated_test.append(guided_event)
-                        self.explorer.execute_event(guided_event)
+                if scroll == 'up' or scroll == 'down' or scroll == 'left' or scroll == 'right':
+                    next_event = DestEvent(action='swipe-' + scroll,
+                                                     exec_id_type=None,
+                                                     exec_id_val=None, text_input='', isEnd=False,
+                                                     crop_screenshot_path=None,
+                                                     state_screenshot_path=current_state.screenshot_path)
 
-                elif len(next_event_list) == 1:
-                    if type(next_event_list[0]) is list:
-                        print('the only event is a list of the following events. should be self actions')
-                        for event in next_event_list[0]:
-                            print(event.exec_id_val, event.exec_id_val, event.action)
-                            current_generated_test.append(event)
-                            self.explorer.execute_event(event)
+                    XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
+                        '.xml', '')
+                    if XML_basename in self.eval_results.keys():
+                        self.eval_results[XML_basename]['true_widget_IR'] = scroll
+                    else:
+                        self.eval_results[XML_basename] = {}
+                        self.eval_results[XML_basename]['true_widget_IR'] = scroll
+                    current_generated_test.append(next_event)
+                    self.explorer.execute_event(next_event)
+
+                else:
+                    if next_event_list is None or len(next_event_list) == 0:
+                        element_candidates = []
+                        for element in current_state.nodes:
+                            if element.interactable:
+                                image = PIL.Image.open(element.path_to_screenshot)
+                                image.show()
+                                element_candidates.append(element)
+                        event_index = int(input(
+                            'no next event found based on the usage model, please provide the index of the event to trigger (enter any out of range index to end current test)\n'))
+                        # kill all the images opened by Preview
+                        for proc in psutil.process_iter():
+                            # print(proc.name())
+                            if proc.name() == 'Preview':
+                                proc.kill()
+                        if event_index >= len(element_candidates):
+                            break
+                        else:
+                            element = element_candidates[event_index]
+                            guided_event = DestEvent(action='click', exec_id_type=element.get_exec_id_type(),
+                                                     exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
+                                                     crop_screenshot_path=element.path_to_screenshot,
+                                                     state_screenshot_path=current_state.screenshot_path)
+                            current_generated_test.append(guided_event)
+                            self.explorer.execute_event(guided_event)
+
+                    elif len(next_event_list) == 1:
+                        if type(next_event_list[0]) is list:
+                            print('the only event is a list of the following events. should be self actions')
+                            for event in next_event_list[0]:
+                                print(event.exec_id_val, event.exec_id_val, event.action)
+                                current_generated_test.append(event)
+                                self.explorer.execute_event(event)
+                                correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                                XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml',
+                                                                                                                    '')
+                                if XML_basename in self.eval_results.keys():
+                                    self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                else:
+                                    self.eval_results[XML_basename] = {}
+                                    self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                for proc in psutil.process_iter():
+                                    if proc.name() == 'Preview':
+                                        proc.kill()
+                        else:
+                            print("only one action is possible in this step.")
+                            image = PIL.Image.open(next_event_list[0].crop_screenshot_path)
+                            image.show()
                             correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
-                            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml',
-                                                                                                                '')
+                            XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
                             if XML_basename in self.eval_results.keys():
                                 self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                             else:
@@ -214,100 +247,86 @@ class TestGenerator:
                             for proc in psutil.process_iter():
                                 if proc.name() == 'Preview':
                                     proc.kill()
+                            isEnd_flag = (next_event_list[0]).isEnd
+                            if isEnd_flag:
+                                ans = input("The model detected that the program should end now, do you want to keep going?")
+                                if ans == 'y':
+                                    isEnd_flag = False
+                            current_generated_test.append(next_event_list[0])
+                            step_classification_res_dir_path = os.path.join(self.widget_classification_res_dir,
+                                                                            XML_basename)
+                            if not os.path.isdir(step_classification_res_dir_path):
+                                os.makedirs(step_classification_res_dir_path)
+                            image_name = str(i) + ".png"
+                            image.save(os.path.join(step_classification_res_dir_path, image_name))
+                            with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
+                                      "w") as triggers_file:
+                                json.dump(recorded_states_and_triggers, triggers_file)
+                            self.explorer.execute_event(next_event_list[0])
                     else:
-                        print("only one action is possible in this step.")
-                        image = PIL.Image.open(next_event_list[0].crop_screenshot_path)
-                        image.show()
-                        correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                        added_in_step = 1
+                        for next_event in next_event_list:
+                            if type(next_event) is list:  # trigger self actions first
+                                for self_action in next_event:
+                                    current_generated_test.append(self_action)
+                                    if self_action.action == "send_keys":
+                                        self.explorer.execute_event(self_action)
+                                        correct_widgetIR = input(
+                                            'Please enter the ground truth IR for the widget the input was typed on:')
+                                        XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
+                                            '.xml', '') + "-" + str(added_in_step)
+                                        if XML_basename in self.eval_results.keys():
+                                            self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                        else:
+                                            self.eval_results[XML_basename] = {}
+                                            self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
+                                        added_in_step += 1
+                                    else:
+                                        next_event_list.append(self_action)
+                                next_event_list.remove(next_event)
+
                         XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
+                        step_classification_res_dir_path = os.path.join(self.widget_classification_res_dir, XML_basename)
+                        if len(next_event_list) != 0:
+                            if not os.path.isdir(step_classification_res_dir_path):
+                                os.makedirs(step_classification_res_dir_path)
+                        print(next_event_list)
+                        for i, event in enumerate(next_event_list):
+                            print(event.exec_id_val)
+                            print("id:" + str(i) + " - val: " + event.exec_id_val + "- matched with: " + event.matched_trigger)
+                            image = PIL.Image.open(event.crop_screenshot_path)
+                            image.show()
+                            image_name = str(i) + "-" + event.matched_trigger + ".png"
+                            image.save(os.path.join(step_classification_res_dir_path, image_name))
+
+                        with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
+                                  "w") as triggers_file:
+                            json.dump(recorded_states_and_triggers, triggers_file)
+                        event_indx = input('Choose the id of the widget you want to interact with:')
+                        next_event = next_event_list[int(event_indx)]
+                        if next_event.action == "send_keys":
+                            input_text = input('Type in the input for the chosen widget:')
+                            next_event.text_input = input_text
+                        correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+
+                        if added_in_step != 1:
+                            XML_basename += "-" + str(added_in_step)
                         if XML_basename in self.eval_results.keys():
                             self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                         else:
                             self.eval_results[XML_basename] = {}
                             self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                        for proc in psutil.process_iter():
-                            if proc.name() == 'Preview':
-                                proc.kill()
-                        isEnd_flag = (next_event_list[0]).isEnd
+                        isEnd_flag = next_event.isEnd
                         if isEnd_flag:
                             ans = input("The model detected that the program should end now, do you want to keep going?")
                             if ans == 'y':
                                 isEnd_flag = False
-                        current_generated_test.append(next_event_list[0])
-                        step_classification_res_dir_path = os.path.join(self.widget_classification_res_dir,
-                                                                        XML_basename)
-                        if not os.path.isdir(step_classification_res_dir_path):
-                            os.makedirs(step_classification_res_dir_path)
-                        image_name = str(i) + ".png"
-                        image.save(os.path.join(step_classification_res_dir_path, image_name))
-                        with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
-                                  "w") as triggers_file:
-                            json.dump(recorded_states_and_triggers, triggers_file)
-                        self.explorer.execute_event(next_event_list[0])
-                else:
-                    added_in_step = 1
-                    for next_event in next_event_list:
-                        if type(next_event) is list:  # trigger self actions first
-                            for self_action in next_event:
-                                current_generated_test.append(self_action)
-                                if self_action.action == "send_keys":
-                                    self.explorer.execute_event(self_action)
-                                    correct_widgetIR = input(
-                                        'Please enter the ground truth IR for the widget the input was typed on:')
-                                    XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
-                                        '.xml', '') + "-" + str(added_in_step)
-                                    if XML_basename in self.eval_results.keys():
-                                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                                    else:
-                                        self.eval_results[XML_basename] = {}
-                                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                                    added_in_step += 1
-                                else:
-                                    next_event_list.append(self_action)
-                            next_event_list.remove(next_event)
-
-                    XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
-                    step_classification_res_dir_path = os.path.join(self.widget_classification_res_dir, XML_basename)
-                    if len(next_event_list) != 0:
-                        if not os.path.isdir(step_classification_res_dir_path):
-                            os.makedirs(step_classification_res_dir_path)
-                    print(next_event_list)
-                    for i, event in enumerate(next_event_list):
-                        print(event.exec_id_val)
-                        print("id:" + str(i) + " - val: " + event.exec_id_val + "- matched with: " + event.matched_trigger)
-                        image = PIL.Image.open(event.crop_screenshot_path)
-                        image.show()
-                        image_name = str(i) + "-" + event.matched_trigger + ".png"
-                        image.save(os.path.join(step_classification_res_dir_path, image_name))
-
-                    with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
-                              "w") as triggers_file:
-                        json.dump(recorded_states_and_triggers, triggers_file)
-                    event_indx = input('Choose the id of the widget you want to interact with:')
-                    next_event = next_event_list[int(event_indx)]
-                    if next_event.action == "send_keys":
-                        input_text = input('Type in the input for the chosen widget:')
-                        next_event.text_input = input_text
-                    correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
-
-                    if added_in_step != 1:
-                        XML_basename += "-" + str(added_in_step)
-                    if XML_basename in self.eval_results.keys():
-                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                    else:
-                        self.eval_results[XML_basename] = {}
-                        self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
-                    isEnd_flag = next_event.isEnd
-                    if isEnd_flag:
-                        ans = input("The model detected that the program should end now, do you want to keep going?")
-                        if ans == 'y':
-                            isEnd_flag = False
-                    current_generated_test.append(next_event)
-                    for proc in psutil.process_iter():
-                        if proc.name() == 'Preview':
-                            proc.kill()
-                    self.explorer.execute_event(next_event)
-                step_index += 1
+                        current_generated_test.append(next_event)
+                        for proc in psutil.process_iter():
+                            if proc.name() == 'Preview':
+                                proc.kill()
+                        self.explorer.execute_event(next_event)
+                    step_index += 1
             self.save_test(current_generated_test)
             self.explorer.driver.close_app()
             self.explorer.driver.launch_app()

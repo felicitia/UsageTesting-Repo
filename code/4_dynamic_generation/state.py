@@ -455,6 +455,13 @@ class State:
             v2 = trigger.replace("_", " ")
             if v2 in text:
                 return True
+        if "_" in trigger:
+            trigger_words = trigger.split("_")
+            for word in trigger_words:
+                if word in ["by", "i", "multi", "to", "sign", "in", "up"]:
+                    continue
+                if word in text:
+                    return True
         if trigger == "to_signin_or_signup":
             if ("sign in" in text) or ("sign up" in text) or ("signin" in text) or ("signup" in text) or ("get started" in text) or ("register" in text) or ("create account" in text) or ("login" in text):
                 return True
@@ -464,15 +471,22 @@ class State:
             if ("register" in text) or ("create account" in text) or ("join" in text):
                 return True
         if trigger == "continue" or trigger == "apply":
-            if ("ok" in text) or ("accept" in text) or ("deny" in text):
+            if ("ok" in text) or ("accept" in text) or ("deny" in text) or ("skip" in text) or ("next" in text):
                 return True
-        if trigger == "menu" and ("drawer" in text):
-            return True
+        if trigger == "menu":
+            if ("drawer" in text) or ("navigation" in text):
+                return True
         if trigger == "to_search" or trigger == "search_bar":
             if "search" in text:
                 return True
+        if trigger == "help":
+            if ("guide" in text) or ("question" in text) or ("faq" in text) or ("how" in text):
+                return True
         if "bookmark" in trigger:
             if "bookmark" in text or "save" in text:
+                return True
+        if "item" in trigger:
+            if "product" in text:
                 return True
         return False
 
