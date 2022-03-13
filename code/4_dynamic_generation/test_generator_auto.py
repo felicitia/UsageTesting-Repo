@@ -63,7 +63,7 @@ class Event:
 
 class DestEvent:
     def __init__(self, action, exec_id_type, exec_id_val, text_input, isEnd, crop_screenshot_path,
-                 state_screenshot_path):
+                 state_screenshot_path, matched_trigger="N/A"):
         self.action = action
         self.exec_id_type = exec_id_type
         self.exec_id_val = exec_id_val
@@ -71,6 +71,7 @@ class DestEvent:
         self.isEnd = isEnd
         self.crop_screenshot_path = crop_screenshot_path
         self.state_screenshot_path = state_screenshot_path
+        self.matched_trigger = matched_trigger
 
     def print_event(self):
         print("---- printing dest event ----")
@@ -273,10 +274,10 @@ class TestGenerator:
                     print(next_event_list)
                     for i, event in enumerate(next_event_list):
                         print(event.exec_id_val)
-                        print("id:" + str(i) + " - val: " + event.exec_id_val)
+                        print("id:" + str(i) + " - val: " + event.exec_id_val + "- matched with: " + event.matched_trigger)
                         image = PIL.Image.open(event.crop_screenshot_path)
                         image.show()
-                        image_name = str(i) + ".png"
+                        image_name = str(i) + "-" + event.matched_trigger + ".png"
                         image.save(os.path.join(step_classification_res_dir_path, image_name))
 
                     with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
@@ -473,7 +474,7 @@ class TestGenerator:
                                                            exec_id_val=match.get_exec_id_val(), text_input='',
                                                            isEnd=isEnd,
                                                            crop_screenshot_path=match.path_to_screenshot,
-                                                           state_screenshot_path=current_state.screenshot_path))
+                                                           state_screenshot_path=current_state.screenshot_path, matched_trigger=trigger))
                         heuristics.add(match.get_exec_id_val())
                         if match.get_exec_id_val() in tops:
                             tops.remove(match.get_exec_id_val())
@@ -488,7 +489,7 @@ class TestGenerator:
                         top_actions.append(DestEvent(action=action, exec_id_type=match.get_exec_id_type(),
                                                      exec_id_val=match.get_exec_id_val(), text_input='', isEnd=isEnd,
                                                      crop_screenshot_path=match.path_to_screenshot,
-                                                     state_screenshot_path=current_state.screenshot_path))
+                                                     state_screenshot_path=current_state.screenshot_path, matched_trigger=trigger))
                         tops.add(match.get_exec_id_val())
                         if match.get_exec_id_val() in secondaries:
                             secondaries.remove(match.get_exec_id_val())
@@ -503,7 +504,7 @@ class TestGenerator:
                                                            exec_id_val=match.get_exec_id_val(), text_input='',
                                                            isEnd=isEnd,
                                                            crop_screenshot_path=match.path_to_screenshot,
-                                                           state_screenshot_path=current_state.screenshot_path))
+                                                           state_screenshot_path=current_state.screenshot_path, matched_trigger=trigger))
                         secondaries.add(match.get_exec_id_val())
 
         print("not in self at the end:")

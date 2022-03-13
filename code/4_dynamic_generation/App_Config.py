@@ -189,7 +189,7 @@ class DailyHunt:
 
 class Guardian:
     def __init__(self):
-        self.appname = 'guardian'
+        self.appname = 'theguardian'
         self.desiredCapabilities = {
             "platformName": "Android",
             "deviceName": "emulator-5554",  # adb devices

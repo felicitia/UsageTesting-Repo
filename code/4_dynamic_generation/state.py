@@ -414,12 +414,16 @@ class State:
                     if widgetIR == "search_bar":
                         if element_type == "EditText":
                             heuristic_matches.append(element)
+                            continue
                     elif widgetIR == "to_search":
                         if element_type != "EditText":
                             heuristic_matches.append(element)
+                            continue
                     else:
                         heuristic_matches.append(element)
-                    continue
+                        continue
+                if self.check_for_top_match_heuristics(widgetIR, screenIR, element):
+                    top_candidates.append(element)
                 type_id = torch.tensor([classifier_utils.convert_class_to_text_label(element_type)])
                 image = classifier_utils.convert_image_to_input_vector(element.path_to_screenshot)
                 image = image.resize(1, 3, 244, 244)
@@ -467,8 +471,20 @@ class State:
         if trigger == "to_search" or trigger == "search_bar":
             if "search" in text:
                 return True
+        if "bookmark" in trigger:
+            if "bookmark" in text or "save" in text:
+                return True
         return False
 
+    def check_for_top_match_heuristics(self, widgetIR, screenIR, element):
+        if screenIR == "menu":
+            if element.is_a_list_item():
+                return True
+        if screenIR == "items" or screenIR == "category":
+            if widgetIR == "item_i" or widgetIR == "category_i":
+                if element.is_a_list_item():
+                    print(element.get_exec_id_val())
+                    return True
 
 
 if __name__ == '__main__':

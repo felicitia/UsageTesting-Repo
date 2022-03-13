@@ -126,6 +126,11 @@ class Node:
         matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
         return [m.group(0) for m in matches]
 
+    def is_a_list_item(self):
+        if self.parent.get_element_type().split('.')[-1] == "ListView" or self.parent.get_element_type().split('.')[-1] == "RecyclerView":
+            return True
+        return False
+
     def get_path_to_dot(self):
         dot_path = self.path_to_screenshot.rsplit("/",2)[0]
         dot_path = dot_path+"/graph.dot"
