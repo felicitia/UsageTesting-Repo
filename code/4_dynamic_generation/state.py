@@ -458,7 +458,7 @@ class State:
         if "_" in trigger:
             trigger_words = trigger.split("_")
             for word in trigger_words:
-                if word in ["by", "i", "multi", "to", "sign", "in", "up"]:
+                if word in ["by", "i", "multi", "to", "sign", "in", "up", "or"]:
                     continue
                 if word in text:
                     return True
