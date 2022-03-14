@@ -257,7 +257,7 @@ class TestGenerator:
                                                                             XML_basename)
                             if not os.path.isdir(step_classification_res_dir_path):
                                 os.makedirs(step_classification_res_dir_path)
-                            image_name = str(i) + ".png"
+                            image_name = str(0) + ".png"
                             image.save(os.path.join(step_classification_res_dir_path, image_name))
                             with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
                                       "w") as triggers_file:

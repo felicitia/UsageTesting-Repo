@@ -470,20 +470,26 @@ class State:
         if trigger == "sign_up":
             if ("register" in text) or ("create account" in text) or ("join" in text):
                 return True
-        if trigger == "continue" or trigger == "apply":
+        if trigger == "continue" or trigger == "apply" or trigger == "bypass":
             if ("ok" in text) or ("accept" in text) or ("deny" in text) or ("skip" in text) or ("next" in text):
                 return True
         if trigger == "menu":
-            if ("drawer" in text) or ("navigation" in text):
+            if ("drawer" in text) or ("navigation" in text) or ("option" in text):
                 return True
         if trigger == "to_search" or trigger == "search_bar":
             if "search" in text:
+                return True
+        if trigger == "cart":
+            if "bag" in text:
                 return True
         if trigger == "help":
             if ("guide" in text) or ("question" in text) or ("faq" in text) or ("how" in text):
                 return True
         if "bookmark" in trigger:
             if "bookmark" in text or "save" in text:
+                return True
+        if trigger == "category":
+            if ("sections" in text) or ("topics" in text):
                 return True
         if "item" in trigger:
             if "product" in text:
