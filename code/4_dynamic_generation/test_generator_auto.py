@@ -169,8 +169,8 @@ class TestGenerator:
             self.explorer.screenshot_idx = 0
             while step_index < self.MAX_ACTION and not isEnd_flag:
                 time.sleep(10)
-                current_state = self.explorer.extract_state(self.output_dir)
                 scroll = input('Do you want to scroll down to see more widgets first?')
+                current_state = self.explorer.extract_state(self.output_dir)
                 next_event_list, recorded_states_and_triggers = self.find_next_event_list(current_state)
                 if scroll == 'up' or scroll == 'down' or scroll == 'left' or scroll == 'right':
                     next_event = DestEvent(action='swipe-' + scroll,
@@ -190,6 +190,34 @@ class TestGenerator:
                     self.explorer.execute_event(next_event)
 
                 else:
+                    if (recorded_states_and_triggers["screen"] == "sign_in") or (recorded_states_and_triggers["screen"] == "sign_up"):
+                        has_input_text = False
+                        for next_event in next_event_list:
+                            if type(next_event) == list:
+                                for e in next_event:
+                                    if e.action == "send_keys":
+                                        has_input_text = True
+                        if not has_input_text:
+                            self_actions = []
+                            print('generating user inputs...')
+                            for element in current_state.nodes:
+                                if element.interactable and 'EditText' in element.get_element_type():
+                                    image = PIL.Image.open(element.path_to_screenshot)
+                                    image.show()
+                                    user_input = input(
+                                        'please enter your input for element that was just opened\n enter nothing if you want to skip this element\n')
+                                    if not user_input == '':
+                                        self_actions.append(
+                                            DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
+                                                      exec_id_val=element.get_exec_id_val(),
+                                                      text_input=user_input, isEnd=False,
+                                                      crop_screenshot_path=element.path_to_screenshot,
+                                                      state_screenshot_path=current_state.screenshot_path))
+                                    for proc in psutil.process_iter():
+                                        if proc.name() == 'Preview':
+                                            proc.kill()
+                            next_event_list = [self_actions] + next_event_list
+
                     if next_event_list is None or len(next_event_list) == 0:
                         element_candidates = []
                         for element in current_state.nodes:
