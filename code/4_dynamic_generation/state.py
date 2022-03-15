@@ -488,6 +488,9 @@ class State:
         if "bookmark" in trigger:
             if "bookmark" in text or "save" in text:
                 return True
+        if "apply" in trigger:
+            if "done" in text or "submit" in text or "send" in text:
+                return True
         if trigger == "category":
             if ("sections" in text) or ("topics" in text):
                 return True

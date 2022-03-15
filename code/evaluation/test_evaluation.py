@@ -97,12 +97,13 @@ def eval_AUT_per_usage(appname, usage_name): # appname: etsy, usage_name: 1-Sign
     eval_json = json.load(eval_json_file)
 
     test1 = {}
-    test2 = {}
     test1['states'] = []
     test1['transitions'] = []
+
+    test2 = {}
     test2['states'] = []
     test2['transitions'] = []
-    test2_exist_flag = False
+
 
     for key in eval_json:
         print('key in order:', key)

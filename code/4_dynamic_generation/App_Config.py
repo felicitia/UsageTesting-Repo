@@ -32,6 +32,17 @@ class SixPM:
             "appActivity": "com.zappos.android.activities.HomeActivity"
         }
 
+class NewsBreak:
+    def __init__(self):
+        self.appname = 'newsbreak'
+        self.desiredCapabilities = {
+            "platformName": "Android",
+            "deviceName": "emulator-5554",  # adb devices
+            "newCommandTimeout": 10000,
+            "appPackage": "com.particlenews.newsbreak",
+            "appActivity": "com.particlemedia.ui.guide.NetworkWarningActivity"
+        }
+
 class Zappos:
     def __init__(self):
         self.appname = 'zappos'
@@ -189,7 +200,7 @@ class DailyHunt:
 
 class Guardian:
     def __init__(self):
-        self.appname = 'theguardian'
+        self.appname = 'guardian'
         self.desiredCapabilities = {
             "platformName": "Android",
             "deviceName": "emulator-5554",  # adb devices

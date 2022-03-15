@@ -1,10 +1,14 @@
 import os
 
 FINAL_ARTIFACT_ROOT_DIR = '/Users/saghar/Documents/dev/Final-Artifacts'
+FINAL_EVAL_ARTIFACT_ROOT_DIR = '/Users/saghar/Documents/GitHub/UsageTesting-Output'
 
-USAGE_REPO_ROOT_DIR = '/Users/saghar/Documents/GitHub/UsageTesting-Repo '
+USAGE_REPO_ROOT_DIR = '/Users/saghar/Documents/GitHub/UsageTesting-Repo'
 
 PATH_TO_WORD2VEC = '/Users/yixue/Documents/Research/FrUITeR/Develop/CraftDroid/code-release/GoogleNews-vectors-negative300.bin'
+
+EVAL_RESULT_PATH = os.path.join(USAGE_REPO_ROOT_DIR, 'code', 'evaluation', 'all_eval_results.csv')
+
 
 usage_folder_map = {}
 usage_folder_map['signin'] = '1-SignIn'

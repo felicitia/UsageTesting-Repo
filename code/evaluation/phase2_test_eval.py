@@ -256,7 +256,7 @@ if __name__ == '__main__':
 
     # usage_name = usage_folder_map['signin']
     # eval_usage_batch(usage_name)
-    usage_list = [usage_folder_map['signin'], usage_folder_map['signup'], usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['menu'], usage_folder_map['account'], usage_folder_map['detail'], usage_folder_map['about'], usage_folder_map['contact'], usage_folder_map['help'], usage_folder_map['addcart'], usage_folder_map['removecart'], usage_folder_map['addbookmark'], usage_folder_map['removebookmark'], usage_folder_map['textsize']]
+    usage_list = [usage_folder_map['signin'], usage_folder_map['signup'], usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['menu'], usage_folder_map['account'], usage_folder_map['detail'], usage_folder_map['about'], usage_folder_map['contact'], usage_folder_map['help'], usage_folder_map['addcart'], usage_folder_map['removecart'], usage_folder_map['addbookmark'], usage_folder_map['removebookmark'], usage_folder_map['textsize'], usage_folder_map['filter'], usage_folder_map['category']]
     # usage_list = [usage_folder_map['signin']]
     for usage_name in usage_list:
         print('usage name:', usage_name)
