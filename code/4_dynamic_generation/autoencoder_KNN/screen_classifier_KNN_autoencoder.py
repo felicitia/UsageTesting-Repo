@@ -12,7 +12,7 @@ def get_app_names(embeddings_directory):
         for name in names_old:
             name = name.split("/")[-1].split(".")[0]
             app_name = name.split("-")[0].lower()
-            if app_name not in app_names:
+            if app_name != "otherapp" and app_name not in app_names:
                 app_names.append(app_name)
 
     with open(os.path.join(embeddings_directory, "AllNames_augmented.json")) as name_augmented_file:
@@ -21,10 +21,9 @@ def get_app_names(embeddings_directory):
         for name in names_augmented:
             name = name.split("/")[-1][:-19]
             app_name = name.split("-")[0].lower()
-            if app_name not in app_names:
+            if app_name!= "otherapp" and app_name not in app_names:
                 app_names.append(app_name)
 
-    print(app_names)
     return app_names
 
 
@@ -86,7 +85,7 @@ class KNN_screen_classifier:
             names_old = names_old_str.split(",")
             for name in names_old:
                 name = name.split("/")[-1].split(".")[0]
-                app_name = name.split("-")[0]
+                app_name = name.split("-")[0].lower()
                 if app_name == self.query_app:
                     train_test_split_dict[idx] = "test"
                 else:
@@ -98,7 +97,7 @@ class KNN_screen_classifier:
             names_augmented = names_augmented_str.split(",")
             for name in names_augmented:
                 name = name.split("/")[-1][:-19]
-                app_name = name.split("-")[0]
+                app_name = name.split("-")[0].lower()
                 if app_name == self.query_app:
                     train_test_split_dict[idx] = "test"
                 else:
@@ -138,20 +137,21 @@ if __name__ == "__main__":
     current_dir_path = os.path.dirname(os.path.realpath(__file__))
     embeddings_path = os.path.join(current_dir_path, "autoencoder_embeddings")
     app_names = get_app_names(embeddings_path)
+    print(app_names)
     k = 5
     n = 5
     labels_path = ["final_labels_all.csv", "augmented_labels.csv"]
     screen_classifier = KNN_screen_classifier('etsy', embeddings_path, labels_path, k, n)
-    KNN_screen_classifier.run_knn_query()
-    # precisions_sum = 0
-    # top_n_percision_sum = 0
-    # for app in app_names:
-    #     screen_classifier = KNN_screen_classifier(app, embeddings_path, labels_path, k, n)
-    #     precision, top_n_precision = screen_classifier.run_all_queries_and_get_percision()
-    #     print(app + ": " + str(precision))
-    #     print(app + " top-5 :" + str(top_n_precision))
-    #     print("---------------")
-    #     precisions_sum += precision
-    #     top_n_percision_sum += top_n_precision
-    # print("average precisions:" + str(precisions_sum/len(app_names)))
-    # print("average top-n precisions:" + str(top_n_percision_sum/len(app_names)))
+    # KNN_screen_classifier.run_knn_query()
+    precisions_sum = 0
+    top_n_percision_sum = 0
+    for app in app_names:
+        screen_classifier = KNN_screen_classifier(app, embeddings_path, labels_path, k, n)
+        precision, top_n_precision = screen_classifier.run_all_queries_and_get_percision()
+        print(app + ": " + str(precision))
+        print(app + " top-5 :" + str(top_n_precision))
+        print("---------------")
+        precisions_sum += precision
+        top_n_percision_sum += top_n_precision
+    print("average precisions:" + str(precisions_sum/len(app_names)))
+    print("average top-n precisions:" + str(top_n_percision_sum/len(app_names)))

@@ -144,32 +144,35 @@ def evaluate_dynamic_screen_classifiers():
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
 
-    correct_d_top_1 = 0
-    correct_d_top_5 = 0
-    correct_d_top_10 = 0
-    correct_ro_top_1 = 0
-    correct_ro_top_5 = 0
-    correct_ro_top_10 = 0
-    correct_d_KNN_top_5 = 0
-    correct_d_KNN_top_1 = 0
-    correct_r_KNN_top_5 = 0
-    correct_r_KNN_top_1 = 0
-    correct_d_mlp_top_5 = 0
-    correct_d_mlp_top_1 = 0
-    correct_r_mlp_top_5 = 0
-    correct_r_mlp_top_1 = 0
-    all_count = 0
+
+
 
     screen_classifier_MLP = MLP_ScreenClassifierForAUT(autoencoder=True)
 
     for usage in os.listdir(recorded_data_path):
+        all_count = 0
+        correct_d_top_1 = 0
+        correct_d_top_5 = 0
+        correct_d_top_10 = 0
+        correct_ro_top_1 = 0
+        correct_ro_top_5 = 0
+        correct_ro_top_10 = 0
+        correct_d_KNN_top_5 = 0
+        correct_d_KNN_top_1 = 0
+        correct_r_KNN_top_5 = 0
+        correct_r_KNN_top_1 = 0
+        correct_d_mlp_top_5 = 0
+        correct_d_mlp_top_1 = 0
+        correct_r_mlp_top_5 = 0
+        correct_r_mlp_top_1 = 0
         if usage == ".DS_Store":
             continue
 
         if not os.path.isdir(os.path.join(output_path, usage)):
             os.makedirs(os.path.join(output_path, usage))
             for app in os.listdir(os.path.join(recorded_data_path, usage)):
-                if app == ".DS_Store":
+                app = app.lower()
+                if app == ".DS_Store" or app == ".ds_store":
                     continue
                 else:
                     if app == "theguardian":
@@ -250,6 +253,26 @@ def evaluate_dynamic_screen_classifiers():
                             if correct_tag in top_n_remaui_screenIR_mlp:
                                 correct_r_mlp_top_5 += 1
 
+
+            usage_res_dict = {
+                "avgust_d_1": str(correct_d_top_1 / all_count),
+                "avgust_d_5": str(correct_d_top_5 / all_count),
+                "avgust_v_1": str(correct_ro_top_1 / all_count),
+                "avgust_v_5": str(correct_ro_top_5 / all_count),
+                "ae_knn_d_1": str(correct_d_KNN_top_1 / all_count),
+                "ae_knn_d_5": str(correct_d_KNN_top_5 / all_count),
+                "ae_knn_v_1": str(correct_r_KNN_top_1 / all_count),
+                "ae_knn_v_5": str(correct_r_KNN_top_5 / all_count),
+                "ae_mlp_d_1": str(correct_d_mlp_top_1 / all_count),
+                "ae_mlp_d_5": str(correct_d_mlp_top_5 / all_count),
+                "ae_mlp_v_1": str(correct_r_mlp_top_1 / all_count),
+                "ae_mlp_v_5": str(correct_r_mlp_top_5 / all_count),
+                "count": str(all_count)
+            }
+
+            with open(os.path.join(output_path,usage,"dynamic_screen_classifier_res.json"), 'w') as json_res:
+                json.dump(usage_res_dict, json_res)
+
             print("from scratch dynamic results:")
             print("top1: " + str(correct_d_top_1 / all_count))
             print("top5: " + str(correct_d_top_5 / all_count))
@@ -284,6 +307,7 @@ def evaluate_dynamic_screen_classifiers():
             print("all count:")
             print(all_count)
             print("------------")
+
         else:
             print("already evaluated usage: " + usage)
 

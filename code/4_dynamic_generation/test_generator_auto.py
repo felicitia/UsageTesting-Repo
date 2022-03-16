@@ -219,29 +219,31 @@ class TestGenerator:
                             next_event_list = [self_actions] + next_event_list
 
                     if next_event_list is None or len(next_event_list) == 0:
-                        element_candidates = []
-                        for element in current_state.nodes:
-                            if element.interactable:
-                                image = PIL.Image.open(element.path_to_screenshot)
-                                image.show()
-                                element_candidates.append(element)
-                        event_index = int(input(
-                            'no next event found based on the usage model, please provide the index of the event to trigger (enter any out of range index to end current test)\n'))
-                        # kill all the images opened by Preview
-                        for proc in psutil.process_iter():
-                            # print(proc.name())
-                            if proc.name() == 'Preview':
-                                proc.kill()
-                        if event_index >= len(element_candidates):
-                            break
-                        else:
-                            element = element_candidates[event_index]
-                            guided_event = DestEvent(action='click', exec_id_type=element.get_exec_id_type(),
-                                                     exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
-                                                     crop_screenshot_path=element.path_to_screenshot,
-                                                     state_screenshot_path=current_state.screenshot_path)
-                            current_generated_test.append(guided_event)
-                            self.explorer.execute_event(guided_event)
+                        isEnd_flag = True
+
+                        # element_candidates = []
+                        # for element in current_state.nodes:
+                        #     if element.interactable:
+                        #         image = PIL.Image.open(element.path_to_screenshot)
+                        #         image.show()
+                        #         element_candidates.append(element)
+                        # event_index = int(input(
+                        #     'no next event found based on the usage model, please provide the index of the event to trigger (enter any out of range index to end current test)\n'))
+                        # # kill all the images opened by Preview
+                        # for proc in psutil.process_iter():
+                        #     # print(proc.name())
+                        #     if proc.name() == 'Preview':
+                        #         proc.kill()
+                        # if event_index >= len(element_candidates):
+                        #     break
+                        # else:
+                        #     element = element_candidates[event_index]
+                        #     guided_event = DestEvent(action='click', exec_id_type=element.get_exec_id_type(),
+                        #                              exec_id_val=element.get_exec_id_val(), text_input='', isEnd=False,
+                        #                              crop_screenshot_path=element.path_to_screenshot,
+                        #                              state_screenshot_path=current_state.screenshot_path)
+                        #     current_generated_test.append(guided_event)
+                        #     self.explorer.execute_event(guided_event)
 
                     elif len(next_event_list) == 1:
                         if type(next_event_list[0]) is list:
@@ -320,6 +322,8 @@ class TestGenerator:
                                 os.makedirs(step_classification_res_dir_path)
                         print(next_event_list)
                         for i, event in enumerate(next_event_list):
+                            if type(event) is list:
+                                continue
                             print(event.exec_id_val)
                             print("id:" + str(i) + " - val: " + event.exec_id_val + "- matched with: " + event.matched_trigger)
                             image = PIL.Image.open(event.crop_screenshot_path)
@@ -591,6 +595,10 @@ class TestGenerator:
             return []
         else:
             if self.use_TRUE_IR_flag:  # when using true labels, just pick an interactable widget directly
+                state_and_triggers_recorded = {
+                    "screen": "ph1",
+                    "triggers": ["ph1"]
+                }
                 matching_element = None
                 # trigger_exist_flag = input('does any of the suggested widgets exist on the current screen? answer n or No; anything else for Yes\n')
                 # if trigger_exist_flag == 'n':

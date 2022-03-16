@@ -290,7 +290,8 @@ class State:
         return screen_classifier
 
     def get_label_with_fs_model(self, classifier_model, layout_emb, text_emb):
-        out = classifier_model(text_emb, layout_emb)
+        with torch.no_grad():
+            out = classifier_model(text_emb, layout_emb)
         y_pred_softmax = torch.log_softmax(out, dim=1)
         top_10 = torch.argsort(y_pred_softmax)[:, -10:]
         top_5 = torch.argsort(y_pred_softmax)[:, -5:]
@@ -427,7 +428,8 @@ class State:
                 type_id = torch.tensor([classifier_utils.convert_class_to_text_label(element_type)])
                 image = classifier_utils.convert_image_to_input_vector(element.path_to_screenshot)
                 image = image.resize(1, 3, 244, 244)
-                out = widget_classifier(text_embedding, type_id, screen_id, image, location_id)
+                with torch.no_grad():
+                    out = widget_classifier(text_embedding, type_id, screen_id, image, location_id)
 
                 y_pred_softmax = torch.log_softmax(out, dim=1)
                 top_n = torch.argsort(y_pred_softmax)[:, -5:]
@@ -460,6 +462,8 @@ class State:
             for word in trigger_words:
                 if word in ["by", "i", "multi", "to", "sign", "in", "up", "or"]:
                     continue
+                if word == "keep":
+                    return False
                 if word in text:
                     return True
         if trigger == "to_signin_or_signup":

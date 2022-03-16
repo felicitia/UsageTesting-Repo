@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 import math
 import copy
+import time
 
 current_dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(current_dir_path, '..'))
@@ -231,12 +232,12 @@ def calculate_final_results(usage_result_root):
     for file in glob.glob(os.path.join(usage_result_root, '*.csv')):
         print('results for', file)
         df = pd.read_csv(file)
-        grouped_df = df.groupby(['AUT', 'usage', 'test_id']).agg({'state_coverage': ['max'], 'transition_coverage': ['max'],
-                                                                  'state_recall': ['max'], 'transition_recall': ['max'],
-                                                                  'effort': ['min'], 'reduction': ['max']})
-
-
-        grouped_df.columns = ['state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']
+        # grouped_df = df.groupby(['AUT', 'usage', 'test_id'])
+        idx = df.groupby(['AUT', 'usage', 'test_id'])['state_coverage'].transform(max) == df['state_coverage']
+        print(df[idx])
+        grouped_df = df[idx]
+        grouped_df = grouped_df[['AUT','state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']]
+        # grouped_df.columns = ['state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']
         grouped_df = grouped_df.reset_index()
         grouped_df = grouped_df.groupby('AUT').agg({'state_coverage': ['mean'], 'transition_coverage': ['mean'],
                                                                   'state_recall': ['mean'], 'transition_recall': ['mean'],

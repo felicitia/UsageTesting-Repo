@@ -7,5 +7,5 @@ wish,6-Account,0,2,"['sign_in', 'sign_in', 'sign_in', 'home', 'setting', 'settin
 wish,6-Account,0,3,"['sign_in', 'sign_in', 'sign_in', 'popup', 'popup', 'home', 'menu']","['sign_in', 'sign_in', 'sign_in', 'home', 'menu']","['email', 'password', 'sign_in', 'continue', 'continue', 'menu', 'account']","['email', 'password', 'sign_in', 'menu', 'account']",0.75,0.8333333333333334,1.0,1.0,2.0,0.7142857142857143,
 wish,6-Account,0,4,"['sign_in', 'sign_in', 'sign_in', 'home', 'menu']","['sign_in', 'sign_in', 'sign_in', 'home', 'menu']","['email', 'password', 'sign_in', 'menu', 'account']","['email', 'password', 'sign_in', 'menu', 'account']",1.0,1.0,1.0,1.0,0.0,1.0,
 wish,6-Account,0,5,"['sign_in', 'sign_in', 'sign_in', 'popup', 'home']","['sign_in', 'sign_in', 'sign_in', 'home', 'menu']","['email', 'password', 'sign_in', 'continue', 'menu']","['email', 'password', 'sign_in', 'menu', 'account']",0.6666666666666666,0.8,0.6666666666666666,0.8,2.0,0.6,
-6pm,6-Account,0,0,"['home', 'home']","['home', 'menu']","['menu_more', 'account']","['menu_more', 'account']",1.0,1.0,0.5,1.0,0.0,1.0,
-6pm,6-Account,0,1,"['home', 'menu']","['home', 'menu']","['menu', 'account']","['menu_more', 'account']",1.0,0.5,1.0,0.5,1.0,0.5,
+6pm,6-Account,0,0,"['home', 'home']","['home', 'menu']","['menu_more', 'account']","['menu', 'account']",1.0,0.5,0.5,0.5,1.0,0.5,
+6pm,6-Account,0,1,"['home', 'menu']","['home', 'menu']","['menu', 'account']","['menu', 'account']",1.0,1.0,1.0,1.0,0.0,1.0,
