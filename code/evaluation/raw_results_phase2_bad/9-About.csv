@@ -1,0 +1,3 @@
+AUT,usage,test_id,human_video_id,human_states,generated_states,human_transitions,generated_transitions,state_coverage,transition_coverage,state_recall,transition_recall,effort,reduction,core_flag
+abc,9-About,0,0,"['get_started', 'popup', 'menu', 'menu', 'menu']","['get_started', 'popup', 'popup', 'menu', 'menu']","['bypass', 'deny', 'up', 'menu_settings']","['continue', 'continue', 'continue', 'menu_settings']",1.0,0.5,1.0,0.25,3.0,0.25,
+abc,9-About,0,1,"['get_started', 'popup', 'popup', 'menu', 'menu', 'menu']","['get_started', 'popup', 'popup', 'menu', 'menu']","['bypass', 'popup', 'deny', 'up', 'menu_settings']","['continue', 'continue', 'continue', 'menu_settings']",1.0,0.5,1.0,0.2,4.0,0.2,

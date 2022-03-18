@@ -122,7 +122,7 @@ class KNN_screen_classifier:
                     correct_top_n_cntr += 1
             except:
                 pass
-        return correct_cntr/all_cntr, correct_top_n_cntr/all_cntr
+        return correct_cntr/all_cntr, correct_top_n_cntr/all_cntr, all_cntr
 
     def run_knn_query(self, query_embedding):
         prediction, top_n = self.classifier.run_dynamic_knn_query(query_embedding)
@@ -145,13 +145,21 @@ if __name__ == "__main__":
     # KNN_screen_classifier.run_knn_query()
     precisions_sum = 0
     top_n_percision_sum = 0
+    all_cor_count = 0
+    all_tn_cor_count = 0
+    all_cnt_dp = 0
     for app in app_names:
         screen_classifier = KNN_screen_classifier(app, embeddings_path, labels_path, k, n)
-        precision, top_n_precision = screen_classifier.run_all_queries_and_get_percision()
+        precision, top_n_precision, num_of_dp = screen_classifier.run_all_queries_and_get_percision()
         print(app + ": " + str(precision))
         print(app + " top-5 :" + str(top_n_precision))
         print("---------------")
         precisions_sum += precision
         top_n_percision_sum += top_n_precision
+        all_cor_count += precision*num_of_dp
+        all_tn_cor_count += top_n_precision*num_of_dp
+        all_cnt_dp += num_of_dp
     print("average precisions:" + str(precisions_sum/len(app_names)))
     print("average top-n precisions:" + str(top_n_percision_sum/len(app_names)))
+    print(all_cor_count/all_cnt_dp)
+    print(all_tn_cor_count/all_cnt_dp)

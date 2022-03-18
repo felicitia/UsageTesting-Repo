@@ -143,11 +143,11 @@ def calculate_coverage(human_test, generated_test):
     overlapping_states = set(human_test['states']).intersection(set(generated_test['states']))
     overlapping_trans = set(human_test['transitions']).intersection(set(generated_test['transitions']))
 
-    state_coverage = len(set(overlapping_states)) / len(set(human_test['states']))
-    trans_coverage = len(set(overlapping_trans)) / len(set(human_test['transitions']))
+    state_recall = len(set(overlapping_states)) / len(set(human_test['states']))
+    trans_recall = len(set(overlapping_trans)) / len(set(human_test['transitions']))
 
-    state_recall = len(set(overlapping_states)) / len(set(generated_test['states']))
-    trans_recall = len(set(overlapping_trans)) / len(set(generated_test['transitions']))
+    state_coverage = len(set(overlapping_states)) / len(set(generated_test['states']))
+    trans_coverage = len(set(overlapping_trans)) / len(set(generated_test['transitions']))
 
     return state_coverage, trans_coverage, state_recall, trans_recall
 
@@ -222,7 +222,7 @@ def eval_usage_batch(usage_name): # 1-SignIn
     print(result_df_list)
     all_results = pd.concat(result_df_list, axis=0, ignore_index=True)
 
-    usage_result_path = os.path.join(current_dir_path, 'raw_results_phase2', usage_name+'.csv')
+    usage_result_path = os.path.join(current_dir_path, 'raw_results_phase2_bad', usage_name+'.csv')
 
     all_results.to_csv(usage_result_path, index=False, header=True)
 
@@ -234,14 +234,27 @@ def calculate_final_results(usage_result_root):
         df = pd.read_csv(file)
         # grouped_df = df.groupby(['AUT', 'usage', 'test_id'])
         idx = df.groupby(['AUT', 'usage', 'test_id'])['state_coverage'].transform(max) == df['state_coverage']
-        print(df[idx])
+        # print("here")
+        # print("----------------------")
+        # print(df[idx])
         grouped_df = df[idx]
         grouped_df = grouped_df[['AUT','state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']]
         # grouped_df.columns = ['state_coverage', 'transition_coverage', 'state_recall', 'transition_recall', 'effort', 'reduction']
         grouped_df = grouped_df.reset_index()
+        grouped_df_idx = grouped_df.groupby('AUT')['state_recall'].transform(max) == grouped_df['state_recall']
+        grouped_df = grouped_df[grouped_df_idx]
+        grouped_df = grouped_df.reset_index()
+        grouped_df_idx = grouped_df.groupby('AUT')['transition_coverage'].transform(max) == grouped_df['transition_coverage']
+        grouped_df = grouped_df[grouped_df_idx]
+        grouped_df_idx = grouped_df.groupby('AUT')['transition_recall'].transform(max) == grouped_df['transition_recall']
+        grouped_df = grouped_df[grouped_df_idx]
+        print("inja")
+        print(grouped_df)
+        # print(grouped_df)
         grouped_df = grouped_df.groupby('AUT').agg({'state_coverage': ['mean'], 'transition_coverage': ['mean'],
                                                                   'state_recall': ['mean'], 'transition_recall': ['mean'],
                                                                   'effort': ['mean'], 'reduction': ['mean']})
+        # print(grouped_df)
         # pd.set_option("display.max_rows", None, "display.max_columns", None)
         mean_df_list.append(grouped_df.mean().round(2))
         print(grouped_df.mean(axis=0).round(2))
@@ -249,6 +262,7 @@ def calculate_final_results(usage_result_root):
 
     mean_df = pd.concat(mean_df_list, axis=1)
     print('-----Final Average Results-----')
+    print(mean_df)
     print(mean_df.mean(axis=1).round(2))
 
 
@@ -257,11 +271,11 @@ if __name__ == '__main__':
 
     # usage_name = usage_folder_map['signin']
     # eval_usage_batch(usage_name)
-    usage_list = [usage_folder_map['signin'], usage_folder_map['signup'], usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['menu'], usage_folder_map['account'], usage_folder_map['detail'], usage_folder_map['about'], usage_folder_map['contact'], usage_folder_map['help'], usage_folder_map['addcart'], usage_folder_map['removecart'], usage_folder_map['addbookmark'], usage_folder_map['removebookmark'], usage_folder_map['textsize'], usage_folder_map['filter'], usage_folder_map['category']]
+    usage_list = [usage_folder_map['search'], usage_folder_map['terms'], usage_folder_map['about'], usage_folder_map['contact'], usage_folder_map['help'], usage_folder_map['addcart'], usage_folder_map['removecart'], usage_folder_map['removebookmark'], usage_folder_map['textsize'], usage_folder_map['filter'], usage_folder_map['address']]
     # usage_list = [usage_folder_map['signin']]
     for usage_name in usage_list:
         print('usage name:', usage_name)
         eval_usage_batch(usage_name)
 
-    calculate_final_results(os.path.join(current_dir_path, 'raw_results_phase2'))
+    calculate_final_results(os.path.join(current_dir_path, 'raw_results_phase2_bad'))
     print('all done! :)')
