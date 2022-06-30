@@ -1,11 +1,11 @@
 import os
 
-FINAL_ARTIFACT_ROOT_DIR = '/Users/saghar/Documents/dev/Final-Artifacts'
-FINAL_EVAL_ARTIFACT_ROOT_DIR = '/Users/saghar/Documents/GitHub/UsageTesting-Output'
+FINAL_ARTIFACT_ROOT_DIR = r'C:\Users\HyoJP\Desktop\UsageTesting-Artifacts'
+FINAL_EVAL_ARTIFACT_ROOT_DIR = r'C:\Users\HyoJP\Desktop\UsageTesting-Output'
 
-USAGE_REPO_ROOT_DIR = '/Users/saghar/Documents/GitHub/UsageTesting-Repo'
+USAGE_REPO_ROOT_DIR = r'C:\Users\HyoJP\Desktop\UsageTesting-Repo'
 
-PATH_TO_WORD2VEC = '/Users/yixue/Documents/Research/FrUITeR/Develop/CraftDroid/code-release/GoogleNews-vectors-negative300.bin'
+PATH_TO_WORD2VEC = r'C:\Users\HyoJP\Desktop\usage testing project files\IR classifier files\Screen_Widget_Classification\ScreenClassifier\GoogleNews-vectors-negative300.bin'
 
 EVAL_RESULT_PATH = os.path.join(USAGE_REPO_ROOT_DIR, 'code', 'evaluation', 'all_eval_results.csv')
 

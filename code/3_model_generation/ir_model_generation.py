@@ -51,7 +51,7 @@ def get_action_from_step(filename_abspath):
 #         raise ValueError('row found is > 1 when getting screenIR, check', screen)
 
 def get_screenIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
-    annotation_file = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/final_labels/final_labels_all.csv'
+    annotation_file = 'C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\final_labels\\final_labels_all.csv'
     appname = os.path.basename(os.path.normpath(app_root_dir))
     screen = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-screen.jpg')
     if 'long' in screen:
@@ -99,7 +99,7 @@ def get_screenIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
 
 
 def get_widgetIR_from_step_LS_merged(app_root_dir, step_image_file_abspath):
-    annotation_file = '/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/final_labels/final_labels_all.csv'
+    annotation_file = 'C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\final_labels\\final_labels_all.csv'
     appname = os.path.basename(os.path.normpath(app_root_dir))
     widget = appname + '-' + os.path.basename(step_image_file_abspath).replace('.jpg', '-widget.jpg')
     if 'long' in widget:
@@ -318,5 +318,5 @@ def run_ir_model_generation(usage_root_dir):
             proc.kill()
 
 if __name__ == '__main__':
-    run_ir_model_generation('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
+    run_ir_model_generation('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Repo\\12-AddCart')
     print('all done! :)')

@@ -2,7 +2,10 @@
  autoencoder.py  (author: Anson Wong / git: ankonzoid)
 """
 import numpy as np
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
+tf.autograph.set_verbosity(3)
 from utils import split
 
 class AutoEncoder():
@@ -96,12 +99,12 @@ class AutoEncoder():
         decoder_output_shape = decoder.layers[-1].output_shape[1:]
 
         # Generate summaries
-        print("\nautoencoder.summary():")
-        print(autoencoder.summary())
-        print("\nencoder.summary():")
-        print(encoder.summary())
-        print("\ndecoder.summary():")
-        print(decoder.summary())
+        #print("\nautoencoder.summary():")
+        #print(autoencoder.summary())
+        #print("\nencoder.summary():")
+        #print(encoder.summary())
+        #print("\ndecoder.summary():")
+        #print(decoder.summary())
 
         # Assign models
         self.autoencoder = autoencoder
@@ -114,10 +117,10 @@ class AutoEncoder():
 
     # Load model architecture and weights
     def load_models(self, loss="binary_crossentropy", optimizer="adam"):
-        print("Loading models...")
-        self.autoencoder = tf.keras.models.load_model(self.info["autoencoderFile"])
-        self.encoder = tf.keras.models.load_model(self.info["encoderFile"])
-        self.decoder = tf.keras.models.load_model(self.info["decoderFile"])
+        #print("Loading models...")
+        self.autoencoder = tf.keras.models.load_model(self.info["autoencoderFile"], compile=False)
+        self.encoder = tf.keras.models.load_model(self.info["encoderFile"], compile=False)
+        self.decoder = tf.keras.models.load_model(self.info["decoderFile"], compile=False)
         self.autoencoder.compile(optimizer=optimizer, loss=loss)
         self.encoder.compile(optimizer=optimizer, loss=loss)
         self.decoder.compile(optimizer=optimizer, loss=loss)

@@ -194,7 +194,9 @@ class Explorer:
         element = None
         alreadyClicked = False
         actions = TouchAction(self.driver)
-        print('executing event:', event.exec_id_type, event.exec_id_val, event.action)
+        print('Executing event:', event.exec_id_type, event.exec_id_val.split('/')[-1], event.action)
+        if event.action != 'send_keys':
+            print('\n-----------------------------------------------------------------------------------------------------\n')
 
         if event.exec_id_type == "accessibility-id":
             time.sleep(3)

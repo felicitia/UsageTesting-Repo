@@ -25,6 +25,9 @@ import pandas as pd
 import nltk
 import random
 
+import warnings
+warnings.filterwarnings("ignore")
+
 os.environ['TOKENIZERS_PARALLELISM'] = "False"
 
 
@@ -95,8 +98,8 @@ class TestGenerator:
         self.eval_flag = eval_flag
         self.use_TRUE_IR_flag = use_TRUE_label_flag
         self.bert = SentenceTransformer('bert-base-nli-mean-tokens').to('cpu')
-        nltk.download('words')
-        nltk.download('punkt')
+        nltk.download('words', quiet=True)
+        nltk.download('punkt', quiet=True)
         self.words = set(nltk.corpus.words.words())
 
         if text_sim_flag:
@@ -148,7 +151,7 @@ class TestGenerator:
         return True
 
     def save_test(self, current_generated_test):
-        print('saving test', self.test_num, '...')
+        print('Saving test', self.test_num, '...')
         for test_file in glob.glob(os.path.join(self.generated_tests_dir, 'test_executable*')):
             existing_test = pickle.load(open(test_file, 'rb'))
             if self.is_test_equal(existing_test, current_generated_test):
@@ -157,7 +160,7 @@ class TestGenerator:
         file_path = os.path.join(self.generated_tests_dir, 'test_executable' + str(self.test_num) + '.pickle')
         with open(file_path, 'wb') as file:
             pickle.dump(current_generated_test, file)
-        print('test generated and saved!')
+        print('Test generated and saved!')
 
     def generate_test(self):
         while self.test_num < self.MAX_TEST_NUM:
@@ -169,7 +172,8 @@ class TestGenerator:
             self.explorer.screenshot_idx = 0
             while step_index < self.MAX_ACTION and not isEnd_flag:
                 time.sleep(10)
-                scroll = input('Do you want to scroll down to see more widgets first?')
+                #scroll = input('Do you want to scroll down to see more widgets first?')
+                scroll = None
                 current_state = self.explorer.extract_state(self.output_dir)
                 next_event_list, recorded_states_and_triggers = self.find_next_event_list(current_state)
                 if scroll == 'up' or scroll == 'down' or scroll == 'left' or scroll == 'right':
@@ -205,7 +209,7 @@ class TestGenerator:
                                     image = PIL.Image.open(element.path_to_screenshot)
                                     image.show()
                                     user_input = input(
-                                        'please enter your input for element that was just opened\n enter nothing if you want to skip this element\n')
+                                        'Please enter your input for element that was just opened\n (enter nothing if you want to skip this element)\n')
                                     if not user_input == '':
                                         self_actions.append(
                                             DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
@@ -301,10 +305,11 @@ class TestGenerator:
                                     current_generated_test.append(self_action)
                                     if self_action.action == "send_keys":
                                         self.explorer.execute_event(self_action)
-                                        correct_widgetIR = input(
-                                            'Please enter the ground truth IR for the widget the input was typed on:')
+                                        #correct_widgetIR = input('Please enter the ground truth IR for the widget the input was typed on:')
+                                        correct_widgetIR = 'search'
                                         XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace(
                                             '.xml', '') + "-" + str(added_in_step)
+                                        print('\n-----------------------------------------------------------------------------------------------------\n')
                                         if XML_basename in self.eval_results.keys():
                                             self.eval_results[XML_basename]['true_widget_IR'] = correct_widgetIR
                                         else:
@@ -320,12 +325,12 @@ class TestGenerator:
                         if len(next_event_list) != 0:
                             if not os.path.isdir(step_classification_res_dir_path):
                                 os.makedirs(step_classification_res_dir_path)
-                        print(next_event_list)
+                        #print(next_event_list)
                         for i, event in enumerate(next_event_list):
                             if type(event) is list:
                                 continue
-                            print(event.exec_id_val)
-                            print("id:" + str(i) + " - val: " + event.exec_id_val + "- matched with: " + event.matched_trigger)
+                            #print(event.exec_id_val)
+                            print("id: " + str(i) + ' | name: ' + event.exec_id_val.split('/')[-1] + "\t| widget IR: " + event.matched_trigger.split('#')[0])
                             image = PIL.Image.open(event.crop_screenshot_path)
                             image.show()
                             image_name = str(i) + "-" + event.matched_trigger + ".png"
@@ -334,12 +339,13 @@ class TestGenerator:
                         with open(os.path.join(step_classification_res_dir_path, "recoded_state_triggers.json"),
                                   "w") as triggers_file:
                             json.dump(recorded_states_and_triggers, triggers_file)
-                        event_indx = input('Choose the id of the widget you want to interact with:')
+                        event_indx = input('\nChoose the id of the widget you want to interact with:')
                         next_event = next_event_list[int(event_indx)]
                         if next_event.action == "send_keys":
                             input_text = input('Type in the input for the chosen widget:')
                             next_event.text_input = input_text
-                        correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                        #correct_widgetIR = input('Please enter the ground truth IR for the widget you chose:')
+                        correct_widgetIR = ' '
 
                         if added_in_step != 1:
                             XML_basename += "-" + str(added_in_step)
@@ -383,13 +389,13 @@ class TestGenerator:
         else:
             XML_basename = os.path.basename(os.path.normpath(current_state.UIXML_path)).replace('.xml', '')
             top1, top5, top10 = current_state.get_screen_IR(self.appname, self.bert, self.words, self.usage_model)
-            print("The screen classifier top1 guess for the screen: ")
-            print(top1)
-            print("The screen classifier top5 guesses for the screen: ")
-            print(top5)
+            print("The screen classifier top1 guess for the screen:\t", top1)
+            print("The screen classifier top5 guesses for the screen:\t", top5)
 
             current_screenIR = input('\nChoose the closest screen tag from the top5 guesses:\n')
-            correct_screenIR = input('\nType in the correct screen tag:\n')
+            #correct_screenIR = input('\nType in the correct screen tag:\n')
+            correct_screenIR = current_screenIR
+            print('\n-----------------------------------------------------------------------------------------------------\n')
 
             if XML_basename in self.eval_results.keys():
                 self.eval_results[XML_basename]['true_screen_IR'] = correct_screenIR
@@ -436,7 +442,7 @@ class TestGenerator:
         return False
 
     def find_actions_from_self_transition(self, matching_screenIR, current_state):
-        print('finding action list for self trigger of', matching_screenIR)
+        #print('finding action list for self trigger of', matching_screenIR)
         self_actions = []
         self_transitions = self.usage_model.machine.get_transitions(trigger='self',
                                                                     source=matching_screenIR,
@@ -446,7 +452,7 @@ class TestGenerator:
         needs_user_input = False
         self_actions_added = set()
         for condition in condition_list:
-            print('finding element for', condition)
+            #print('finding element for', condition)
 
             if '#' in condition:
                 widgetIR = condition.split('#')[0]
@@ -465,17 +471,17 @@ class TestGenerator:
                                                           crop_screenshot_path=element.path_to_screenshot,
                                                           state_screenshot_path=current_state.screenshot_path))
                             self_actions_added.add(element.get_exec_id_val())
-                print("every thing that was added from self:")
-                print(self_actions_added)
+                #print("every thing that was added from self:")
+                #print(self_actions_added)
         # generate actions for EditText fields and fill the form
         if needs_user_input:
-            print('generating user inputs...')
+            print('Generating user inputs...')
             for element in current_state.nodes:
                 if element.interactable and 'EditText' in element.get_element_type():
                     image = PIL.Image.open(element.path_to_screenshot)
                     image.show()
                     user_input = input(
-                        'please enter your input for element that was just opened\n enter nothing if you want to skip this element\n')
+                        'Please enter your input for element that was just opened\n (enter nothing if you want to skip this element)\n')
                     if not user_input == '':
                         self_actions.append(DestEvent(action='send_keys', exec_id_type=element.get_exec_id_type(),
                                                       exec_id_val=element.get_exec_id_val(),
@@ -489,7 +495,7 @@ class TestGenerator:
         return self_actions
 
     def find_matching_element_per_trigger(self, current_state, trigger, screenIR):
-        print('finding matching action for trigger', trigger)
+        #print('finding matching action for trigger', trigger)
         widgetIR = trigger.split('#')[0]
         top_candidates, secondary_candidates, heuristic_based_candidates = current_state.find_widget_to_trigger(
             widgetIR, screenIR, self.bert, self.appname)
@@ -558,10 +564,10 @@ class TestGenerator:
                                                            state_screenshot_path=current_state.screenshot_path, matched_trigger=trigger))
                         secondaries.add(match.get_exec_id_val())
 
-        print("not in self at the end:")
-        print(heuristics)
-        print(tops)
-        print(secondaries)
+        #print("not in self at the end:")
+        #print(heuristics)
+        #print(tops)
+        #print(secondaries)
         if len(heuristic_actions) >= SUGGESTION_CNT:
             return heuristic_actions[:SUGGESTION_CNT]
         elif len(heuristic_actions) + len(top_actions) > SUGGESTION_CNT:
@@ -719,7 +725,7 @@ if __name__ == "__main__":
     test_gen.start(output_path, usage_model_path, AUT.appname)
 
     end = time.time()
-    print("Dynamic generation running time " + str(end - start) + " seconds")
+    print("Dynamic generation running time: " + str(end - start) + " seconds")
 
     # kill all the images opened by Preview
     for proc in psutil.process_iter():

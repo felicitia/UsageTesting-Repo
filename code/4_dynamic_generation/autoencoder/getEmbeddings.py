@@ -23,11 +23,11 @@ def getAEembeddings(inputDir, layout_image_path):
     # Read images
     extensions = [os.path.basename(os.path.normpath(layout_image_path))]
 
-    print("Reading images from '{}'...".format(inputDir))
+    #print("Reading images from '{}'...".format(inputDir))
     imgs_all_with_names = read_imgs_dir(inputDir, extensions, parallel=parallel)
     imgs_all = [tup[0] for tup in imgs_all_with_names]
     namesToPrint = [tup[1] for tup in imgs_all_with_names]
-    print('namesToPrint', namesToPrint)
+    #print('namesToPrint', namesToPrint)
     # with open(os.path.join(outDir, 'AllNames.json'), 'w') as f:
     #     json.dump(namesToPrint, f)
 
@@ -82,7 +82,7 @@ def getAEembeddings(inputDir, layout_image_path):
     # Apply transformations to all images
     transformer = ImageTransformer(shape_img_resize)
 
-    print("Applying image transformer to all resized images...")
+    #print("Applying image transformer to all resized images...")
     imgs_all_transformed = apply_transformer(imgs_all, transformer, parallel=parallel)
 
     X_all = np.array(imgs_all_transformed).reshape((-1,) + input_shape_model)
@@ -98,7 +98,7 @@ def getAEembeddings(inputDir, layout_image_path):
             model.load_models(loss="binary_crossentropy", optimizer="adam")
 
 
-    print("Inferencing embeddings using pre-trained model...")
+    #print("Inferencing embeddings using pre-trained model...")
     E_all = model.predict(X_all)
     E_all_flatten = E_all.reshape((-1, np.prod(output_shape_model)))
 

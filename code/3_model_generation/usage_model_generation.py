@@ -100,10 +100,10 @@ def merge_ir_models(usage_root_dir, AUTname):
         # print('merged ir model', ir_model_list[i].name)
         i += 1
     usage_model.states = list(set(usage_model.states))
-    if not os.path.exists(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name)):
-        os.makedirs(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name))
-    usage_model.get_graph().draw(os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name, usage_model.name + '.png'), prog='dot')
-    pickle_file_path = os.path.join('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/output/models', usage_name, 'usage_model-' + AUTname + '.pickle')
+    if not os.path.exists(os.path.join('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\output\\models', usage_name)):
+        os.makedirs(os.path.join('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\output\\models', usage_name))
+    usage_model.get_graph().draw(os.path.join('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\output\\models', usage_name, usage_model.name + '.png'), prog='dot')
+    pickle_file_path = os.path.join('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Artifacts\\output\\models', usage_name, 'usage_model-' + AUTname + '.pickle')
     with open(pickle_file_path, 'wb') as file:
         pickle.dump(usage_model, file)
 
@@ -137,7 +137,7 @@ def run_usage_model_generation(usage_root_dir):
 
 
 if __name__ == '__main__':
-    usage_root_dir = os.path.abspath('/Users/yixue/Documents/Research/UsageTesting/Final-Artifacts/usage_data/1-SignIn')
+    usage_root_dir = os.path.abspath('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Repo\\12-AddCart')
     # generating_usage_models(usage_root_dir)
     run_usage_model_generation(usage_root_dir)
     print('all done! :)')

@@ -19,7 +19,7 @@ class LayoutTree:
         self.thisdriv=driver
         self.pagesrc=driver.page_source
         self.root = ET.fromstring(driver.page_source)
-        print(self.root)
+        #print(self.root)
         self.pathName = pathName
         info=driver.get_system_bars()
         self.statusbar_h=info["statusBar"]["height"]
@@ -217,7 +217,7 @@ class LayoutTree:
         minElement=res[0]
         print("The enclosing element is:")
         # printing result  
-        print(tree.getpath(minElement)) 
+        #print(tree.getpath(minElement)) 
         # print(node)
         if "bounds" in minElement.attrib:
             if minElement.attrib["bounds"]!=None:
@@ -228,7 +228,7 @@ class LayoutTree:
 
     def extract_state(self, saveElementBoundsRect=None, saveCrops=True, onlyVisible=False):
         counter = 0
-        print("{}/graph.dot".format(self.pathName), "w")
+        #print("{}/graph.dot".format(self.pathName), "w")
         f = open("{}/graph.dot".format(self.pathName), "w")
         f.write("digraph Layout {\n\n\tnode [shape=record fontname=Arial];\n\n")
         curr_state = state.State(self.screenshot)
@@ -372,7 +372,7 @@ class LayoutTree:
             element_text = ""
             node = queue.get()
             has_name = False
-            print(node.tag)
+            #print(node.tag)
         
             if node.tag == 'hierarchy':
                 self.scaleWidth = int(node.attrib["width"])
@@ -426,7 +426,7 @@ class LayoutTree:
                     element_text += "\"text\" : \"" + value + "\" , "
 
                 if isElementMatched:
-                    print(key)
+                    #print(key)
                     if key == "content-desc":
                         textual_info += "\"content-desc\" : \"" + value + "\" , "
                     if key == "id":

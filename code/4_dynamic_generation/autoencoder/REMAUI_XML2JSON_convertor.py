@@ -52,7 +52,7 @@ def convert_to_json_REMAUI(input_XML_path):
         with open(input_XML_path) as xml_file:
             data_dict = dict(xmltodict.parse(xml_file.read()))
         xml_file.close()
-        package_name = (input_XML_path.split("/")[1]).split("-")[0]
+        package_name = (input_XML_path.split("\\")[1]).split("-")[0]
         json_dict = {"activity_name": package_name, "request_id": 3, "is_keyboard_deployed": False}
         activity = {"added_fragments": ["1"], "active_fragments": ["1"]}
         root = get_object(data_dict)
@@ -71,7 +71,7 @@ def convert_to_json_REMAUI(input_XML_path):
 
 
 if __name__ == '__main__':
-    input_XML_path = '/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/code/4_dynamic_generation/tmp_screen_test/REMAUI/0-0/activity_main.xml'
+    input_XML_path = r'C:\Users\HyoJP\Desktop\UsageTesting-Repo\code\4_dynamic_generation\tmp_screen_test\REMAUI\0-0\activity_main.xml'
     # input_XML_path = '/Users/yixue/Documents/Research/UsageTesting/KNNscreenClassifier/REMAUIOutputNew/about/6pm-about-1/activity_main.xml'
     convert_to_json_REMAUI(input_XML_path) # will output the json at the same directory as the xml input
     print('all done! :)')

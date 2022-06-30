@@ -113,5 +113,5 @@ def run_linear_model_generation(usage_root_dir):
             proc.kill()
 
 if __name__ == '__main__':
-    run_linear_model_generation('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples')
+    run_linear_model_generation('C:\\Users\\HyoJP\\Desktop\\UsageTesting-Repo\\video_data_examples')
     print('all done! :)')
