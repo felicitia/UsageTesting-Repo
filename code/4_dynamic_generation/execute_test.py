@@ -23,13 +23,13 @@ if __name__ == '__main__':
         "platformName": "Android",
         "deviceName": "emulator-5554",
         "newCommandTimeout": 10000,
-        "appPackage": "com.etsy.android",
-        "appActivity": "com.etsy.android.ui.homescreen.HomescreenTabsActivity"
+        "appPackage": "com.alibaba.aliexpresshd",
+        "appActivity": "com.alibaba.aliexpresshd.home.ui.MainActivity"
     }
     start = time.time()
     explorer = Explorer(desiredCapabilities)
     # explorer.execute_test('/Users/yixue/Documents/Research/UsageTesting/UsageTesting-Repo/video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle')
-    explorer.execute_test_and_generate_linear_model(os.path.join(USAGE_REPO_ROOT_DIR, 'video_data_examples/dynamic_output/etsy/generated_tests/test_executable0.pickle'))
+    explorer.execute_test_and_generate_linear_model('C:/Users/HyoJP/Desktop/UsageTesting-Artifacts/output/models/7-Detail/dynamic_output_phase_2/aliexpress/generated_tests/test_executable0.pickle')
     end = time.time()
     print("test running time " + str(end - start) + " seconds")
     # kill all the images opened by Preview

@@ -47,6 +47,9 @@ def evaluation_with_classifiers(AUT, usage_name):
 
 
 if __name__ == '__main__':
+    #AUT = BBC()
+    #usage_name = usage_folder_map['search'] # this usage_folder_map is defined in global_config.py
+        
     AUT = AliExpress()
     usage_name = usage_folder_map['detail'] # this usage_folder_map is defined in global_config.py
     evaluation_with_classifiers(AUT, usage_name)
