@@ -15,6 +15,6 @@ AVGUST is a human-in-the-loop technique that assists developers in generating us
 5. the IR Models, generated tests, and intermediate results (e.g., screenshots, cropped widgets, reverse engineered UI layout hierarchy) are under [`output`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/output/models) folder.
 6. the processed video frames, screenshots, cropped widgets, keyboard classifier's results of all the usages are under [`usage_data`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/usage_data) folder.
 
-This repository also contains the [`software requirements`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/environment_mac.txt) and [`installation instructions`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/INSTALL.md) for the provided artifact.
+This repository also contains the [`software requirements`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/environment_mac.yml) and [`installation instructions`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/INSTALL.md) for the provided artifact.
 
 [![DOI](https://zenodo.org/badge/471224639.svg)](https://zenodo.org/badge/latestdoi/471224639)
