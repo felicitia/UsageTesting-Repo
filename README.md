@@ -17,4 +17,6 @@ AVGUST is a human-in-the-loop technique that assists developers in generating us
 
 This repository also contains the [`software requirements`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/environment_mac.yml) and [`installation instructions`](https://github.com/felicitia/UsageTesting-Repo/tree/demo/INSTALL.md) for the provided artifact.
 
+A video illustrating the capabilities of AVGUST can be found [`here`](https://youtu.be/LPICxVd0YAg).
+
 [![DOI](https://zenodo.org/badge/471224639.svg)](https://zenodo.org/badge/latestdoi/471224639)
